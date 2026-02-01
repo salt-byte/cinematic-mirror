@@ -47,6 +47,10 @@ export async function register(email: string, password: string) {
   });
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
+
+  // 新用户注册后，同步本地档案到服务器（如果有的话）
+  await syncArchivesAfterAuth();
+
   return result;
 }
 
@@ -57,6 +61,10 @@ export async function login(email: string, password: string) {
   });
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
+
+  // 登录后同步档案
+  await syncArchivesAfterAuth();
+
   return result;
 }
 
@@ -71,6 +79,87 @@ export async function getCurrentUser() {
 
 export function isLoggedIn(): boolean {
   return !!authToken;
+}
+
+// =====================================================
+// 档案同步相关
+// =====================================================
+
+// 从服务器加载档案并与本地合并
+async function syncArchivesAfterAuth(): Promise<void> {
+  try {
+    // 获取服务器档案
+    const serverProfiles = await getUserProfiles();
+
+    // 获取本地档案
+    const localStr = localStorage.getItem('cinematic_archives');
+    const localProfiles = localStr ? JSON.parse(localStr) : [];
+
+    // 合并档案（服务器优先，按ID去重）
+    const merged = mergeProfiles(serverProfiles, localProfiles);
+
+    // 保存到本地
+    localStorage.setItem('cinematic_archives', JSON.stringify(merged));
+
+    console.log(`[档案同步] 服务器: ${serverProfiles.length}, 本地: ${localProfiles.length}, 合并后: ${merged.length}`);
+  } catch (error) {
+    console.warn('[档案同步] 同步失败:', error);
+  }
+}
+
+// 合并档案（服务器优先）
+function mergeProfiles(serverProfiles: any[], localProfiles: any[]): any[] {
+  const profileMap = new Map<string, any>();
+
+  // 先添加本地档案
+  for (const p of localProfiles) {
+    if (p.id) {
+      // 转换本地格式到统一格式
+      profileMap.set(p.id, normalizeProfile(p));
+    }
+  }
+
+  // 服务器档案覆盖本地
+  for (const p of serverProfiles) {
+    if (p.id) {
+      profileMap.set(p.id, normalizeProfile(p));
+    }
+  }
+
+  // 按时间倒序
+  return Array.from(profileMap.values()).sort((a, b) => {
+    const timeA = a.timestamp || new Date(a.created_at).getTime();
+    const timeB = b.timestamp || new Date(b.created_at).getTime();
+    return timeB - timeA;
+  });
+}
+
+// 统一档案格式（服务器用snake_case，前端用camelCase）
+function normalizeProfile(p: any): any {
+  return {
+    id: p.id,
+    title: p.title,
+    subtitle: p.subtitle,
+    analysis: p.analysis,
+    narrative: p.narrative,
+    timestamp: p.timestamp || new Date(p.created_at).getTime(),
+    angles: p.angles,
+    visualAdvice: p.visualAdvice || p.visual_advice || {},
+    matches: p.matches,
+    stylingVariants: p.stylingVariants || p.styling_variants || [],
+  };
+}
+
+// 导出手动同步函数
+export async function refreshArchivesFromServer(): Promise<any[]> {
+  if (!authToken) {
+    console.warn('[档案同步] 未登录，跳过同步');
+    return [];
+  }
+
+  await syncArchivesAfterAuth();
+  const str = localStorage.getItem('cinematic_archives');
+  return str ? JSON.parse(str) : [];
 }
 
 // =====================================================
@@ -147,7 +236,7 @@ export async function sendConsultationMessage(message: string) {
 
 export function endConsultation() {
   if (currentConsultationId) {
-    request(`/consultation/session/${currentConsultationId}`, { method: 'DELETE' }).catch(() => {});
+    request(`/consultation/session/${currentConsultationId}`, { method: 'DELETE' }).catch(() => { });
     currentConsultationId = null;
   }
 }

@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { PersonalityProfile } from '../types';
 import { MOVIE_DATABASE, StylingOption } from '../library';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface CharacterData {
   name: string;
@@ -12,6 +13,7 @@ interface CharacterData {
 }
 
 const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) => {
+  const { t } = useLanguage();
   const [activeCharacterIndex, setActiveCharacterIndex] = useState(0);
   const [activeStylingIndex, setActiveStylingIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -22,11 +24,11 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full space-y-6 bg-parchment-base min-h-screen">
         <div className="size-16 border border-walnut/10 rounded-full flex items-center justify-center">
-           <span className="material-symbols-outlined text-2xl text-walnut/20">auto_stories</span>
+          <span className="material-symbols-outlined text-2xl text-walnut/20">auto_stories</span>
         </div>
         <div className="space-y-2">
-           <h3 className="text-sm font-retro font-black text-walnut tracking-widest">档案尚未洗印</h3>
-           <p className="text-[10px] font-serif text-walnut/40 italic">"导演还在为你构思第一套出场造型。"</p>
+          <h3 className="text-sm font-retro font-black text-walnut tracking-widest">{t('styling.noArchives')}</h3>
+          <p className="text-[10px] font-serif text-walnut/40 italic">{t('styling.notReady')}</p>
         </div>
       </div>
     );
@@ -85,10 +87,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full space-y-6 bg-parchment-base min-h-screen">
         <div className="size-16 border border-walnut/10 rounded-full flex items-center justify-center">
-           <span className="material-symbols-outlined text-2xl text-walnut/20">auto_stories</span>
+          <span className="material-symbols-outlined text-2xl text-walnut/20">auto_stories</span>
         </div>
         <div className="space-y-2">
-           <h3 className="text-sm font-retro font-black text-walnut tracking-widest">造型数据加载中</h3>
+          <h3 className="text-sm font-retro font-black text-walnut tracking-widest">{t('styling.loading')}</h3>
         </div>
       </div>
     );
@@ -98,8 +100,8 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
     <div className="flex flex-col h-full bg-parchment-base pb-40">
       {/* 页面标题 */}
       <header className="px-6 py-6 text-center space-y-2">
-        <div className="text-[8px] font-mono tracking-[0.6em] text-walnut/30 uppercase">Director's Styling Dossier</div>
-        <h2 className="text-lg font-retro font-black text-walnut tracking-[0.15em]">穿搭图鉴</h2>
+        <div className="text-[8px] font-mono tracking-[0.6em] text-walnut/30 uppercase">{t('styling.department')}</div>
+        <h2 className="text-lg font-retro font-black text-walnut tracking-[0.15em]">{t('styling.title')}</h2>
       </header>
 
       {/* 角色标签页 */}
@@ -109,11 +111,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
             <button
               key={i}
               onClick={() => handleCharacterChange(i)}
-              className={`shrink-0 px-4 py-2.5 transition-all border ${
-                i === activeCharacterIndex
+              className={`shrink-0 px-4 py-2.5 transition-all border ${i === activeCharacterIndex
                   ? 'bg-walnut text-parchment-base border-walnut'
                   : 'bg-transparent text-walnut/50 border-walnut/20 hover:border-walnut/40'
-              }`}
+                }`}
             >
               <div className="text-[11px] font-black tracking-wider">{char.name}</div>
               <div className="text-[8px] opacity-60 mt-0.5">《{char.movie}》</div>
@@ -125,7 +126,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
       {/* 匹配度显示 */}
       <div className="px-6 mb-4">
         <div className="flex items-center gap-3 text-[10px]">
-          <span className="text-walnut/40">匹配度</span>
+          <span className="text-walnut/40">{t('styling.matchRate')}</span>
           <div className="flex-1 h-1 bg-walnut/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-vintageRed transition-all duration-500"
@@ -196,11 +197,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
               <button
                 key={i}
                 onClick={() => scrollToStyling(i)}
-                className={`transition-all ${
-                  i === activeStylingIndex
+                className={`transition-all ${i === activeStylingIndex
                     ? 'w-6 h-1.5 bg-vintageRed'
                     : 'w-1.5 h-1.5 bg-walnut/20'
-                } rounded-full`}
+                  } rounded-full`}
               />
             ))}
           </div>
@@ -213,7 +213,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
           {/* 色彩构图 */}
           <div className="space-y-4">
             <h3 className="font-black text-[9px] uppercase tracking-widest text-walnut/40 flex items-center gap-2">
-              <span className="w-6 h-[1px] bg-walnut/20"></span> 色彩构图 / Palette
+              <span className="w-6 h-[1px] bg-walnut/20"></span> {t('styling.palette')}
             </h3>
             <div className="flex items-center gap-5">
               <div className="flex -space-x-3">
@@ -240,7 +240,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/50 p-4 border border-walnut/10">
               <h4 className="text-[10px] font-black text-vintageRed uppercase mb-2 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[14px]">texture</span> 材质
+                <span className="material-symbols-outlined text-[14px]">texture</span> {t('styling.materials')}
               </h4>
               <ul className="text-[11px] space-y-1.5 text-walnut/70 font-serif">
                 {activeStyling.materials?.map((m, idx) => (
@@ -253,7 +253,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
             </div>
             <div className="bg-white/50 p-4 border border-walnut/10">
               <h4 className="text-[10px] font-black text-vintageRed uppercase mb-2 flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[14px]">apparel</span> 剪裁
+                <span className="material-symbols-outlined text-[14px]">apparel</span> {t('styling.tailoring')}
               </h4>
               <ul className="text-[11px] space-y-1.5 text-walnut/70 font-serif">
                 {activeStyling.tailoring?.map((t, idx) => (
@@ -269,7 +269,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
           {/* 剧本片段 */}
           <div className="space-y-3">
             <h3 className="font-black text-[9px] uppercase tracking-widest text-walnut/40 flex items-center gap-2">
-              <span className="w-6 h-[1px] bg-walnut/20"></span> 人物故事
+              <span className="w-6 h-[1px] bg-walnut/20"></span> {t('styling.characterStory')}
             </h3>
             <div className="bg-white/30 p-5 border-l-2 border-walnut/20">
               <p className="text-[10px] font-mono text-walnut/30 uppercase tracking-widest mb-2">
@@ -284,8 +284,8 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
           {/* 导演点评 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <h3 className="font-retro font-black text-lg text-vintageRed">导演点评</h3>
-              <span className="text-[9px] text-walnut/30 font-bold tracking-tighter uppercase mt-0.5">Director's Note</span>
+              <h3 className="font-retro font-black text-lg text-vintageRed">{t('styling.directorComment')}</h3>
+              <span className="text-[9px] text-walnut/30 font-bold tracking-tighter uppercase mt-0.5">{t('styling.directorNote')}</span>
             </div>
             <div className="relative p-5 bg-walnut/[0.03] border-l-4 border-vintageRed/30">
               <span className="material-symbols-outlined absolute -top-2 -right-1 text-vintageRed/10 text-4xl font-light pointer-events-none">format_quote</span>

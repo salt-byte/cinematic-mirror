@@ -468,7 +468,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "白色极简外壳里的职业觉醒",
         subtitle: "去装饰化的权威感 · 中性色建立信任 · 把野心收进线条里",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p1208989459.jpg?sa_cv=1b8c33ea1bf30168115d6de02fae475b&sa_ct=697e8379",
+        image: "https://nenya.doubanio.com/view/photo/xl/public/p457124410.jpg?sa_cv=a51372cedcb21ccbc0c5433e38dd14c9&sa_ct=697e8195",
         palette: [
           { hex: "#F2EFEA", name: "象牙白", enName: "Ivory White" },
           { hex: "#B8B8B8", name: "羊毛灰", enName: "Wool Gray" },

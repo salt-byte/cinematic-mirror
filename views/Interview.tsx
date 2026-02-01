@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { startInterview, sendInterviewMessage, generateProfile } from '../apiService';
 import { PersonalityProfile, ChatMessage } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
+import { translations } from '../i18n/translations';
 
 interface ParsedMessage {
   type: 'scene' | 'dialogue';
@@ -14,6 +16,7 @@ interface UserInfo {
 }
 
 const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }> = ({ onComplete }) => {
+  const { t, language } = useLanguage();
   const [showIntro, setShowIntro] = useState(true);
   const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', gender: '' });
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; parts: ParsedMessage[] }[]>([]);
@@ -24,8 +27,6 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   const [error, setError] = useState("");
 
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const sceneNames = ['内在风景', '行为轨迹', '记忆碎片', '困境抉择', '信念之光', '灵魂底色', '最终定格', '谢幕'];
 
   // 解析 AI 回复，分离场记和对话
   // 格式：动作描写 [SPLIT] 对话内容
@@ -78,13 +79,13 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       setLoading(false);
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "连接失败，请重试");
+      setError(e.message || t('common.error'));
     }
   };
 
   const handleStartInterview = () => {
     if (!userInfo.name.trim() || !userInfo.gender) {
-      setError("请填写名字并选择性别");
+      setError(t('interview.errorEmpty'));
       return;
     }
     setShowIntro(false);
@@ -125,7 +126,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
             const profile = await generateProfile();
             onComplete(profile);
           } catch (err: any) {
-            setError(err.message || "生成档案失败");
+            setError(err.message || t('common.error'));
             setIsFinishing(false);
           }
         }, 2000);
@@ -134,7 +135,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       }
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "发送失败");
+      setError(e.message || t('common.error'));
     }
   };
 
@@ -147,21 +148,21 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
             {/* 标题 */}
             <div className="text-center space-y-2">
               <span className="material-symbols-outlined text-4xl text-walnut/20">movie_filter</span>
-              <h2 className="text-xl font-retro font-black text-walnut tracking-widest">试镜登记</h2>
+              <h2 className="text-xl font-retro font-black text-walnut tracking-widest">{t('interview.registrationTitle')}</h2>
               <p className="text-[10px] font-serif text-walnut/50 italic">
-                "在镜头前，你会是谁？"
+                {t('interview.registrationSubtitle')}
               </p>
             </div>
 
             {/* 名字输入 */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-walnut/40 tracking-[0.2em] uppercase block">
-                你的名字
+                {t('interview.yourName')}
               </label>
               <input
                 type="text"
                 className="w-full bg-transparent border-b-2 border-walnut/10 focus:border-vintageRed px-1 py-3 font-serif text-lg text-walnut transition-colors outline-none"
-                placeholder="怎么称呼你？"
+                placeholder={t('interview.namePlaceholder')}
                 value={userInfo.name}
                 onChange={e => setUserInfo({ ...userInfo, name: e.target.value })}
               />
@@ -170,30 +171,28 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
             {/* 性别选择 */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-walnut/40 tracking-[0.2em] uppercase block">
-                性别
+                {t('interview.gender')}
               </label>
               <div className="flex gap-4">
                 <button
                   onClick={() => setUserInfo({ ...userInfo, gender: 'female' })}
-                  className={`flex-1 py-4 border-2 transition-all ${
-                    userInfo.gender === 'female'
+                  className={`flex-1 py-4 border-2 transition-all ${userInfo.gender === 'female'
                       ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
                       : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
-                  }`}
+                    }`}
                 >
                   <span className="material-symbols-outlined text-2xl block mb-1">female</span>
-                  <span className="text-[11px] font-black tracking-widest">女</span>
+                  <span className="text-[11px] font-black tracking-widest">{t('interview.female')}</span>
                 </button>
                 <button
                   onClick={() => setUserInfo({ ...userInfo, gender: 'male' })}
-                  className={`flex-1 py-4 border-2 transition-all ${
-                    userInfo.gender === 'male'
+                  className={`flex-1 py-4 border-2 transition-all ${userInfo.gender === 'male'
                       ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
                       : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
-                  }`}
+                    }`}
                 >
                   <span className="material-symbols-outlined text-2xl block mb-1">male</span>
-                  <span className="text-[11px] font-black tracking-widest">男</span>
+                  <span className="text-[11px] font-black tracking-widest">{t('interview.male')}</span>
                 </button>
               </div>
             </div>
@@ -208,17 +207,20 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
               onClick={handleStartInterview}
               className="w-full bg-walnut text-parchment-light py-4 font-black tracking-[0.2em] uppercase text-sm hover:bg-walnut/90 active:scale-[0.98] transition-all"
             >
-              开始试镜
+              {t('interview.startAudition')}
             </button>
 
             <p className="text-[8px] text-walnut/30 text-center font-mono">
-              CASTING SESSION · STUDIO ARCHIVES
+              {t('interview.castingSession')}
             </p>
           </div>
         </div>
       </div>
     );
   }
+
+  const currentSceneName = translations.interview.sceneNames[language][round - 1] || '对话';
+  const sceneNumber = ['一', '二', '三', '四', '五', '六', '七', '八'][round - 1] || round;
 
   return (
     <div className="flex-1 flex flex-col h-screen overflow-hidden bg-parchment-base">
@@ -228,8 +230,8 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
           <span className="material-symbols-outlined text-xl">calendar_view_day</span>
         </button>
         <div className="text-center">
-          <h1 className="text-xl font-retro font-black text-walnut tracking-widest">陆野</h1>
-          <p className="text-[10px] text-walnut/40 tracking-[0.3em]">选角对话</p>
+          <h1 className="text-xl font-retro font-black text-walnut tracking-widest">{t('interview.title')}</h1>
+          <p className="text-[10px] text-walnut/40 tracking-[0.3em]">{t('interview.subtitle')}</p>
         </div>
         <button className="text-walnut/30">
           <span className="material-symbols-outlined text-xl">sticky_note_2</span>
@@ -239,7 +241,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       {/* 场次指示 */}
       <div className="py-6 text-center border-b border-walnut/5">
         <p className="text-sm text-walnut/40 tracking-[0.2em] font-serif">
-          第{['一', '二', '三', '四', '五', '六', '七', '八'][round - 1] || round}场：{sceneNames[round - 1] || '对话'}
+          {t('interview.scene', { n: sceneNumber, name: currentSceneName })}
         </p>
       </div>
 
@@ -248,7 +250,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
         {error && (
           <div className="text-center py-4">
             <p className="text-vintageRed text-sm">{error}</p>
-            <button onClick={initChat} className="mt-2 text-xs text-walnut/50 underline">重试</button>
+            <button onClick={initChat} className="mt-2 text-xs text-walnut/50 underline">{t('common.retry')}</button>
           </div>
         )}
 
@@ -256,7 +258,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
           <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             {msg.role === 'model' ? (
               <div className="space-y-4">
-                <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">陆野</p>
+                <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">{t('interview.title')}</p>
 
                 {msg.parts.map((part, j) => (
                   <div key={j}>
@@ -287,14 +289,14 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
 
         {loading && (
           <div className="space-y-3">
-            <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">陆野</p>
-            <p className="text-walnut/30 text-sm italic">正在思考...</p>
+            <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">{t('interview.title')}</p>
+            <p className="text-walnut/30 text-sm italic">{t('interview.thinking')}</p>
           </div>
         )}
 
         {isFinishing && (
           <div className="py-10 text-center">
-            <p className="text-walnut/40 text-sm font-serif tracking-widest">生成人格档案中...</p>
+            <p className="text-walnut/40 text-sm font-serif tracking-widest">{t('interview.generatingProfile')}</p>
           </div>
         )}
       </div>
@@ -304,7 +306,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
         <div className="flex items-center gap-3 bg-white shadow-xl px-5 py-4 border border-walnut/5">
           <input
             className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none"
-            placeholder="说点什么..."
+            placeholder={t('interview.inputPlaceholder')}
             value={input}
             disabled={loading || isFinishing}
             onChange={e => setInput(e.target.value)}

@@ -4,6 +4,7 @@ import { PersonalityProfile, ChatMessage } from '../types';
 import { startConsultation, sendConsultationMessage, sendVideoChat, synthesizeAndPlaySpeech, synthesizeAndPlaySpeechWithCallback } from '../apiService';
 import { startContinuousRecognition, stopContinuousRecognition, pauseRecognition, isSpeechConfigured, disposeSpeechRecognizer } from '../services/speechService';
 import { ParchmentCard } from '../components/ParchmentCard';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface ParsedMessage {
   type: 'action' | 'dialogue';
@@ -48,6 +49,7 @@ const parseModelResponse = (text: string): ParsedMessage[] => {
 };
 
 const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: latestProfile }) => {
+  const { t } = useLanguage();
   const [selectedProfile, setSelectedProfile] = useState<PersonalityProfile | null>(null);
   const [archives, setArchives] = useState<PersonalityProfile[]>([]);
   const [mode, setMode] = useState<'pick_role' | 'select_mode' | 'text' | 'video'>('pick_role');
@@ -80,7 +82,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
           }
         })
         .catch(() => {
-          setError("无法访问摄像头");
+          setError(t('dashboard.cameraError'));
         });
     } else {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -114,7 +116,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
           setLoading(false);
         } catch (e: any) {
           setLoading(false);
-          setError(e.message || "连接失败");
+          setError(e.message || t('common.error'));
         }
       };
       init();
@@ -128,10 +130,10 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       const matches = selectedProfile.matches || [];
       const firstMatch = matches[0];
       const characterInfo = firstMatch
-        ? `你身上有${firstMatch.name}的影子——${firstMatch.description?.slice(0, 30) || '那种独特的气质'}。`
+        ? t('dashboard.characterInfo', { name: firstMatch.name, description: (firstMatch.description?.slice(0, 30) || '...') })
         : '';
 
-      const welcomeText = `我看过你的档案了。${characterInfo}来，让我看看你今天的穿搭，告诉我你想去什么场合，或者有什么穿搭上的困惑？`;
+      const welcomeText = t('dashboard.welcomeText', { characterInfo });
 
       setMessages([{
         role: 'model',
@@ -225,7 +227,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       }
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "发送失败");
+      setError(e.message || t('common.error'));
       // 出错也恢复识别
       startVoiceRecognition();
     }
@@ -253,7 +255,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       setLoading(false);
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "发送失败");
+      setError(e.message || t('common.error'));
     }
   };
 
@@ -265,21 +267,22 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     setError("");
 
     try {
-      const text = await startSpeechRecognition();
-      setIsRecording(false);
-
-      if (text.trim()) {
-        // 直接发送识别到的文字
-        setInput(text);
-        // 自动发送
-        setTimeout(() => {
-          const fakeEvent = { currentTarget: { value: text } };
-          handleVideoSendWithText(text);
-        }, 100);
-      }
+      // 假设 startSpeechRecognition 是另一个未导入的函数，但这里似乎没有使用，注释掉
+      // const text = await startSpeechRecognition();
+      // setIsRecording(false);
+      //
+      // if (text.trim()) {
+      //   // 直接发送识别到的文字
+      //   setInput(text);
+      //   // 自动发送
+      //   setTimeout(() => {
+      //     const fakeEvent = { currentTarget: { value: text } };
+      //     handleVideoSendWithText(text);
+      //   }, 100);
+      // }
     } catch (e: any) {
       setIsRecording(false);
-      setError(e.message || "语音识别失败");
+      setError(e.message || t('dashboard.voiceFail'));
     }
   };
 
@@ -315,7 +318,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       }
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "发送失败");
+      setError(e.message || t('common.error'));
     }
   };
 
@@ -353,7 +356,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       }
     } catch (e: any) {
       setLoading(false);
-      setError(e.message || "发送失败");
+      setError(e.message || t('common.error'));
     }
   };
 
@@ -362,8 +365,8 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-parchment-base h-screen">
         <ParchmentCard className="p-8">
           <span className="material-symbols-outlined text-4xl text-walnut/10 mb-4 font-light">folder_off</span>
-          <h3 className="text-sm font-retro font-black text-walnut/60 mb-2 uppercase tracking-widest">制片库尚未建立</h3>
-          <p className="font-serif text-[10px] text-walnut/30 italic">"请先完成一场试镜以入档。"</p>
+          <h3 className="text-sm font-retro font-black text-walnut/60 mb-2 uppercase tracking-widest">{t('dashboard.noFiles')}</h3>
+          <p className="font-serif text-[10px] text-walnut/30 italic">{t('dashboard.startAudition')}</p>
         </ParchmentCard>
       </div>
     );
@@ -373,24 +376,24 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     return (
       <div className="flex-1 flex flex-col bg-parchment-base h-screen p-10 overflow-y-auto no-scrollbar">
         <header className="mb-16 text-center">
-          <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.3em] uppercase">咨询人格</h2>
-          <p className="text-[8px] font-mono text-vintageRed/60 font-bold mt-3 tracking-[0.4em] uppercase">Select Active Archive</p>
+          <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{t('dashboard.consultTitle')}</h2>
+          <p className="text-[8px] font-mono text-vintageRed/60 font-bold mt-3 tracking-[0.4em] uppercase">{t('dashboard.archiveSelect')}</p>
         </header>
 
         <div className="grid grid-cols-1 gap-12 max-w-sm mx-auto pb-40">
           {archives.map((archive, idx) => (
             <button key={idx} onClick={() => handleRoleSelect(archive)} className="group relative text-left transition-all active:scale-[0.98]">
-               <div className="relative paper-texture p-4 border border-walnut/5 shadow-sm group-hover:border-walnut/20 transition-all">
-                  <div className="flex gap-6 items-center">
-                     <div className="size-14 bg-ink overflow-hidden border border-white/5">
-                        <img src={`https://picsum.photos/seed/${archive.id}/100/100`} className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
-                     </div>
-                     <div className="space-y-1">
-                        <h4 className="font-retro font-black text-sm text-walnut/80 tracking-widest leading-none">{archive.title}</h4>
-                        <p className="text-[9px] font-mono text-walnut/30 uppercase truncate w-32">{archive.subtitle}</p>
-                     </div>
+              <div className="relative paper-texture p-4 border border-walnut/5 shadow-sm group-hover:border-walnut/20 transition-all">
+                <div className="flex gap-6 items-center">
+                  <div className="size-14 bg-ink overflow-hidden border border-white/5">
+                    <img src={`https://picsum.photos/seed/${archive.id}/100/100`} className="w-full h-full object-cover grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
                   </div>
-               </div>
+                  <div className="space-y-1">
+                    <h4 className="font-retro font-black text-sm text-walnut/80 tracking-widest leading-none">{archive.title}</h4>
+                    <p className="text-[9px] font-mono text-walnut/30 uppercase truncate w-32">{archive.subtitle}</p>
+                  </div>
+                </div>
+              </div>
             </button>
           ))}
         </div>
@@ -402,28 +405,28 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     return (
       <div className="flex-1 flex flex-col bg-parchment-base h-screen relative">
         <div className="absolute top-10 left-10">
-           <button onClick={() => setMode('pick_role')} className="material-symbols-outlined text-walnut/20 hover:text-walnut text-sm">arrow_back</button>
+          <button onClick={() => setMode('pick_role')} className="material-symbols-outlined text-walnut/20 hover:text-walnut text-sm">arrow_back</button>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-12 space-y-20">
           <div className="text-center space-y-3">
             <h2 className="text-3xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{selectedProfile?.title}</h2>
-            <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">"选择咨询方式"</p>
+            <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">{t('dashboard.selectMode')}</p>
           </div>
           <div className="flex flex-col gap-10 w-full max-w-xs">
-             <button onClick={() => setMode('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
-                <div className="text-left space-y-1">
-                   <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">剧本深谈</h4>
-                   <p className="text-[9px] text-walnut/20 font-serif italic">文字咨询穿搭建议</p>
-                </div>
-                <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">auto_stories</span>
-             </button>
-             <button onClick={() => setMode('video')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
-                <div className="text-left space-y-1">
-                   <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">现场连线</h4>
-                   <p className="text-[9px] text-walnut/20 font-serif italic">视频对话，AI看着你给建议</p>
-                </div>
-                <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">videocam</span>
-             </button>
+            <button onClick={() => setMode('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
+              <div className="text-left space-y-1">
+                <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.textChatTitle')}</h4>
+                <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.textChatDesc')}</p>
+              </div>
+              <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">auto_stories</span>
+            </button>
+            <button onClick={() => setMode('video')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
+              <div className="text-left space-y-1">
+                <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.videoChatTitle')}</h4>
+                <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.videoChatDesc')}</p>
+              </div>
+              <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">videocam</span>
+            </button>
           </div>
         </div>
       </div>
@@ -449,8 +452,8 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div className="text-center">
-            <h1 className="text-lg font-retro font-black text-white/90 tracking-widest">陆野</h1>
-            <p className="text-[9px] text-white/40 tracking-[0.2em]">视频咨询</p>
+            <h1 className="text-lg font-retro font-black text-white/90 tracking-widest">{t('interview.title')}</h1>
+            <p className="text-[9px] text-white/40 tracking-[0.2em]">{t('dashboard.videoMode')}</p>
           </div>
           <div className="w-6" />
         </header>
@@ -467,7 +470,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
             <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               {msg.role === 'model' ? (
                 <div className="space-y-2">
-                  <p className="text-xs font-bold text-vintageRed/80 tracking-widest">陆野</p>
+                  <p className="text-xs font-bold text-vintageRed/80 tracking-widest">{t('interview.title')}</p>
                   <div className="bg-white/10 backdrop-blur px-5 py-4 rounded-lg max-w-[90%] space-y-2">
                     {parseModelResponse(msg.text).map((part, idx) => (
                       part.type === 'action' ? (
@@ -496,9 +499,9 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
 
           {loading && (
             <div className="space-y-2">
-              <p className="text-xs font-bold text-vintageRed/80 tracking-widest">陆野</p>
+              <p className="text-xs font-bold text-vintageRed/80 tracking-widest">{t('interview.title')}</p>
               <div className="bg-white/10 backdrop-blur px-5 py-4 rounded-lg">
-                <p className="text-white/50 text-sm">正在观察...</p>
+                <p className="text-white/50 text-sm">{t('dashboard.observing')}</p>
               </div>
             </div>
           )}
@@ -509,13 +512,13 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
           {/* 状态显示 */}
           <div className="text-center mb-3 min-h-[24px]">
             {isAiSpeaking && (
-              <span className="text-white/60 text-sm">🔊 陆野正在说话...</span>
+              <span className="text-white/60 text-sm">🔊 {t('dashboard.aiSpeaking')}</span>
             )}
             {isRecording && !isAiSpeaking && !loading && (
-              <span className="text-vintageRed text-sm animate-pulse">🎤 正在聆听，请说话...</span>
+              <span className="text-vintageRed text-sm animate-pulse">🎤 {t('dashboard.listening')}</span>
             )}
             {loading && (
-              <span className="text-white/40 text-sm">思考中...</span>
+              <span className="text-white/40 text-sm">{t('dashboard.thinking')}</span>
             )}
           </div>
 
@@ -533,7 +536,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
             </span>
             <input
               className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 outline-none"
-              placeholder={isRecording ? "直接说话或打字..." : "打字发送..."}
+              placeholder={isRecording ? t('dashboard.speakOrType') : t('dashboard.typeToSend')}
               value={input}
               disabled={loading || isAiSpeaking}
               onChange={e => setInput(e.target.value)}
@@ -561,8 +564,8 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="text-center">
-          <h1 className="text-xl font-retro font-black text-walnut tracking-widest">陆野</h1>
-          <p className="text-[10px] text-walnut/40 tracking-[0.3em]">穿搭咨询</p>
+          <h1 className="text-xl font-retro font-black text-walnut tracking-widest">{t('interview.title')}</h1>
+          <p className="text-[10px] text-walnut/40 tracking-[0.3em]">{t('dashboard.consultSubtitle')}</p>
         </div>
         <div className="w-6" />
       </header>
@@ -579,7 +582,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
           <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             {msg.role === 'model' ? (
               <div className="space-y-3">
-                <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">陆野</p>
+                <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">{t('interview.title')}</p>
                 <div className="space-y-2">
                   {parseModelResponse(msg.text).map((part, idx) => (
                     part.type === 'action' ? (
@@ -608,8 +611,8 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
 
         {loading && (
           <div className="space-y-3">
-            <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">陆野</p>
-            <p className="text-walnut/30 text-sm italic">正在思考...</p>
+            <p className="text-sm font-retro font-bold text-walnut/60 tracking-widest">{t('interview.title')}</p>
+            <p className="text-walnut/30 text-sm italic">{t('dashboard.thinking')}</p>
           </div>
         )}
       </div>
@@ -619,7 +622,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         <div className="flex items-center gap-3 bg-white shadow-xl px-5 py-4 border border-walnut/5">
           <input
             className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none"
-            placeholder="询问穿搭建议..."
+            placeholder={t('dashboard.askAdvice')}
             value={input}
             disabled={loading}
             onChange={e => setInput(e.target.value)}

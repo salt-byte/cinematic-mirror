@@ -77,7 +77,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "购物战利品的微笑",
         subtitle: "比佛利山甜心 · 奢牌日常化 · 轻松的优越感",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p1919582787.jpg?sa_cv=43669229c6f75b13cc3d89c0a80b9e6d&sa_ct=697dc280",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Cher/p1919582787.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvQ2hlci9wMTkxOTU4Mjc4Ny5qcGciLCJpYXQiOjE3Njk5MDY1MDYsImV4cCI6MjA4NTI2NjUwNn0.Jdu8lxUMqQl0elC9oAo_jQbhWFgUHS9I_yKd13014-M",
         palette: [
           { hex: "#0B0B0B", name: "羊绒黑", enName: "Cashmere Black" },
           { hex: "#FFFFFF", name: "领口白", enName: "Collar White" },
@@ -100,7 +100,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "法式 preppy 的冷淡智感",
         subtitle: "贝雷帽点题 · 黑白条纹西装 · 翻领白衬衫 · 美丽废物配饰",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2906654321.jpg?sa_cv=0bdb568b6b7a86df828dd8fd5b6b757a&sa_ct=697dc5d2",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Cher/10.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvQ2hlci8xMC5wbmciLCJpYXQiOjE3Njk5MDY1OTcsImV4cCI6MjA4NTI2NjU5N30.NJsbYg877Y77PyotfcDi-q3GkofDu-CZGVDruLhFWSo",
         palette: [
           { hex: "#0B0B0B", name: "贝雷黑", enName: "Beret Black" },
           { hex: "#2C2C2C", name: "条纹炭灰", enName: "Charcoal Stripe" },
@@ -124,7 +124,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "红格纹的偏智感",
         subtitle: "苏格兰格纹 · 私校制服感 · 复古学院甜酷",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2906654326.jpg?sa_cv=6205b4f05fc5e8234f4eb05e239664b2&sa_ct=697dc45b",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Cher/p2906654326.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvQ2hlci9wMjkwNjY1NDMyNi5qcGciLCJpYXQiOjE3Njk5MDY2OTMsImV4cCI6MjA4NTI2NjY5M30.pM_2KWk0MbYwiHKXeagGxLY60BSvszR-7abzdNUaCxY",
         palette: [
           { hex: "#7A0F1A", name: "酒红格纹", enName: "Burgundy Tartan" },
           { hex: "#0B0B0B", name: "贝雷黑", enName: "Beret Black" },
@@ -156,7 +156,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "白衬衫的松弛自信",
         subtitle: "90年代极简性感 · 生活化精致 · 领口与腰线的对话",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p780978782.jpg?sa_cv=e81e7bcd95a359174095d8623b24cec8&sa_ct=697e74e9",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/pretty%20woman/p780978782.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvcHJldHR5IHdvbWFuL3A3ODA5Nzg3ODIuanBnIiwiaWF0IjoxNzY5OTA2ODEyLCJleHAiOjIwODUyNjY4MTJ9.TvpArjNCbYc0HBARosWuYtvSGFmbOrr-ei13kvCF6B8",
         palette: [
           { hex: "#FFFFFF", name: "衬衫白", enName: "Crisp White" },
           { hex: "#1F5FBF", name: "宝石蓝", enName: "Gem Blue" },
@@ -180,7 +180,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "棕波点的优雅规训",
         subtitle: "红黑白体系外的复古变奏 · 轮廓感女人味 · 体面到发光",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2907664083.jpg?sa_cv=67def017caa3cd436829ba80b80c08a9&sa_ct=697e789a",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/pretty%20woman/p2907664083.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvcHJldHR5IHdvbWFuL3AyOTA3NjY0MDgzLmpwZyIsImlhdCI6MTc2OTkwNjg2NSwiZXhwIjoyMDg1MjY2ODY1fQ.roUki_HEwEFwOkfhTaiWTWoNsLcW5K77aADdgB81tac",
         palette: [
           { hex: "#5B3A2E", name: "可可棕", enName: "Cocoa Brown" },
           { hex: "#F7F2E8", name: "奶油白", enName: "Cream White" },
@@ -228,7 +228,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "白裙与黑帽的上流入场",
         subtitle: "红黑白经典体系 · 复古名媛轮廓 · 低调但极强的权威感",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2874794649.jpg?sa_cv=c1b633eb79749fe6f79febde3a38df4c&sa_ct=697e78bb",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/pretty%20woman/p2874794649.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvcHJldHR5IHdvbWFuL3AyODc0Nzk0NjQ5LmpwZyIsImlhdCI6MTc2OTkwNjkxMywiZXhwIjoyMDg1MjY2OTEzfQ.JTiVBmPlqk2aY6Oa8R0J1IcQ-BVavfAdr1KP7jphFfs",
         palette: [
           { hex: "#F6F1E7", name: "象牙白", enName: "Ivory" },
           { hex: "#0B0B0B", name: "帽檐黑", enName: "Hat Black" },
@@ -364,7 +364,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "黄大衣购物战利品",
         subtitle: "高饱和多巴胺 · 奢牌道具化 · 甜蜜冲动与焦虑并存",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2539559405.jpg?sa_cv=7757c40611913107d2659d77737375b8&sa_ct=697e7e11",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/libeca/12.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbGliZWNhLzEyLnBuZyIsImlhdCI6MTc2OTkwNzAyNCwiZXhwIjoyMDg1MjY3MDI0fQ.OK9a8Ac2t3sAg5vrZUwClQbi08FSrwSDce37t2bi7x4",
         palette: [
           { hex: "#E5C64A", name: "柠檬黄", enName: "Lemon Yellow" },
           { hex: "#F3D24B", name: "手套黄", enName: "Glove Yellow" },
@@ -412,7 +412,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "黑白粗花与紫手套的焦虑时髦",
         subtitle: "图案外套当盔甲 · 亮粉上衣硬撑甜美 · 读账单也要精致到发光",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2539559299.jpg?sa_cv=651123aa49aa845088784eb3613917e7&sa_ct=697e7fe5",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/libeca/p2539559299.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbGliZWNhL3AyNTM5NTU5Mjk5LmpwZyIsImlhdCI6MTc2OTkwNzA3NywiZXhwIjoyMDg1MjY3MDc3fQ.8b1EZe3oJRmKvM6_KXls_QwzW14gI6j5pOCtrjl5sEE",
         palette: [
           { hex: "#111111", name: "棋盘黑", enName: "Checker Black" },
           { hex: "#F5F2EA", name: "奶油白", enName: "Cream White" },
@@ -468,7 +468,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "白色极简外壳里的职业觉醒",
         subtitle: "去装饰化的权威感 · 中性色建立信任 · 把野心收进线条里",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p457124410.jpg?sa_cv=a51372cedcb21ccbc0c5433e38dd14c9&sa_ct=697e8195",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p457124410.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wNDU3MTI0NDEwLmpwZyIsImlhdCI6MTc2OTkwNzE0MSwiZXhwIjoyMDg1MjY3MTQxfQ.EOlq1yM0-wujEKXGbGGppgu6pb6TxXToOAmW1gTHouo",
         palette: [
           { hex: "#F2EFEA", name: "象牙白", enName: "Ivory White" },
           { hex: "#B8B8B8", name: "羊毛灰", enName: "Wool Gray" },
@@ -492,7 +492,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "祖母绿大衣里的自我站位",
         subtitle: "高饱和色的冷处理 · 轮廓优先于讨好 · 把野心穿成风景",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p1208989459.jpg?sa_cv=1b8c33ea1bf30168115d6de02fae475b&sa_ct=697e8379",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p1208989459.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wMTIwODk4OTQ1OS5qcGciLCJpYXQiOjE3Njk5MDcxODQsImV4cCI6MjA4NTI2NzE4NH0.34--PjzEOnf7ztpFqiPjdtLx-wqldQ7ZOujXMJZZens",
         palette: [
           { hex: "#1F7A4F", name: "祖母绿", enName: "Emerald Green" },
           { hex: "#FFFFFF", name: "手套白", enName: "Glove White" },
@@ -516,7 +516,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "黑白香奈儿里的专业觉醒",
         subtitle: "制服化优雅 · 去情绪化表达 · 用细节完成身份跃迁",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p2904836768.jpg?sa_cv=a9d231ccccd38b3cf8a7989e4e11a56f&sa_ct=697e8308",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p2904836768.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wMjkwNDgzNjc2OC5qcGciLCJpYXQiOjE3Njk5MDcyMjQsImV4cCI6MjA4NTI2NzIyNH0.FqjM9h1NuFYSoZT-VpCkET1KLvrvEGQwDkkhzWFMKTQ",
         palette: [
           { hex: "#0F0F0F", name: "制服黑", enName: "Uniform Black" },
           { hex: "#FFFFFF", name: "衬衫白", enName: "Shirt White" },
@@ -540,7 +540,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "黑色Chanel剪裁下的职场加冕",
         subtitle: "制服化精英感 · 用品牌语言完成身份跃迁 · 走路本身就是宣言",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p614765715.jpg?sa_cv=2f8da575ad5586a44019c3d0a61e8844&sa_ct=697e83c0",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p614765715.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wNjE0NzY1NzE1LmpwZyIsImlhdCI6MTc2OTkwNzI2NCwiZXhwIjoyMDg1MjY3MjY0fQ._KnAf7LMTLLkJ8vweLaCt_A2Cw2RkFdjuizfILxisJU",
         palette: [
           { hex: "#0A0A0A", name: "编辑黑", enName: "Editor Black" },
           { hex: "#C8A25A", name: "古董金", enName: "Antique Gold" },
@@ -568,7 +568,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "黑色羊羔毛大衣下的过渡期自我",
         subtitle: "收敛中的实验感 · 仍在学习规则的途中 · 用低调完成一次自我校准",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p614766002.jpg?sa_cv=d960e135e949ad6be287adfd8d111097&sa_ct=697e8431",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p614766002.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wNjE0NzY2MDAyLmpwZyIsImlhdCI6MTc2OTkwNzMwMSwiZXhwIjoyMDg1MjY3MzAxfQ.jKzHHBHZia8kMGj9_roedIGoMGelfheRYKLl82svmdU",
         palette: [
           { hex: "#0F0F10", name: "编辑室黑", enName: "Editorial Black" },
           { hex: "#7A4A2E", name: "铁锈棕", enName: "Rust Brown" },
@@ -596,7 +596,7 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
       {
         title: "皮革与牛仔构成的自我站稳时刻",
         subtitle: "去装饰化的职业日常 · 把力量收回身体本身 · 不靠品牌也成立的成熟感",
-        image: "https://nenya.doubanio.com/view/photo/xl/public/p614766229.jpg?sa_cv=49410ef28108a0805e8472d1a916c6a7&sa_ct=697e86fb",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/andy/p614766229.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvYW5keS9wNjE0NzY2MjI5LmpwZyIsImlhdCI6MTc2OTkwNzMzNSwiZXhwIjoyMDg1MjY3MzM1fQ.3k3ymgApAzAu2jpFiUNKt6GTIAY2XhbuTZJpjIe7_gg",
         palette: [
           { hex: "#4A2F1E", name: "皮革棕", enName: "Leather Brown" },
           { hex: "#0F0F10", name: "理性黑", enName: "Rational Black" },
@@ -620,6 +620,137 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "她走在雨后的街道上，手插在夹克口袋里。没有回头确认，也没有刻意加快脚步，一切都刚刚好地跟着她走。",
         directorNote: "这是安迪完成内化阶段后的关键日常造型。她已经不需要通过显性的时尚符号来证明自己是否属于这个行业，而是开始用功能性和舒适度筛选衣服。皮夹克和牛仔裤看似普通，但剪裁和质感都非常准确，说明她已经学会分辨什么是长期成立的单品。高领上衣和深色调让情绪保持内敛，整个人更像是在为自己工作，而不是为体系表演。这一身不是为了被看见，而是为了走得更远。"
+      }
+    ]
+  },
+  {
+    id: "joanna_mysalingeryear",
+    name: "乔安娜",
+    movie: "我的塞林格之年",
+    traits: [
+      "内向克制",
+      "审美低调",
+      "高度自省",
+      "理性优先",
+      "情绪不外放",
+      "对文学与秩序保持敬畏",
+      "不靠外表争夺注意力",
+      "慢热型表达",
+      "对自我边界高度敏感",
+      "通过穿着保持精神安全感"
+    ],
+    stylings: [
+      {
+        title: "文学办公室里的功能型日常",
+        subtitle: "低存在感穿搭 · 把身体藏进秩序里 · 让衣服不参与表达",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/joanna/p2581865671.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvam9hbm5hL3AyNTgxODY1NjcxLmpwZyIsImlhdCI6MTc2OTkwOTAxMywiZXhwIjoyMDg1MjY5MDEzfQ.sxfCclouzJBDc3VWe7HcWUVeoJXy1T4leDXxRG3fi3Q",
+        palette: [
+          { hex: "#4A3F35", name: "旧木棕", enName: "Archive Brown" },
+          { hex: "#2B2B2B", name: "文件黑", enName: "File Black" },
+          { hex: "#E5DED2", name: "信纸白", enName: "Letter Ivory" },
+          { hex: "#7C746B", name: "尘封灰", enName: "Dust Gray" }
+        ],
+        materials: [
+          "棉质或羊毛混纺连衣裙",
+          "纸质文件与信封",
+          "木质与金属办公用品"
+        ],
+        tailoring: [
+          "整体剪裁直筒且保守，完全不强调身体线条",
+          "领口偏高，减少身体暴露与情绪暗示",
+          "衣服颜色与环境高度融合，降低视觉存在感",
+          "穿搭服务于久坐与工作，而不是展示"
+        ],
+        scriptSnippet: "她坐在旧木桌前整理信件，动作很轻，像怕打扰到什么。衣服的颜色和周围融为一体，只有手指翻动纸张的声音在安静中显得清晰。",
+        directorNote: "这一类造型的核心不是美感，而是功能性与心理安全。穿着被刻意压到最低存在度，让人物可以在高文学密度的环境中保持隐身状态。衣服的作用是稳定，而不是表达。"
+      },
+      {
+        title: "红色针织带来的有限情绪值",
+        subtitle: "低饱和色彩实验 · 情绪被严格控制 · 仍然不主动取悦视线",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/joanna/14.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvam9hbm5hLzE0LnBuZyIsImlhdCI6MTc2OTkwOTAzNywiZXhwIjoyMDg1MjY5MDM3fQ.ovF3AxM-g4A2cYgJ0vYe2MxwM9S23Vi6_5gLLfAbBZw",
+        palette: [
+          { hex: "#7A1F1F", name: "压低红", enName: "Muted Red" },
+          { hex: "#5B4632", name: "皮革棕", enName: "Leather Brown" },
+          { hex: "#1E1E1E", name: "城市黑", enName: "City Black" }
+        ],
+        materials: [
+          "棉或针织上衣",
+          "牛仔或棉质下装",
+          "实用型皮革包袋"
+        ],
+        tailoring: [
+          "版型依然简单，没有任何强调曲线的意图",
+          "红色被压到偏暗，避免情绪外溢",
+          "整体仍以舒适和行动自由为优先"
+        ],
+        scriptSnippet: "她低头走在街上，红色针织在灰调的城市里显得很安静。不是要被看到，只是今天想给自己一点温度。",
+        directorNote: "这里的红色不是宣言，而是一次受控的色彩尝试。它并不承担吸引目光的功能，只是在中性体系中加入一点个人温度，但仍然被理性牢牢管理。"
+      },
+      {
+        title: "室内光线下的中性色平衡",
+        subtitle: "生活感穿搭 · 情绪被材质吸收 · 不制造视觉主张",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/joanna/13.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvam9hbm5hLzEzLnBuZyIsImlhdCI6MTc2OTkwOTA1NywiZXhwIjoyMDg1MjY5MDU3fQ.qyfKrxc42x7WoPFDhX53O68LoYyKaT_ADXOrz-ScMdU",
+        palette: [
+          { hex: "#5A2E2E", name: "酒红褐", enName: "Wine Brown" },
+          { hex: "#6C736A", name: "灰绿", enName: "Muted Green" },
+          { hex: "#D8CDBF", name: "暖灯米", enName: "Lamp Beige" }
+        ],
+        materials: [
+          "柔软针织面料",
+          "家居织物",
+          "哑光生活材质"
+        ],
+        tailoring: [
+          "衣服几乎没有结构强调，更接近居住状态",
+          "颜色服务于情绪而非造型",
+          "整体处在穿着与生活之间的灰区"
+        ],
+        scriptSnippet: "她蜷在沙发角落看书，身上的颜色和灯光混在一起。不需要被定义，只需要被包裹。",
+        directorNote: "这一组造型强调的是服装的陪伴属性。它不制造角色形象，而是作为情绪的背景存在，让人物可以停留在思考状态中。"
+      },
+      {
+        title: "绿色外套构成的精神防护层",
+        subtitle: "知识型穿搭 · 把注意力转移到阅读上 · 用衣服隔离世界",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/joanna/16.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvam9hbm5hLzE2LnBuZyIsImlhdCI6MTc2OTkwOTEwOCwiZXhwIjoyMDg1MjY5MTA4fQ.HbOTs_C4e8tDDmTO9Nxv8-U4iT20AoVO_SSncPR49Yc",
+        palette: [
+          { hex: "#4F6A59", name: "图书馆绿", enName: "Library Green" },
+          { hex: "#8A6B4F", name: "纸张棕", enName: "Paper Brown" },
+          { hex: "#2A2A2A", name: "夜色黑", enName: "Night Black" }
+        ],
+        materials: [
+          "棉质或羊毛风衣",
+          "纸质书籍",
+          "皮革斜挎包"
+        ],
+        tailoring: [
+          "外套宽松但有结构，形成心理上的保护层",
+          "颜色与公共空间融合，避免被单独注视",
+          "书本成为真正的视觉中心"
+        ],
+        scriptSnippet: "她站在地铁里看书，绿色外套把她和周围隔开。有人从旁边经过，她没有抬头。",
+        directorNote: "这类穿搭的重点是防御而不是表达。风衣像一层可移动的边界，让人物在公共空间中保持精神独立，衣服只是容器。"
+      },
+      {
+        title: "波点衬衫里的理性女性气质",
+        subtitle: "去甜美化处理 · 装饰被理性化 · 保持社交安全距离",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/joanna/17.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvam9hbm5hLzE3LnBuZyIsImlhdCI6MTc2OTkwOTEzMywiZXhwIjoyMDg1MjY5MTMzfQ.2EHCjcCm6JcHPZxVmL1IfS1x3rI9A6WFRpelHtbepvM",
+        palette: [
+          { hex: "#FFFFFF", name: "纸白", enName: "Paper White" },
+          { hex: "#1A1A1A", name: "墨点黑", enName: "Ink Black" },
+          { hex: "#776656", name: "室内棕", enName: "Interior Brown" }
+        ],
+        materials: [
+          "棉质波点衬衫",
+          "中长裙",
+          "平底鞋"
+        ],
+        tailoring: [
+          "衬衫剪裁规整，强调秩序感",
+          "波点作为唯一装饰，但比例与密度高度克制",
+          "整体偏理性而非柔美"
+        ],
+        scriptSnippet: "她整理好衬衫领口，看了一眼镜子。波点很小，刚好够说明她今天有一点想被注意到，但只是一点。",
+        directorNote: "波点在这里不是可爱元素，而是一种被控制的装饰。它让造型不至于过分严肃，但仍然维持清晰的理性边界，是一种安全的女性表达方式。"
       }
     ]
   }

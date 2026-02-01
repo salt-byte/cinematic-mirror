@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { register } from '../apiService';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface RegisterProps {
   onBack: () => void;
@@ -9,6 +10,7 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -18,11 +20,11 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
 
   const handleRegister = async () => {
     if (!formData.email || !formData.password) {
-      setError("请填写完整信息");
+      setError(t('register.errorEmpty'));
       return;
     }
     if (formData.password.length < 6) {
-      setError("密码至少6位");
+      setError(t('register.errorPassword'));
       return;
     }
     setLoading(true);
@@ -31,7 +33,7 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
       await register(formData.email, formData.password);
       onComplete();
     } catch (err: any) {
-      setError(err.message || "注册失败");
+      setError(err.message || t('register.errorFail'));
     } finally {
       setLoading(false);
     }
@@ -44,8 +46,8 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
           <span className="material-symbols-outlined">arrow_back_ios</span>
         </button>
         <div>
-          <h2 className="text-walnut font-retro font-black text-xl tracking-widest">片场签约</h2>
-          <p className="text-[8px] font-mono text-walnut/40 uppercase tracking-widest">Studio Enrollment Form #0024</p>
+          <h2 className="text-walnut font-retro font-black text-xl tracking-widest">{t('register.studioSigning')}</h2>
+          <p className="text-[8px] font-mono text-walnut/40 uppercase tracking-widest">{t('register.enrollmentForm')}</p>
         </div>
       </header>
 
@@ -58,34 +60,34 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
 
           <div className="space-y-8">
             <div className="text-center border-b border-walnut/10 pb-6">
-              <h3 className="text-2xl font-retro font-black text-walnut">新晋导演档案录入</h3>
-              <p className="text-xs font-serif italic text-walnut/60 mt-2">"请签署这份协议，开启你的影史篇章"</p>
+              <h3 className="text-2xl font-retro font-black text-walnut">{t('auth.registerTitle')}</h3>
+              <p className="text-xs font-serif italic text-walnut/60 mt-2">{t('auth.registerSubtitle')}</p>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-walnut/40 tracking-[0.2em] uppercase block">
-                  联络电传 / EMAIL ADDR
+                  {t('auth.email')}
                 </label>
-                <input 
+                <input
                   type="email"
                   className="w-full bg-transparent border-b-2 border-walnut/10 focus:border-vintageRed px-1 py-2 font-mono text-sm text-walnut transition-colors outline-none"
                   placeholder="director@cinema-mirror.com"
                   value={formData.email}
-                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-walnut/40 tracking-[0.2em] uppercase block">
-                  私人密钥 / STUDIO PASS
+                  {t('auth.password')}
                 </label>
-                <input 
+                <input
                   type="password"
                   className="w-full bg-transparent border-b-2 border-walnut/10 focus:border-vintageRed px-1 py-2 font-mono text-sm text-walnut transition-colors outline-none"
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={e => setFormData({...formData, password: e.target.value})}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
             </div>
@@ -101,12 +103,11 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 95% 100%, 5% 100%, 0 85%)' }}
               >
                 <span className="text-lg font-retro font-black tracking-[0.3em]">
-                  {loading ? "签约中..." : "签约并进入试镜"}
+                  {loading ? t('common.loading') : t('auth.signUp')}
                 </span>
               </button>
               <p className="text-[8px] font-mono text-walnut/30 text-center leading-relaxed">
-                BY SIGNING, YOU AGREE TO LET AI ANALYZE YOUR SOUL<br/>
-                AND RECONSTRUCT YOUR CINEMATIC REALITY.
+                {t('auth.agreementEn')}
               </p>
             </div>
           </div>
@@ -115,11 +116,11 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
       </div>
 
       <div className="mt-12 text-center">
-        <button 
+        <button
           onClick={onBack}
           className="text-[10px] font-black text-walnut/40 uppercase tracking-widest hover:text-vintageRed transition-colors"
         >
-          已是老戏骨？返回登录
+          {t('auth.hasAccount')}
         </button>
       </div>
     </div>

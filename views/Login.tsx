@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { login } from '../apiService';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface LoginProps {
   onDirectorLogin: () => void;
@@ -8,6 +9,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("director@studio.com");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError("请填写邮箱和密码");
+      setError(t('login.errorEmpty'));
       return;
     }
     setLoading(true);
@@ -24,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
       await login(email, password);
       onDirectorLogin();
     } catch (err: any) {
-      setError(err.message || "登录失败");
+      setError(err.message || t('login.errorFail'));
     } finally {
       setLoading(false);
     }
@@ -34,16 +36,16 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
     <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden">
       {/* 顶部海报区域 */}
       <div className="relative w-full h-56 shrink-0">
-        <div 
-          className="absolute inset-0 bg-center bg-cover grayscale sepia-[0.3] brightness-75" 
+        <div
+          className="absolute inset-0 bg-center bg-cover grayscale sepia-[0.3] brightness-75"
           style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAQTp2Xnb9Mq1T1VHa-SDuOoAaWLhEFnqwApjOL-fJi3k83SxgGvancGV-hkaGhXn3OjPMHE-4tszvZyQvlTEFBA7QmLa9zbI0JOrtP-LQyiT4FMZxXWjQW_RKdY22Z0Nh1f1-YFTxbeRdWUWcXdlrFz2mfS6XIneAAgtkChbAmjyWWpeVh_FKfY7jizCt_1vsqOfo8cvB6p-tk4Zu3kzW7Pb7FN8htiO1Bh9X_n2YLDa60WqEYe1aSJXjsUOTBLJgmA_Ay8SsSs1I')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-parchment-base via-transparent to-black/60"></div>
         <div className="absolute bottom-8 left-8 right-8">
           <div className="flex items-center gap-2 mb-2">
-            <span className="bg-vintageRed text-white text-[9px] font-black px-2 py-0.5 rounded-sm tracking-[0.3em] uppercase shadow-lg">Archives Access</span>
+            <span className="bg-vintageRed text-white text-[9px] font-black px-2 py-0.5 rounded-sm tracking-[0.3em] uppercase shadow-lg">{t('login.archivesAccess')}</span>
           </div>
-          <h1 className="text-walnut text-4xl font-black italic tracking-tighter leading-none font-retro">CINEMATIC MIRROR</h1>
+          <h1 className="text-walnut text-4xl font-black italic tracking-tighter leading-none font-retro">{t('common.appName')}</h1>
         </div>
       </div>
 
@@ -52,7 +54,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
         {/* 登录区域 */}
         <div className="space-y-8">
           <div className="flex items-center gap-4">
-            <h2 className="text-walnut text-xl font-black tracking-widest uppercase">主角归位</h2>
+            <h2 className="text-walnut text-xl font-black tracking-widest uppercase">{t('login.protagonistReturn')}</h2>
             <div className="flex-1 h-px bg-walnut/10" />
           </div>
 
@@ -60,9 +62,9 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
             <div className="space-y-2">
               <label className="text-walnut/40 text-[9px] font-black tracking-[0.2em] flex items-center gap-2 uppercase">
                 <span className="material-symbols-outlined text-[14px]">alternate_email</span>
-                档案账号 / EMAIL
+                {t('auth.email')}
               </label>
-              <input 
+              <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -74,9 +76,9 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
             <div className="space-y-2">
               <label className="text-walnut/40 text-[9px] font-black tracking-[0.2em] flex items-center gap-2 uppercase">
                 <span className="material-symbols-outlined text-[14px]">key</span>
-                通行密码 / PASSCODE
+                {t('auth.password')}
               </label>
-              <input 
+              <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -93,8 +95,8 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
               disabled={loading}
               className="w-full mt-4 bg-walnut text-parchment-light py-5 shadow-stack flex flex-col items-center justify-center gap-1 active:scale-95 transition-all group disabled:opacity-50"
             >
-              <span className="text-[8px] font-bold tracking-[0.4em] uppercase opacity-40 group-hover:opacity-60 transition-opacity">Return to Studio</span>
-              <span className="text-xl font-black tracking-[0.2em]">{loading ? "登录中..." : "直接登录"}</span>
+              <span className="text-[8px] font-bold tracking-[0.4em] uppercase opacity-40 group-hover:opacity-60 transition-opacity">{t('login.returnToStudio')}</span>
+              <span className="text-xl font-black tracking-[0.2em]">{loading ? t('login.loggingIn') : t('login.login')}</span>
             </button>
           </div>
         </div>
@@ -103,22 +105,22 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
         <div className="mt-auto mb-12 flex flex-col items-center">
           <div className="w-full flex items-center gap-4 mb-10">
             <div className="flex-1 h-px bg-walnut/10" />
-            <span className="text-[9px] font-black text-walnut/20 tracking-[0.5em] uppercase italic">The New Chapter</span>
+            <span className="text-[9px] font-black text-walnut/20 tracking-[0.5em] uppercase italic">{t('login.newChapter')}</span>
             <div className="flex-1 h-px bg-walnut/10" />
           </div>
 
-          <button 
+          <button
             onClick={onGoToRegister}
             className="w-full relative p-8 border-4 border-double border-vintageRed text-vintageRed bg-vintageRed/5 active:scale-95 transition-all transform hover:-rotate-1 group overflow-hidden"
           >
             {/* 背景纸张纹理 */}
             <div className="absolute inset-0 paper-texture opacity-10 pointer-events-none" />
-            
+
             <div className="flex flex-col items-center relative z-10">
-              <span className="text-[10px] font-black tracking-[0.3em] mb-2 opacity-60">CASTING & AUDITION</span>
-              <span className="text-3xl font-black tracking-tight uppercase font-retro">寻找你的角色</span>
+              <span className="text-[10px] font-black tracking-[0.3em] mb-2 opacity-60">{t('login.castingAudition')}</span>
+              <span className="text-3xl font-black tracking-tight uppercase font-retro">{t('login.findRole')}</span>
               <div className="mt-3 flex items-center gap-2">
-                <span className="text-[9px] font-bold text-vintageRed/60 tracking-widest uppercase italic">立刻注册账号</span>
+                <span className="text-[9px] font-bold text-vintageRed/60 tracking-widest uppercase italic">{t('login.registerNow')}</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </div>
             </div>
@@ -128,9 +130,9 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
               <span className="material-symbols-outlined !text-7xl -rotate-12">verified</span>
             </div>
           </button>
-          
+
           <p className="mt-6 text-[8px] font-mono text-walnut/30 uppercase tracking-[0.2em] text-center leading-relaxed">
-            New talent must register with the archives<br/>before the first interview session.
+            {t('login.registerHint')}
           </p>
         </div>
       </div>

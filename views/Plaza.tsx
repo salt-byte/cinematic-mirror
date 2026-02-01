@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ParchmentCard, Tape } from '../components/ParchmentCard';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const POSTS = [
   {
@@ -35,7 +36,11 @@ const POSTS = [
 ];
 
 const Plaza: React.FC = () => {
+  const { t } = useLanguage();
   const [showModal, setShowModal] = useState(true);
+
+  // Cast tabs to string array as t returns string type but value is array
+  const tabs = t('plaza.tabs') as unknown as string[];
 
   return (
     <div className="flex flex-col h-full desk-texture relative">
@@ -48,13 +53,13 @@ const Plaza: React.FC = () => {
 
             <div className="pt-4 space-y-4">
               <span className="material-symbols-outlined text-4xl text-walnut/30">movie_filter</span>
-              <h3 className="text-lg font-retro font-black text-walnut tracking-widest">功能开发中</h3>
-              <p className="text-[12px] font-serif text-walnut/60 leading-relaxed italic">
-                "电影广场正在紧锣密鼓地筹备中，<br/>
-                敬请期待更多精彩内容。"
-              </p>
+              <h3 className="text-lg font-retro font-black text-walnut tracking-widest">{t('plaza.developingTitle')}</h3>
+              <p
+                className="text-[12px] font-serif text-walnut/60 leading-relaxed italic"
+                dangerouslySetInnerHTML={{ __html: t('plaza.developingDesc') }}
+              />
               <p className="text-[9px] font-mono text-walnut/30 uppercase tracking-widest">
-                Coming Soon · Studio Archives
+                {t('plaza.comingSoon')}
               </p>
             </div>
 
@@ -62,7 +67,7 @@ const Plaza: React.FC = () => {
               onClick={() => setShowModal(false)}
               className="mt-4 px-6 py-2.5 bg-walnut/10 hover:bg-walnut/20 text-walnut text-[11px] font-black tracking-widest uppercase transition-colors"
             >
-              先看看效果
+              {t('plaza.preview')}
             </button>
           </div>
         </div>
@@ -70,7 +75,7 @@ const Plaza: React.FC = () => {
       {/* Search/Filter Bar */}
       <nav className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-base/40 backdrop-blur-md sticky top-0 z-30">
         <div className="flex gap-8 overflow-x-auto no-scrollbar">
-          {['全集动态', '热门短片', '洗印店', '手绘分镜'].map((tab, idx) => (
+          {Array.isArray(tabs) && tabs.map((tab, idx) => (
             <a key={idx} href="#" className={`relative shrink-0 font-black text-sm tracking-widest ${idx === 0 ? 'text-walnut' : 'text-walnut/40'}`}>
               {tab}
               {idx === 0 && <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-vintageRed/80 blur-[0.5px]" />}
@@ -89,8 +94,8 @@ const Plaza: React.FC = () => {
               <Tape className="top-12 -left-8 -rotate-45 w-20 opacity-40" />
             )}
 
-            <ParchmentCard 
-              edgeType="zigzag" 
+            <ParchmentCard
+              edgeType="zigzag"
               className={`p-2 pb-6 transform transition-transform group-hover:rotate-0 group-hover:scale-[1.01] ${i % 2 === 0 ? 'rotate-[-0.5deg]' : 'rotate-[0.8deg]'}`}
             >
               {/* Header */}
@@ -109,50 +114,50 @@ const Plaza: React.FC = () => {
               {/* Photo Frame */}
               <div className="px-2">
                 <div className={`relative bg-ink p-1 shadow-stack border border-black/5 overflow-hidden group-hover:brightness-105 transition-all duration-300`}>
-                   <img src={post.img} alt="" className="w-full h-auto object-cover opacity-95 group-hover:opacity-100" />
-                   
-                   {/* Cinematic Overlays */}
-                   {post.mood === 'wong-kar-wai' && (
-                     <div className="absolute top-2 right-2 size-2.5 bg-vintageRed rounded-full shadow-md border-b-2 border-black/40" />
-                   )}
-                   {post.caption && (
-                      <div className="absolute bottom-3 left-3 bg-white/80 p-1 px-2 text-[8px] font-retro rotate-[-2deg] shadow-sm border border-walnut/5 text-walnut">
-                        {post.caption}
-                      </div>
-                   )}
+                  <img src={post.img} alt="" className="w-full h-auto object-cover opacity-95 group-hover:opacity-100" />
+
+                  {/* Cinematic Overlays */}
+                  {post.mood === 'wong-kar-wai' && (
+                    <div className="absolute top-2 right-2 size-2.5 bg-vintageRed rounded-full shadow-md border-b-2 border-black/40" />
+                  )}
+                  {post.caption && (
+                    <div className="absolute bottom-3 left-3 bg-white/80 p-1 px-2 text-[8px] font-retro rotate-[-2deg] shadow-sm border border-walnut/5 text-walnut">
+                      {post.caption}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Content */}
               <div className="px-4 mt-6 space-y-5">
-                 {post.isProject ? (
-                    <div className="border-l-4 border-vintageRed pl-3">
-                      <p className="text-xs font-black tracking-[0.15em] text-walnut uppercase leading-relaxed">
-                        {post.content}
-                      </p>
-                    </div>
-                 ) : (
-                    <p className="text-sm leading-relaxed text-walnut font-serif first-letter:text-3xl first-letter:font-black first-letter:float-left first-letter:mr-2 first-letter:leading-none">
+                {post.isProject ? (
+                  <div className="border-l-4 border-vintageRed pl-3">
+                    <p className="text-xs font-black tracking-[0.15em] text-walnut uppercase leading-relaxed">
                       {post.content}
                     </p>
-                 )}
-                 
-                 {/* Interactions */}
-                 <div className="flex items-center justify-between pt-4 border-t border-walnut/5 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <div className="flex items-center gap-6">
-                       <button className="flex items-center gap-1.5 text-walnut hover:text-vintageRed transition-colors">
-                          <span className="material-symbols-outlined text-lg">favorite</span>
-                          <span className="text-[10px] font-black font-mono mt-0.5">{post.likes}</span>
-                       </button>
-                       <button className="flex items-center gap-1.5 text-walnut hover:text-vintageRed transition-colors">
-                          <span className="material-symbols-outlined text-lg">chat</span>
-                          <span className="text-[10px] font-black font-mono mt-0.5">{post.comments}</span>
-                       </button>
-                    </div>
-                    <button className="text-walnut/60 hover:text-walnut">
-                      <span className="material-symbols-outlined text-lg">share</span>
+                  </div>
+                ) : (
+                  <p className="text-sm leading-relaxed text-walnut font-serif first-letter:text-3xl first-letter:font-black first-letter:float-left first-letter:mr-2 first-letter:leading-none">
+                    {post.content}
+                  </p>
+                )}
+
+                {/* Interactions */}
+                <div className="flex items-center justify-between pt-4 border-t border-walnut/5 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-6">
+                    <button className="flex items-center gap-1.5 text-walnut hover:text-vintageRed transition-colors">
+                      <span className="material-symbols-outlined text-lg">favorite</span>
+                      <span className="text-[10px] font-black font-mono mt-0.5">{post.likes}</span>
                     </button>
-                 </div>
+                    <button className="flex items-center gap-1.5 text-walnut hover:text-vintageRed transition-colors">
+                      <span className="material-symbols-outlined text-lg">chat</span>
+                      <span className="text-[10px] font-black font-mono mt-0.5">{post.comments}</span>
+                    </button>
+                  </div>
+                  <button className="text-walnut/60 hover:text-walnut">
+                    <span className="material-symbols-outlined text-lg">share</span>
+                  </button>
+                </div>
               </div>
             </ParchmentCard>
           </article>
