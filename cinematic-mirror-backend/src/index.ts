@@ -8,8 +8,6 @@ import routes from './routes/index.js';
 // 加载环境变量
 dotenv.config();
 
-const __dirname = process.cwd();
-
 
 const app = express();
 const PORT = process.env.PORT || 3001;
