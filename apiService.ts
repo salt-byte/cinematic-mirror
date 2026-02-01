@@ -2,8 +2,10 @@
 // 影中镜 - 后端 API 服务
 // =====================================================
 
-// 开发环境用绝对路径，生产环境用相对路径
-const API_BASE = import.meta.env.DEV ? 'http://localhost:3001/api' : '/api';
+// 开发环境用本地地址，生产环境用环境变量或默认后端地址
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : (import.meta.env.DEV ? 'http://localhost:3001/api' : '/api');
 
 // 存储 token
 let authToken: string | null = localStorage.getItem('cinematic_token');
