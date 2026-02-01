@@ -158,7 +158,7 @@ export class ConsultationService {
         return this.fallbackTextResponse(message, profile);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { choices: { message: { content: string } }[] };
       return data.choices[0]?.message?.content || '让我再看看...';
     } catch (error: any) {
       console.error('Video chat error:', error);

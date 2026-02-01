@@ -43,7 +43,7 @@ export async function chatCompletion(
     throw new Error(`SiliconFlow API Error: ${response.status} - ${error}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { choices: { message: { content: string } }[] };
   return data.choices[0]?.message?.content || '';
 }
 
