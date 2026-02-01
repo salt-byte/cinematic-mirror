@@ -37,9 +37,9 @@ export interface PersonalityProfile {
   title: string;
   subtitle: string;
   analysis: string;
-  narrative: string; 
+  narrative: string;
   timestamp: number;
-  angles: { label: string; essence: string }[]; 
+  angles: { label: string; essence: string }[];
   visualAdvice: {
     camera: string;
     lighting: string;

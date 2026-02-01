@@ -49,7 +49,7 @@ const parseModelResponse = (text: string): ParsedMessage[] => {
 };
 
 const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: latestProfile }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedProfile, setSelectedProfile] = useState<PersonalityProfile | null>(null);
   const [archives, setArchives] = useState<PersonalityProfile[]>([]);
   const [mode, setMode] = useState<'pick_role' | 'select_mode' | 'text' | 'video'>('pick_role');
@@ -111,7 +111,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         setLoading(true);
         setError("");
         try {
-          const { welcomeMessage } = await startConsultation(selectedProfile.id);
+          const { welcomeMessage } = await startConsultation(selectedProfile.id, language);
           setMessages([{ role: 'model', text: welcomeMessage.text }]);
           setLoading(false);
         } catch (e: any) {
@@ -208,7 +208,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         }
       }
 
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id);
+      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
       setMessages(prev => [...prev, { role: 'model', text: response }]);
       setLoading(false);
 
@@ -309,7 +309,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         }
       }
 
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id);
+      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
       setMessages(prev => [...prev, { role: 'model', text: response }]);
       setLoading(false);
       const dialoguePart = response.includes('[SPLIT]') ? response.split('[SPLIT]')[1]?.trim() : response;
@@ -346,7 +346,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         }
       }
 
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id);
+      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
       setMessages(prev => [...prev, { role: 'model', text: response }]);
       setLoading(false);
       // 播放 AI 回复语音

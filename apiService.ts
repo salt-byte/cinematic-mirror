@@ -217,10 +217,10 @@ export async function getProfile(profileId: string) {
 
 let currentConsultationId: string | null = null;
 
-export async function startConsultation(profileId: string) {
+export async function startConsultation(profileId: string, language?: 'zh' | 'en') {
   const result = await request<{ sessionId: string; welcomeMessage: any }>('/consultation/start', {
     method: 'POST',
-    body: JSON.stringify({ profileId }),
+    body: JSON.stringify({ profileId, language: language || 'zh' }),
   });
   currentConsultationId = result.sessionId;
   return result;
@@ -281,10 +281,10 @@ export async function addComment(postId: string, content: string) {
 // 视频聊天相关
 // =====================================================
 
-export async function sendVideoChat(message: string, imageData: string, profileId: string): Promise<string> {
+export async function sendVideoChat(message: string, imageData: string, profileId: string, language?: 'zh' | 'en'): Promise<string> {
   const result = await request<{ response: string }>('/consultation/video-chat', {
     method: 'POST',
-    body: JSON.stringify({ message, imageData, profileId }),
+    body: JSON.stringify({ message, imageData, profileId, language: language || 'zh' }),
   });
   return result.response;
 }

@@ -11,12 +11,20 @@ interface ResultProps {
 }
 
 const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
-   const { t } = useLanguage();
+   const { t, language } = useLanguage();
 
    if (!profile) return null;
 
    const angles = Array.isArray(profile.angles) ? profile.angles : [];
    const matches = Array.isArray(profile.matches) ? profile.matches : [];
+
+   // Helper for bilingual text
+   const getText = (zh: string, en?: string) => {
+      // If language is en and en exists, use it. Otherwise use zh.
+      // Note: for profile fields (title, analysis), they depend on AI generation language,
+      // handled by backend prompt. Here we mainly handle DB fields.
+      return language === 'en' && en ? en : zh;
+   };
 
    return (
       <div className="flex-1 overflow-y-auto pb-60 bg-parchment-base animate-in fade-in duration-1000 no-scrollbar relative">
@@ -98,32 +106,36 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
                   </header>
 
                   <div className="grid grid-cols-1 gap-20">
-                     {matches.map((match, idx) => (
-                        <div key={idx} className="flex flex-col items-center">
-                           <div className="w-full max-w-[220px] aspect-[3/4] bg-white/5 p-1 relative shadow-2xl mb-8 group overflow-hidden">
-                              <img
-                                 src={(() => {
-                                    const character = MOVIE_DATABASE.find(c => c.name === match.name || c.id === match.characterId);
-                                    return character?.stylings?.[0]?.image || `https://picsum.photos/seed/${match.name}/400/600`;
-                                 })()}
-                                 className="w-full h-full object-cover object-top grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-                              <div className="absolute bottom-4 left-4">
-                                 <div className="bg-vintageRed text-white text-[9px] font-black py-1 px-2 w-fit tracking-widest shadow-lg">
-                                    {match.matchRate}% {t('result.match')}
+                     {matches.map((match, idx) => {
+                        const character = MOVIE_DATABASE.find(c => c.name === match.name || c.id === match.characterId);
+                        return (
+                           <div key={idx} className="flex flex-col items-center">
+                              <div className="w-full max-w-[220px] aspect-[3/4] bg-white/5 p-1 relative shadow-2xl mb-8 group overflow-hidden">
+                                 <img
+                                    src={character?.stylings?.[0]?.image || `https://picsum.photos/seed/${match.name}/400/600`}
+                                    className="w-full h-full object-cover object-top grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
+                                 />
+                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+                                 <div className="absolute bottom-4 left-4">
+                                    <div className="bg-vintageRed text-white text-[9px] font-black py-1 px-2 w-fit tracking-widest shadow-lg">
+                                       {match.matchRate}% {t('result.match')}
+                                    </div>
                                  </div>
                               </div>
+                              <div className="text-center space-y-3 max-w-[300px]">
+                                 <h4 className="font-retro font-black text-2xl text-parchment-base tracking-[0.2em]">
+                                    《{getText(match.movie, character?.movieEn)}》
+                                 </h4>
+                                 <p className="text-[11px] font-mono text-vintageRed tracking-[0.3em] font-black uppercase">
+                                    Role: {getText(match.name, character?.nameEn)}
+                                 </p>
+                                 <p className="text-[12px] font-serif text-parchment-base/40 italic leading-[2] pt-4">
+                                    “{match.description}”
+                                 </p>
+                              </div>
                            </div>
-                           <div className="text-center space-y-3 max-w-[300px]">
-                              <h4 className="font-retro font-black text-2xl text-parchment-base tracking-[0.2em]">《{match.movie}》</h4>
-                              <p className="text-[11px] font-mono text-vintageRed tracking-[0.3em] font-black uppercase">Role: {match.name}</p>
-                              <p className="text-[12px] font-serif text-parchment-base/40 italic leading-[2] pt-4">
-                                 “{match.description}”
-                              </p>
-                           </div>
-                        </div>
-                     ))}
+                        );
+                     })}
                   </div>
                </div>
             </div>

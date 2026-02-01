@@ -6,14 +6,16 @@ import { useLanguage } from '../i18n/LanguageContext';
 
 interface CharacterData {
   name: string;
+  nameEn?: string;
   movie: string;
+  movieEn?: string;
   matchRate: number;
   description: string;
   stylings: StylingOption[];
 }
 
 const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeCharacterIndex, setActiveCharacterIndex] = useState(0);
   const [activeStylingIndex, setActiveStylingIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -43,8 +45,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
     );
 
     return {
-      name: match.name,
-      movie: match.movie,
+      name: match.name,       // Fallback to match data
+      nameEn: dbCharacter?.nameEn,
+      movie: match.movie,     // Fallback to match data
+      movieEn: dbCharacter?.movieEn,
       matchRate: match.matchRate,
       description: match.description,
       stylings: dbCharacter?.stylings || []
@@ -53,6 +57,15 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
 
   const activeCharacter = characters[activeCharacterIndex];
   const activeStyling = activeCharacter?.stylings[activeStylingIndex];
+
+  // Helper to get bilingual text
+  const getText = (zh: string, en?: string) => {
+    return language === 'en' && en ? en : zh;
+  };
+
+  const getList = (zh: string[], en?: string[]) => {
+    return language === 'en' && en && en.length > 0 ? en : zh;
+  };
 
   const handleStylingScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
@@ -112,12 +125,14 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
               key={i}
               onClick={() => handleCharacterChange(i)}
               className={`shrink-0 px-4 py-2.5 transition-all border ${i === activeCharacterIndex
-                  ? 'bg-walnut text-parchment-base border-walnut'
-                  : 'bg-transparent text-walnut/50 border-walnut/20 hover:border-walnut/40'
+                ? 'bg-walnut text-parchment-base border-walnut'
+                : 'bg-transparent text-walnut/50 border-walnut/20 hover:border-walnut/40'
                 }`}
             >
-              <div className="text-[11px] font-black tracking-wider">{char.name}</div>
-              <div className="text-[8px] opacity-60 mt-0.5">《{char.movie}》</div>
+              <div className="text-[11px] font-black tracking-wider">
+                {getText(char.name, char.nameEn)}
+              </div>
+              <div className="text-[8px] opacity-60 mt-0.5">《{getText(char.movie, char.movieEn)}》</div>
             </button>
           ))}
         </div>
@@ -178,10 +193,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                   {/* 标题叠加 */}
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-white text-xl font-retro font-black tracking-wide drop-shadow-lg">
-                      {styling.title}
+                      {getText(styling.title, styling.titleEn)}
                     </h3>
                     <p className="text-white/60 text-[10px] mt-1 tracking-widest">
-                      {styling.subtitle}
+                      {getText(styling.subtitle, styling.subtitleEn)}
                     </p>
                   </div>
                 </div>
@@ -198,8 +213,8 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                 key={i}
                 onClick={() => scrollToStyling(i)}
                 className={`transition-all ${i === activeStylingIndex
-                    ? 'w-6 h-1.5 bg-vintageRed'
-                    : 'w-1.5 h-1.5 bg-walnut/20'
+                  ? 'w-6 h-1.5 bg-vintageRed'
+                  : 'w-1.5 h-1.5 bg-walnut/20'
                   } rounded-full`}
               />
             ))}
@@ -227,9 +242,14 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-walnut leading-tight">
-                  {activeStyling.palette?.map(p => p.name).join(' · ')}
+                  {activeStyling.palette?.map(p => getText(p.name, p.enName)).join(' · ')}
                 </p>
                 <p className="text-[9px] text-walnut/40 font-mono mt-1 uppercase tracking-tight">
+                  {/* Since we are mixing displays, maybe we show hex or just keep EN names? 
+                      Original was showing En names here. Now we can show the other lang or just keep En for 'code' look? 
+                      Let's stick to showing En names as 'technical code' if language includes them, or maybe just always En names in subtitle if that's the design.
+                      Actually, original used `p.enName` for the small text. Let's keep `p.enName` for the mono text as it looks like a color code.
+                  */}
                   {activeStyling.palette?.map(p => p.enName || 'Color').join(' / ')}
                 </p>
               </div>
@@ -243,7 +263,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                 <span className="material-symbols-outlined text-[14px]">texture</span> {t('styling.materials')}
               </h4>
               <ul className="text-[11px] space-y-1.5 text-walnut/70 font-serif">
-                {activeStyling.materials?.map((m, idx) => (
+                {getList(activeStyling.materials, activeStyling.materialsEn)?.map((m, idx) => (
                   <li key={idx} className="flex items-start gap-1.5">
                     <span className="mt-1 size-1 bg-vintageRed/30 rounded-full shrink-0" />
                     <span>{m}</span>
@@ -256,7 +276,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                 <span className="material-symbols-outlined text-[14px]">apparel</span> {t('styling.tailoring')}
               </h4>
               <ul className="text-[11px] space-y-1.5 text-walnut/70 font-serif">
-                {activeStyling.tailoring?.map((t, idx) => (
+                {getList(activeStyling.tailoring, activeStyling.tailoringEn)?.map((t, idx) => (
                   <li key={idx} className="flex items-start gap-1.5">
                     <span className="mt-1 size-1 bg-vintageRed/30 rounded-full shrink-0" />
                     <span>{t}</span>
@@ -273,10 +293,10 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
             </h3>
             <div className="bg-white/30 p-5 border-l-2 border-walnut/20">
               <p className="text-[10px] font-mono text-walnut/30 uppercase tracking-widest mb-2">
-                INT. {activeCharacter.movie.toUpperCase()} - CONTINUOUS
+                INT. {getText(activeCharacter.movie, activeCharacter.movieEn).toUpperCase()} - CONTINUOUS
               </p>
               <p className="text-[12px] font-serif text-walnut/70 italic leading-relaxed">
-                {activeStyling.scriptSnippet}
+                {getText(activeStyling.scriptSnippet, activeStyling.scriptSnippetEn)}
               </p>
             </div>
           </div>
@@ -290,7 +310,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
             <div className="relative p-5 bg-walnut/[0.03] border-l-4 border-vintageRed/30">
               <span className="material-symbols-outlined absolute -top-2 -right-1 text-vintageRed/10 text-4xl font-light pointer-events-none">format_quote</span>
               <p className="text-[13px] leading-relaxed text-walnut/80 font-serif italic">
-                {activeStyling.directorNote}
+                {getText(activeStyling.directorNote, activeStyling.directorNoteEn)}
               </p>
             </div>
           </div>

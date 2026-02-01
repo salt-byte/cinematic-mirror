@@ -8,7 +8,7 @@ export class ConsultationController {
   // 开始咨询会话
   async startConsultation(req: Request, res: Response): Promise<void> {
     try {
-      const { profileId } = req.body;
+      const { profileId, language } = req.body;
 
       if (!profileId) {
         sendError(res, '请提供档案ID', 400);
@@ -23,7 +23,7 @@ export class ConsultationController {
         return;
       }
 
-      const result = await consultationService.startConsultation(profile);
+      const result = await consultationService.startConsultation(profile, language || 'zh');
       sendSuccess(res, result, '咨询开始');
     } catch (error: any) {
       sendError(res, error.message, 500);
@@ -79,7 +79,7 @@ export class ConsultationController {
   // 视频聊天
   async videoChat(req: Request, res: Response): Promise<void> {
     try {
-      const { message, imageData, profileId } = req.body;
+      const { message, imageData, profileId, language } = req.body;
 
       if (!message || !profileId) {
         sendError(res, '请提供消息和档案ID', 400);
@@ -94,7 +94,7 @@ export class ConsultationController {
         return;
       }
 
-      const response = await consultationService.videoChat(message, imageData || '', profile);
+      const response = await consultationService.videoChat(message, imageData || '', profile, language || 'zh');
       sendSuccess(res, { response });
     } catch (error: any) {
       sendError(res, error.message, 500);

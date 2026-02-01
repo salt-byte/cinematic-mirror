@@ -1,25 +1,29 @@
 import { v4 as uuidv4 } from 'uuid';
 import { chatCompletion, VISION_MODEL, SILICONFLOW_API_KEY, SILICONFLOW_BASE_URL } from '../config/siliconflow';
-import { CONSULTATION_SYSTEM_PROMPT } from '../config/constants';
+import { CONSULTATION_SYSTEM_PROMPT, getPromptsByLanguage } from '../config/constants';
 import type { ChatMessage, PersonalityProfile } from '../types/index';
 
 // 内存中存储咨询会话
 const consultationSessions = new Map<string, {
   profileId: string;
+  language?: 'zh' | 'en';
   messages: { role: string; content: string }[];
   chatMessages: ChatMessage[];
 }>();
 
 export class ConsultationService {
   // 开始咨询会话
-  async startConsultation(profile: PersonalityProfile): Promise<{
+  async startConsultation(profile: PersonalityProfile, language: 'zh' | 'en' = 'zh'): Promise<{
     sessionId: string;
     welcomeMessage: ChatMessage;
   }> {
     const sessionId = uuidv4();
 
+    // 获取对应语言的提示词
+    const prompts = getPromptsByLanguage(language);
+
     // 构建系统提示词
-    const systemPrompt = CONSULTATION_SYSTEM_PROMPT.replace(
+    const systemPrompt = prompts.consultationPrompt.replace(
       '{PROFILE}',
       JSON.stringify({
         title: profile.title,
@@ -32,10 +36,14 @@ export class ConsultationService {
     );
 
     // 获取欢迎消息
+    const welcomePrompt = language === 'en'
+      ? 'Please start the consultation, greeting me first and briefly describing your impression of this profile.'
+      : '请开始咨询，先打个招呼并简单介绍你对这份档案的印象。';
+
     const responseText = await chatCompletion(
       [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: '请开始咨询，先打个招呼并简单介绍你对这份档案的印象。' }
+        { role: 'user', content: welcomePrompt }
       ],
       { temperature: 0.8, max_tokens: 500 }
     );
@@ -49,9 +57,10 @@ export class ConsultationService {
     // 存储会话
     consultationSessions.set(sessionId, {
       profileId: profile.id,
+      language,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: '请开始咨询，先打个招呼并简单介绍你对这份档案的印象。' },
+        { role: 'user', content: welcomePrompt },
         { role: 'assistant', content: responseText }
       ],
       chatMessages: [welcomeMessage]
@@ -107,8 +116,29 @@ export class ConsultationService {
   }
 
   // 视频聊天 - 用户发消息，AI 看着画面回复
-  async videoChat(message: string, imageData: string, profile: PersonalityProfile): Promise<string> {
-    const systemPrompt = `你是陆野导演，正在通过视频连线和用户聊穿搭。
+  async videoChat(message: string, imageData: string, profile: PersonalityProfile, language: 'zh' | 'en' = 'zh'): Promise<string> {
+    const prompts = getPromptsByLanguage(language);
+
+    let systemPrompt = '';
+
+    if (language === 'en') {
+      systemPrompt = `You are Director Lu Ye, chatting with a user about styling via video call.
+
+User Profile:
+- Title: ${profile.title}
+- Description: ${profile.subtitle}
+- Analysis: ${profile.analysis || ''}
+- Matched Characters: ${profile.matches?.map(m => `${m.name}(${m.movie})`).join(', ') || 'None'}
+
+Your Task:
+1. Observe the user's current outfit (via image)
+2. Give specific styling advice based on their question and profile traits
+3. Speak like a real director - direct, tasteful, slightly arrogant but sincere
+4. Keep replies within 60-100 words
+5. Be specific about colors, styles, materials, and coordination
+6. If the image is unclear, give advice based on the question`;
+    } else {
+      systemPrompt = `你是陆野导演，正在通过视频连线和用户聊穿搭。
 
 用户的人格档案：
 - 标题：${profile.title}
@@ -123,6 +153,7 @@ export class ConsultationService {
 4. 回复控制在60-100字，不要太长
 5. 可以具体说颜色、款式、材质、搭配方式
 6. 如果图片看不清，也要根据问题给出建议`;
+    }
 
     try {
       const response = await fetch(`${SILICONFLOW_BASE_URL}/chat/completions`, {
