@@ -3,14 +3,13 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import routes from './routes/index.js';
 
 // 加载环境变量
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = process.cwd();
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
