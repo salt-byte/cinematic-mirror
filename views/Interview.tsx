@@ -72,8 +72,8 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       // 保存用户信息到 localStorage
       localStorage.setItem('cinematic_user_info', JSON.stringify(userInfo));
 
-      // 启动试镜，传递用户信息
-      const { initialMessage } = await startInterview(userInfo.name, userInfo.gender);
+      // 启动试镜，传递用户信息和语言
+      const { initialMessage } = await startInterview(userInfo.name, userInfo.gender, language);
       const parts = parseModelResponse(initialMessage.text);
       setMessages([{ role: 'model', parts }]);
       setLoading(false);
@@ -177,8 +177,8 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
                 <button
                   onClick={() => setUserInfo({ ...userInfo, gender: 'female' })}
                   className={`flex-1 py-4 border-2 transition-all ${userInfo.gender === 'female'
-                      ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
-                      : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
+                    ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
+                    : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
                     }`}
                 >
                   <span className="material-symbols-outlined text-2xl block mb-1">female</span>
@@ -187,8 +187,8 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
                 <button
                   onClick={() => setUserInfo({ ...userInfo, gender: 'male' })}
                   className={`flex-1 py-4 border-2 transition-all ${userInfo.gender === 'male'
-                      ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
-                      : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
+                    ? 'border-vintageRed bg-vintageRed/5 text-vintageRed'
+                    : 'border-walnut/10 text-walnut/50 hover:border-walnut/30'
                     }`}
                 >
                   <span className="material-symbols-outlined text-2xl block mb-1">male</span>

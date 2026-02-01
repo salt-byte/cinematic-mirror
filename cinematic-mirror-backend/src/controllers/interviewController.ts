@@ -13,10 +13,10 @@ export class InterviewController {
         return;
       }
 
-      const { userName, userGender } = req.body;
+      const { userName, userGender, language } = req.body;
 
-      const result = await interviewService.startInterview(userId, userName, userGender);
-      sendSuccess(res, result, '试镜开始');
+      const result = await interviewService.startInterview(userId, userName, userGender, language || 'zh');
+      sendSuccess(res, result, language === 'en' ? 'Audition started' : '试镜开始');
     } catch (error: any) {
       sendError(res, error.message, 500);
     }

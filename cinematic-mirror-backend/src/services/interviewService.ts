@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import supabase from '../config/supabase';
 import { chatCompletion, CHAT_MODEL } from '../config/siliconflow';
-import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE } from '../config/constants';
+import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE, getPromptsByLanguage } from '../config/constants';
 import type { ChatMessage, PersonalityProfile, CharacterMatch, StyleVariant } from '../types/index';
 
 // 内存中存储活跃的聊天会话
@@ -19,21 +19,32 @@ export class InterviewService {
   async startInterview(
     userId: string,
     userName?: string,
-    userGender?: string
+    userGender?: string,
+    language: 'zh' | 'en' = 'zh'
   ): Promise<{ sessionId: string; initialMessage: ChatMessage }> {
     const sessionId = uuidv4();
 
+    // 根据语言选择提示词
+    const prompts = getPromptsByLanguage(language);
+    let systemPrompt = prompts.directorPrompt;
+
     // 根据用户信息调整系统提示词
-    let systemPrompt = DIRECTOR_SYSTEM_PROMPT;
     if (userName || userGender) {
-      const genderText = userGender === 'female' ? '女性' : userGender === 'male' ? '男性' : '';
-      const userInfoText = `\n\n## 受试者信息\n- 名字：${userName || '未知'}\n- 性别：${genderText || '未知'}\n\n请根据对方的性别给出合适的穿搭建议方向。称呼对方时可以使用ta的名字。`;
-      systemPrompt += userInfoText;
+      if (language === 'en') {
+        const genderText = userGender === 'female' ? 'female' : userGender === 'male' ? 'male' : '';
+        const userInfoText = `\n\n## Subject Information\n- Name: ${userName || 'Unknown'}\n- Gender: ${genderText || 'Unknown'}\n\nPlease provide suitable styling advice based on their gender. You may address them by their name.`;
+        systemPrompt += userInfoText;
+      } else {
+        const genderText = userGender === 'female' ? '女性' : userGender === 'male' ? '男性' : '';
+        const userInfoText = `\n\n## 受试者信息\n- 名字：${userName || '未知'}\n- 性别：${genderText || '未知'}\n\n请根据对方的性别给出合适的穿搭建议方向。称呼对方时可以使用ta的名字。`;
+        systemPrompt += userInfoText;
+      }
     }
 
     // 初始化消息历史
     const systemMessage = { role: 'system', content: systemPrompt };
-    const userStartMessage = { role: 'user', content: '试镜开始，请你先开场。' };
+    const startText = language === 'en' ? 'The audition begins, please start.' : '试镜开始，请你先开场。';
+    const userStartMessage = { role: 'user', content: startText };
 
     // 调用 DeepSeek
     const responseText = await chatCompletion(

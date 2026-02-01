@@ -170,10 +170,10 @@ export async function refreshArchivesFromServer(): Promise<any[]> {
 
 let currentSessionId: string | null = null;
 
-export async function startInterview(userName?: string, userGender?: string) {
+export async function startInterview(userName?: string, userGender?: string, language?: 'zh' | 'en') {
   const result = await request<{ sessionId: string; initialMessage: any }>('/interview/start', {
     method: 'POST',
-    body: JSON.stringify({ userName, userGender }),
+    body: JSON.stringify({ userName, userGender, language: language || 'zh' }),
   });
   currentSessionId = result.sessionId;
   return result;
