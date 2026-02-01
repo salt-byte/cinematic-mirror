@@ -1,8 +1,9 @@
 {
   "name": "cinematic-mirror-backend",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "影中镜 - Cinematic Mirror 后端服务",
-  "main": "dist/index.js",
+  "main": "dist/cinematic-mirror-backend/src/index.js",
   "scripts": {
     "sync-db": "cp ../library.ts src/config/library.ts",
     "predev": "npm run sync-db",
