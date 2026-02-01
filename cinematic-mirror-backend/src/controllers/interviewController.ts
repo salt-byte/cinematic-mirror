@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { interviewService } from '../services/interviewService.js';
-import { sendSuccess, sendError } from '../utils/response.js';
+import { interviewService } from '../services/interviewService';
+import { sendSuccess, sendError } from '../utils/response';
 
 export class InterviewController {
   // 开始试镜

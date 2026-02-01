@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import supabase from '../config/supabase.js';
-import type { PlazaPost, PostComment, PaginatedResponse } from '../types/index.js';
+import supabase from '../config/supabase';
+import type { PlazaPost, PostComment, PaginatedResponse } from '../types/index';
 
 export class PlazaService {
   // 获取帖子列表（分页）

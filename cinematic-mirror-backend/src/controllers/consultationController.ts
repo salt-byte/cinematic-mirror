@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import { consultationService } from '../services/consultationService.js';
-import { interviewService } from '../services/interviewService.js';
-import { sendSuccess, sendError } from '../utils/response.js';
-import type { PersonalityProfile } from '../types/index.js';
+import { consultationService } from '../services/consultationService';
+import { interviewService } from '../services/interviewService';
+import { sendSuccess, sendError } from '../utils/response';
+import type { PersonalityProfile } from '../types/index';
 
 export class ConsultationController {
   // 开始咨询会话

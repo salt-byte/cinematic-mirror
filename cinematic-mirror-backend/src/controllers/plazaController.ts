@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { plazaService } from '../services/plazaService.js';
-import { sendSuccess, sendError } from '../utils/response.js';
+import { plazaService } from '../services/plazaService';
+import { sendSuccess, sendError } from '../utils/response';
 
 export class PlazaController {
   // 获取帖子列表

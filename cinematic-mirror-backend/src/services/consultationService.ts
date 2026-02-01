@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { chatCompletion, VISION_MODEL, SILICONFLOW_API_KEY, SILICONFLOW_BASE_URL } from '../config/siliconflow.js';
-import { CONSULTATION_SYSTEM_PROMPT } from '../config/constants.js';
-import type { ChatMessage, PersonalityProfile } from '../types/index.js';
+import { chatCompletion, VISION_MODEL, SILICONFLOW_API_KEY, SILICONFLOW_BASE_URL } from '../config/siliconflow';
+import { CONSULTATION_SYSTEM_PROMPT } from '../config/constants';
+import type { ChatMessage, PersonalityProfile } from '../types/index';
 
 // 内存中存储咨询会话
 const consultationSessions = new Map<string, {

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { userService } from '../services/userService.js';
-import { sendSuccess, sendError } from '../utils/response.js';
+import { userService } from '../services/userService';
+import { sendSuccess, sendError } from '../utils/response';
 
 export class AuthController {
   // 注册

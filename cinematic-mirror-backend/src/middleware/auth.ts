@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwt.js';
-import { sendError } from '../utils/response.js';
-import type { JwtPayload } from '../types/index.js';
+import { verifyToken } from '../utils/jwt';
+import { sendError } from '../utils/response';
+import type { JwtPayload } from '../types/index';
 
 // 扩展 Express Request 类型
 declare global {

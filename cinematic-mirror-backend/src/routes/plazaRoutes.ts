@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { plazaController } from '../controllers/plazaController.js';
-import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.js';
+import { plazaController } from '../controllers/plazaController';
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth';
 
 const router = Router();
 

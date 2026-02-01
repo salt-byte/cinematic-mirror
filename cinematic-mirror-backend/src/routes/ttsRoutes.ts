@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { synthesizeSpeech, isAzureTtsConfigured } from '../config/azureTts.js';
+import { synthesizeSpeech, isAzureTtsConfigured } from '../config/azureTts';
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import type { ApiResponse } from '../types/index.js';
+import type { ApiResponse } from '../types/index';
 
 export function sendSuccess<T>(res: Response, data: T, message?: string, statusCode = 200): void {
   const response: ApiResponse<T> = {

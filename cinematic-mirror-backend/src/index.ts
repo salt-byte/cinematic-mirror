@@ -3,7 +3,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
-import routes from './routes/index.js';
+import routes from './routes/index';
 
 // 加载环境变量
 dotenv.config();

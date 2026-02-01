@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import supabase from '../config/supabase.js';
-import { generateToken } from '../utils/jwt.js';
-import type { User, UserPublic } from '../types/index.js';
+import supabase from '../config/supabase';
+import { generateToken } from '../utils/jwt';
+import type { User, UserPublic } from '../types/index';
 
 export class UserService {
   // 注册新用户

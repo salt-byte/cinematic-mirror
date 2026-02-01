@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import authRoutes from './authRoutes.js';
-import interviewRoutes from './interviewRoutes.js';
-import consultationRoutes from './consultationRoutes.js';
-import plazaRoutes from './plazaRoutes.js';
-import ttsRoutes from './ttsRoutes.js';
+import authRoutes from './authRoutes';
+import interviewRoutes from './interviewRoutes';
+import consultationRoutes from './consultationRoutes';
+import plazaRoutes from './plazaRoutes';
+import ttsRoutes from './ttsRoutes';
 
 const router = Router();
 

@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import supabase from '../config/supabase.js';
-import { chatCompletion, CHAT_MODEL } from '../config/siliconflow.js';
-import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE } from '../config/constants.js';
-import type { ChatMessage, PersonalityProfile, CharacterMatch, StyleVariant } from '../types/index.js';
+import supabase from '../config/supabase';
+import { chatCompletion, CHAT_MODEL } from '../config/siliconflow';
+import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE } from '../config/constants';
+import type { ChatMessage, PersonalityProfile, CharacterMatch, StyleVariant } from '../types/index';
 
 // 内存中存储活跃的聊天会话
 const activeSessions = new Map<string, {
