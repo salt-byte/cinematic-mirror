@@ -1,0 +1,26 @@
+{
+  "name": "影中镜-cinematic-mirror",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix cinematic-mirror-backend\" \"vite\"",
+    "dev:frontend": "vite",
+    "dev:backend": "npm run dev --prefix cinematic-mirror-backend",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@google/genai": "^1.38.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.47.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.1",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

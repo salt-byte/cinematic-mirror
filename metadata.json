@@ -1,0 +1,8 @@
+{
+  "name": "影中镜 Cinematic Mirror",
+  "description": "基于性格分析的电影感穿搭与人格导视系统。",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
