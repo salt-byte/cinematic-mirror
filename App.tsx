@@ -16,8 +16,22 @@ import { LanguageProvider, LanguageSwitcher, useLanguage } from './i18n/Language
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(View.WELCOME);
   const [profile, setProfile] = useState<PersonalityProfile | null>(() => {
+    // 优先读取当前活跃的档案
     const saved = localStorage.getItem('cinematic_mirror_profile');
-    return saved ? JSON.parse(saved) : null;
+    if (saved) return JSON.parse(saved);
+
+    // 如果没有活跃档案，自动加载最近的档案
+    const archives = localStorage.getItem('cinematic_archives');
+    if (archives) {
+      const list = JSON.parse(archives);
+      if (list.length > 0) {
+        // 返回最新的档案
+        const latest = list[0];
+        localStorage.setItem('cinematic_mirror_profile', JSON.stringify(latest));
+        return latest;
+      }
+    }
+    return null;
   });
 
   const navigate = (view: View) => setCurrentView(view);
