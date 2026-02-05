@@ -1,20 +1,22 @@
 /**
- * Gemini 2.0 Live API 服务
- * 使用 WebSocket 实现实时音视频对话
+ * Gemini Live API 服务
+ * 使用 @google/genai SDK 的 ai.live.connect 实现实时音视频对话
  */
 
-// WebSocket 端点
-const LIVE_API_ENDPOINT = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent';
+import { GoogleGenAI, Modality } from '@google/genai';
+
+// 实时多模态模型
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
 
 // 获取 API Key
-const getApiKey = () => {
+const getApiKey = (): string => {
     // @ts-ignore - Vite 环境变量
     return import.meta.env?.VITE_GEMINI_API_KEY || '';
 };
 
 export interface LiveSessionConfig {
     systemInstruction?: string;
-    voiceName?: string; // 语音名称，如 "Puck", "Charon", "Kore", "Fenrir", "Aoede"
+    voiceName?: string;
     onAudioData?: (audioData: ArrayBuffer) => void;
     onTextResponse?: (text: string) => void;
     onError?: (error: Error) => void;
@@ -23,11 +25,9 @@ export interface LiveSessionConfig {
 }
 
 class GeminiLiveService {
-    private ws: WebSocket | null = null;
+    private session: any = null;
     private config: LiveSessionConfig = {};
     private audioContext: AudioContext | null = null;
-    private audioQueue: ArrayBuffer[] = [];
-    private isPlaying = false;
     private isConnected = false;
 
     /**
@@ -38,7 +38,6 @@ class GeminiLiveService {
             this.audioContext = new AudioContext({ sampleRate: 24000 });
             console.log('🔊 AudioContext initialized');
         }
-        // iOS 需要 resume
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
             console.log('🔊 AudioContext resumed');
@@ -53,119 +52,83 @@ class GeminiLiveService {
 
         const apiKey = getApiKey();
         if (!apiKey) {
-            throw new Error('Missing Gemini API Key');
+            throw new Error('Missing Gemini API Key. Please set VITE_GEMINI_API_KEY.');
         }
 
-        const url = `${LIVE_API_ENDPOINT}?key=${apiKey}`;
+        try {
+            const ai = new GoogleGenAI({ apiKey });
 
-        return new Promise((resolve, reject) => {
-            this.ws = new WebSocket(url);
-
-            this.ws.onopen = () => {
-                console.log('🔗 Live API WebSocket connected');
-                this.isConnected = true;
-
-                // 发送初始配置
-                this.sendSetup();
-
-                this.config.onConnected?.();
-                resolve();
-            };
-
-            this.ws.onmessage = (event) => {
-                this.handleMessage(event);
-            };
-
-            this.ws.onerror = (error) => {
-                console.error('❌ WebSocket error:', error);
-                this.config.onError?.(new Error('WebSocket connection failed'));
-                reject(error);
-            };
-
-            this.ws.onclose = () => {
-                console.log('📴 WebSocket disconnected');
-                this.isConnected = false;
-                this.config.onDisconnected?.();
-            };
-        });
-    }
-
-    /**
-     * 发送初始会话配置
-     */
-    private sendSetup(): void {
-        const setupMessage = {
-            setup: {
-                model: 'models/gemini-2.0-flash-exp',
-                generationConfig: {
-                    responseModalities: ['AUDIO', 'TEXT'],
+            this.session = await ai.live.connect({
+                model: LIVE_MODEL,
+                callbacks: {
+                    onopen: () => {
+                        console.log('✅ Live API connected');
+                        this.isConnected = true;
+                        this.config.onConnected?.();
+                    },
+                    onmessage: (message: any) => {
+                        this.handleMessage(message);
+                    },
+                    onerror: (error: any) => {
+                        console.error('❌ Live API error:', error);
+                        this.config.onError?.(error instanceof Error ? error : new Error(String(error)));
+                    },
+                    onclose: () => {
+                        console.log('📴 Live API disconnected');
+                        this.isConnected = false;
+                        this.config.onDisconnected?.();
+                    }
+                },
+                config: {
+                    responseModalities: [Modality.AUDIO, Modality.TEXT],
+                    systemInstruction: config.systemInstruction || '你是一位专业的服装造型顾问，会根据用户的外表给出穿搭建议。请用中文回复。',
                     speechConfig: {
                         voiceConfig: {
                             prebuiltVoiceConfig: {
-                                voiceName: this.config.voiceName || 'Puck'
+                                voiceName: config.voiceName || 'Puck'
                             }
                         }
                     }
-                },
-                systemInstruction: {
-                    parts: [{
-                        text: this.config.systemInstruction || '你是一位专业的服装造型顾问，会根据用户的外表给出穿搭建议。请用中文回复。'
-                    }]
                 }
-            }
-        };
+            });
 
-        this.ws?.send(JSON.stringify(setupMessage));
-        console.log('📤 Sent setup message');
+        } catch (error: any) {
+            console.error('Failed to connect to Live API:', error);
+            throw error;
+        }
     }
 
     /**
-     * 处理收到的消息
+     * 处理服务器消息
      */
-    private handleMessage(event: MessageEvent): void {
+    private handleMessage(message: any): void {
         try {
-            if (event.data instanceof Blob) {
-                // 二进制音频数据
-                event.data.arrayBuffer().then(buffer => {
-                    this.config.onAudioData?.(buffer);
-                    this.audioQueue.push(buffer);
-                    this.playAudioQueue();
-                });
-            } else {
-                // JSON 消息
-                const message = JSON.parse(event.data);
+            // 处理文本响应
+            if (message.text) {
+                this.config.onTextResponse?.(message.text);
+            }
 
-                if (message.serverContent) {
-                    const content = message.serverContent;
-
-                    // 处理文本响应
-                    if (content.modelTurn?.parts) {
-                        for (const part of content.modelTurn.parts) {
-                            if (part.text) {
-                                this.config.onTextResponse?.(part.text);
-                            }
-                            if (part.inlineData?.mimeType?.startsWith('audio/')) {
-                                // Base64 编码的音频
-                                const audioData = this.base64ToArrayBuffer(part.inlineData.data);
-                                this.config.onAudioData?.(audioData);
-                                this.audioQueue.push(audioData);
-                                this.playAudioQueue();
-                            }
-                        }
+            // 处理转录内容
+            if (message.serverContent?.modelTurn?.parts) {
+                for (const part of message.serverContent.modelTurn.parts) {
+                    if (part.text) {
+                        this.config.onTextResponse?.(part.text);
                     }
-
-                    // 会话结束
-                    if (content.turnComplete) {
-                        console.log('✅ Turn complete');
+                    if (part.inlineData?.data) {
+                        const audioData = this.base64ToArrayBuffer(part.inlineData.data);
+                        this.config.onAudioData?.(audioData);
+                        this.playAudio(audioData);
                     }
-                }
-
-                if (message.setupComplete) {
-                    console.log('✅ Setup complete');
                 }
             }
+
+            // 处理直接音频数据
+            if (message.data && message.data instanceof ArrayBuffer) {
+                this.config.onAudioData?.(message.data);
+                this.playAudio(message.data);
+            }
         } catch (error) {
-            console.error('Error parsing message:', error);
+            console.error('Error handling message:', error);
         }
     }
 
@@ -173,128 +136,107 @@ class GeminiLiveService {
      * 发送音频数据
      */
     sendAudio(audioData: ArrayBuffer): void {
-        if (!this.isConnected || !this.ws) return;
+        if (!this.isConnected || !this.session) return;
 
-        const base64Audio = this.arrayBufferToBase64(audioData);
-
-        const message = {
-            realtimeInput: {
-                mediaChunks: [{
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: base64Audio
-                }]
-            }
-        };
-
-        this.ws.send(JSON.stringify(message));
+        try {
+            this.session.sendRealtimeInput({
+                audio: {
+                    data: this.arrayBufferToBase64(audioData),
+                    mimeType: 'audio/pcm;rate=16000'
+                }
+            });
+        } catch (error) {
+            console.error('Error sending audio:', error);
+        }
     }
 
     /**
      * 发送视频帧（图片）
      */
     sendVideoFrame(imageData: string): void {
-        if (!this.isConnected || !this.ws) return;
+        if (!this.isConnected || !this.session) return;
 
-        // imageData 应该是 base64 编码的 JPEG
-        const base64Image = imageData.replace(/^data:image\/\w+;base64,/, '');
+        try {
+            const base64Image = imageData.replace(/^data:image\/\w+;base64,/, '');
 
-        const message = {
-            realtimeInput: {
-                mediaChunks: [{
-                    mimeType: 'image/jpeg',
-                    data: base64Image
-                }]
-            }
-        };
-
-        this.ws.send(JSON.stringify(message));
+            this.session.sendRealtimeInput({
+                media: {
+                    data: base64Image,
+                    mimeType: 'image/jpeg'
+                }
+            });
+        } catch (error) {
+            console.error('Error sending video frame:', error);
+        }
     }
 
     /**
      * 发送文本消息
      */
     sendText(text: string): void {
-        if (!this.isConnected || !this.ws) return;
+        if (!this.isConnected || !this.session) return;
 
-        const message = {
-            clientContent: {
+        try {
+            this.session.sendClientContent({
                 turns: [{
                     role: 'user',
                     parts: [{ text }]
                 }],
                 turnComplete: true
-            }
-        };
-
-        this.ws.send(JSON.stringify(message));
+            });
+        } catch (error) {
+            console.error('Error sending text:', error);
+        }
     }
 
     /**
-     * 播放音频队列
+     * 播放音频
      */
-    private async playAudioQueue(): Promise<void> {
-        if (this.isPlaying || this.audioQueue.length === 0) return;
-
-        this.isPlaying = true;
-
-        // 确保 AudioContext 已初始化并恢复
+    private async playAudio(audioData: ArrayBuffer): Promise<void> {
         if (!this.audioContext) {
             this.audioContext = new AudioContext({ sampleRate: 24000 });
         }
 
-        // iOS 需要在用户交互后恢复 AudioContext
         if (this.audioContext.state === 'suspended') {
-            try {
-                await this.audioContext.resume();
-                console.log('🔊 AudioContext resumed for playback');
-            } catch (e) {
-                console.error('Failed to resume AudioContext:', e);
-            }
+            await this.audioContext.resume();
         }
 
-        while (this.audioQueue.length > 0) {
-            const audioData = this.audioQueue.shift()!;
+        try {
+            // PCM 16-bit 转 Float32
+            const pcmData = new Int16Array(audioData);
+            const floatData = new Float32Array(pcmData.length);
 
-            try {
-                // Gemini 返回的是 PCM 16-bit 音频
-                const pcmData = new Int16Array(audioData);
-                const floatData = new Float32Array(pcmData.length);
-
-                for (let i = 0; i < pcmData.length; i++) {
-                    floatData[i] = pcmData[i] / 32768;
-                }
-
-                const audioBuffer = this.audioContext.createBuffer(1, floatData.length, 24000);
-                audioBuffer.getChannelData(0).set(floatData);
-
-                const source = this.audioContext.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(this.audioContext.destination);
-
-                console.log('🔊 Playing audio chunk:', floatData.length, 'samples');
-
-                await new Promise<void>(resolve => {
-                    source.onended = () => resolve();
-                    source.start();
-                });
-            } catch (error) {
-                console.error('Error playing audio:', error);
+            for (let i = 0; i < pcmData.length; i++) {
+                floatData[i] = pcmData[i] / 32768;
             }
-        }
 
-        this.isPlaying = false;
+            const audioBuffer = this.audioContext.createBuffer(1, floatData.length, 24000);
+            audioBuffer.getChannelData(0).set(floatData);
+
+            const source = this.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(this.audioContext.destination);
+            source.start();
+
+            console.log('🔊 Playing audio:', floatData.length, 'samples');
+        } catch (error) {
+            console.error('Error playing audio:', error);
+        }
     }
 
     /**
      * 断开连接
      */
     disconnect(): void {
-        if (this.ws) {
-            this.ws.close();
-            this.ws = null;
+        if (this.session) {
+            try {
+                this.session.close();
+            } catch (e) {
+                // Ignore close errors
+            }
+            this.session = null;
         }
         this.isConnected = false;
-        this.audioQueue = [];
 
         if (this.audioContext) {
             this.audioContext.close();

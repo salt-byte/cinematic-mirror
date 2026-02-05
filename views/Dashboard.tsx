@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { PersonalityProfile, ChatMessage } from '../types';
-import { startConsultation, sendConsultationMessage, sendVideoChat, synthesizeAndPlaySpeech, synthesizeAndPlaySpeechWithCallback } from '../apiService';
-import { startContinuousRecognition, stopContinuousRecognition, pauseRecognition, isSpeechConfigured, disposeSpeechRecognizer } from '../services/speechService';
+import { startConsultation, sendConsultationMessage } from '../apiService';
+import { geminiLive } from '../services/geminiLiveService';
 import { ParchmentCard } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
 
@@ -65,6 +65,9 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const frameIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('cinematic_archives');
@@ -127,112 +130,172 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     }
   }, [selectedProfile, mode]);
 
-  // 视频咨询初始化 - 自动语音对话
+  // 视频咨询初始化 - Gemini Live API
   useEffect(() => {
-    if (selectedProfile && mode === 'video' && messages.length === 0) {
-      // 根据档案生成定制开场白
-      const matches = selectedProfile.matches || [];
-      const firstMatch = matches[0];
-      const characterInfo = firstMatch
-        ? t('dashboard.characterInfo', { name: firstMatch.name, description: (firstMatch.description?.slice(0, 30) || '...') })
-        : '';
-
-      const welcomeText = t('dashboard.welcomeText', { characterInfo });
-
-      setMessages([{
-        role: 'model',
-        text: welcomeText
-      }]);
-
-      // 播放欢迎语音，播放完后开始监听
-      setIsAiSpeaking(true);
-      synthesizeAndPlaySpeechWithCallback(welcomeText, () => {
-        setIsAiSpeaking(false);
-        // AI 说完后开始连续语音识别
-        startVoiceRecognition();
-      });
+    if (selectedProfile && mode === 'video') {
+      initLiveSession();
     }
 
-    // 清理：离开视频模式时停止语音识别
     return () => {
-      stopContinuousRecognition();
-      disposeSpeechRecognizer();
+      if (geminiLive.isSessionActive()) {
+        cleanupLiveSession();
+      }
     };
   }, [selectedProfile, mode]);
 
-  // 开始语音识别
-  const startVoiceRecognition = () => {
-    if (!isSpeechConfigured()) {
-      console.warn('Speech not configured');
-      return;
-    }
+  // 初始化 Live API 会话
+  const initLiveSession = async () => {
+    if (!selectedProfile) return;
 
-    setIsRecording(true);
-    startContinuousRecognition(
-      // 识别完成回调（一句话说完）
-      (text) => {
-        if (text.trim() && !isAiSpeaking && !loading) {
-          setRecognizingText("");
-          handleAutoSend(text);
-        }
-      },
-      // 实时识别回调
-      (text) => {
-        setRecognizingText(text);
-      }
-    );
-  };
+    // iOS 需要在用户交互时初始化 AudioContext
+    geminiLive.initAudioContext();
 
-  // 自动发送识别到的消息
-  const handleAutoSend = async (text: string) => {
-    if (!text.trim() || loading || !selectedProfile || isAiSpeaking) return;
-
-    // 暂停语音识别
-    pauseRecognition();
-    setIsRecording(false);
-
-    const userMsg = text;
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
-      let imageData = '';
-      if (videoRef.current && canvasRef.current) {
-        const canvas = canvasRef.current;
-        const video = videoRef.current;
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0);
-          imageData = canvas.toDataURL('image/jpeg', 0.7);
-        }
-      }
+      // 构建系统指令
+      const matches = selectedProfile.matches || [];
+      const firstMatch = matches[0];
+      const characterContext = firstMatch
+        ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。`
+        : '';
 
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
-      setMessages(prev => [...prev, { role: 'model', text: response }]);
-      setLoading(false);
+      const systemInstruction = `你是影中镜的专业造型顾问导演。你正在与一位寻求穿搭建议的用户进行视频对话。
+${characterContext}
+请根据用户的外表、穿着给出专业的穿搭和形象建议。回复要简洁自然，像真人对话一样。使用中文回复。`;
 
-      // 播放 AI 回复语音
-      const dialoguePart = response.includes('[SPLIT]') ? response.split('[SPLIT]')[1]?.trim() : response;
-      if (dialoguePart) {
-        setIsAiSpeaking(true);
-        synthesizeAndPlaySpeechWithCallback(dialoguePart, () => {
+      // 连接 Live API
+      await geminiLive.connect({
+        systemInstruction,
+        voiceName: 'Puck',
+        onTextResponse: (text) => {
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+            if (last?.role === 'model') {
+              return [...prev.slice(0, -1), { ...last, text: last.text + text }];
+            }
+            return [...prev, { role: 'model', text }];
+          });
+        },
+        onAudioData: () => {
+          setIsAiSpeaking(true);
+        },
+        onConnected: () => {
+          console.log('✅ Live API connected');
+          setLoading(false);
+          startMediaCapture();
+        },
+        onDisconnected: () => {
           setIsAiSpeaking(false);
-          // AI 说完后恢复语音识别
-          startVoiceRecognition();
-        });
-      } else {
-        // 没有语音，直接恢复识别
-        startVoiceRecognition();
-      }
-    } catch (e: any) {
+          setIsRecording(false);
+        },
+        onError: (err) => {
+          console.error('Live API error:', err);
+          setError(err.message);
+          setLoading(false);
+        }
+      });
+
+      const welcomeText = language === 'en'
+        ? 'Connected! I can see you now. Tell me about your outfit today.'
+        : '已连接！我现在能看到你了。和我说说你今天的穿搭吧。';
+      setMessages([{ role: 'model', text: welcomeText }]);
+
+    } catch (err: any) {
+      console.error('Failed to init live session:', err);
+      setError(err.message || 'Failed to connect to Live API');
       setLoading(false);
-      setError(e.message || t('common.error'));
-      // 出错也恢复识别
-      startVoiceRecognition();
     }
+  };
+
+  // 开始捕获音视频
+  const startMediaCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+      mediaStreamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+
+      // 音频处理
+      audioContextRef.current = new AudioContext({ sampleRate: 16000 });
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      const processor = audioContextRef.current.createScriptProcessor(4096, 1, 1);
+
+      processor.onaudioprocess = (e) => {
+        if (!geminiLive.isSessionActive()) return;
+
+        const inputData = e.inputBuffer.getChannelData(0);
+        const pcm16 = new Int16Array(inputData.length);
+        for (let i = 0; i < inputData.length; i++) {
+          pcm16[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+        }
+        geminiLive.sendAudio(pcm16.buffer);
+      };
+
+      source.connect(processor);
+      processor.connect(audioContextRef.current.destination);
+      setIsRecording(true);
+
+      // 每秒发送一帧视频
+      frameIntervalRef.current = window.setInterval(() => {
+        if (!geminiLive.isSessionActive()) return;
+
+        if (videoRef.current && canvasRef.current) {
+          const canvas = canvasRef.current;
+          const video = videoRef.current;
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, 640, 480);
+            const imageData = canvas.toDataURL('image/jpeg', 0.5);
+            geminiLive.sendVideoFrame(imageData);
+          }
+        }
+      }, 1000);
+
+    } catch (err: any) {
+      console.error('Failed to start media capture:', err);
+      setError(t('dashboard.cameraError'));
+    }
+  };
+
+  // 清理 Live API 会话
+  const cleanupLiveSession = () => {
+    if (frameIntervalRef.current) {
+      clearInterval(frameIntervalRef.current);
+      frameIntervalRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
+    }
+
+    geminiLive.disconnect();
+    setIsRecording(false);
+    setIsAiSpeaking(false);
+  };
+
+  // 视频模式下发送文字
+  const handleLiveTextSend = () => {
+    if (!input.trim() || !geminiLive.isSessionActive()) return;
+
+    const userMsg = input;
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    geminiLive.sendText(userMsg);
   };
 
   const handleRoleSelect = (p: PersonalityProfile) => {
@@ -255,107 +318,6 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       const response = await sendConsultationMessage(userMsg);
       setMessages(prev => [...prev, { role: 'model', text: response.text }]);
       setLoading(false);
-    } catch (e: any) {
-      setLoading(false);
-      setError(e.message || t('common.error'));
-    }
-  };
-
-  // 语音输入处理
-  const handleVoiceInput = async () => {
-    if (loading || isRecording) return;
-
-    setIsRecording(true);
-    setError("");
-
-    try {
-      // 假设 startSpeechRecognition 是另一个未导入的函数，但这里似乎没有使用，注释掉
-      // const text = await startSpeechRecognition();
-      // setIsRecording(false);
-      //
-      // if (text.trim()) {
-      //   // 直接发送识别到的文字
-      //   setInput(text);
-      //   // 自动发送
-      //   setTimeout(() => {
-      //     const fakeEvent = { currentTarget: { value: text } };
-      //     handleVideoSendWithText(text);
-      //   }, 100);
-      // }
-    } catch (e: any) {
-      setIsRecording(false);
-      setError(e.message || t('dashboard.voiceFail'));
-    }
-  };
-
-  // 带文字参数的视频发送
-  const handleVideoSendWithText = async (text: string) => {
-    if (!text.trim() || loading || !selectedProfile) return;
-    const userMsg = text;
-    setInput("");
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setLoading(true);
-    setError("");
-
-    try {
-      let imageData = '';
-      if (videoRef.current && canvasRef.current) {
-        const canvas = canvasRef.current;
-        const video = videoRef.current;
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0);
-          imageData = canvas.toDataURL('image/jpeg', 0.7);
-        }
-      }
-
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
-      setMessages(prev => [...prev, { role: 'model', text: response }]);
-      setLoading(false);
-      const dialoguePart = response.includes('[SPLIT]') ? response.split('[SPLIT]')[1]?.trim() : response;
-      if (dialoguePart) {
-        synthesizeAndPlaySpeech(dialoguePart);
-      }
-    } catch (e: any) {
-      setLoading(false);
-      setError(e.message || t('common.error'));
-    }
-  };
-
-  // 视频咨询发送 - 带上当前画面
-  const handleVideoSend = async () => {
-    if (!input.trim() || loading || !selectedProfile) return;
-    const userMsg = input;
-    setInput("");
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setLoading(true);
-    setError("");
-
-    try {
-      // 捕获当前视频帧
-      let imageData = '';
-      if (videoRef.current && canvasRef.current) {
-        const canvas = canvasRef.current;
-        const video = videoRef.current;
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0);
-          imageData = canvas.toDataURL('image/jpeg', 0.7);
-        }
-      }
-
-      const response = await sendVideoChat(userMsg, imageData, selectedProfile.id, language);
-      setMessages(prev => [...prev, { role: 'model', text: response }]);
-      setLoading(false);
-      // 播放 AI 回复语音
-      const dialoguePart = response.includes('[SPLIT]') ? response.split('[SPLIT]')[1]?.trim() : response;
-      if (dialoguePart) {
-        synthesizeAndPlaySpeech(dialoguePart);
-      }
     } catch (e: any) {
       setLoading(false);
       setError(e.message || t('common.error'));
@@ -542,10 +504,10 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
               value={input}
               disabled={loading || isAiSpeaking}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleVideoSend()}
+              onKeyDown={e => e.key === 'Enter' && handleLiveTextSend()}
             />
             <button
-              onClick={handleVideoSend}
+              onClick={handleLiveTextSend}
               disabled={loading || !input.trim() || isAiSpeaking}
               className="text-white/50 hover:text-white disabled:opacity-20 transition-colors"
             >
