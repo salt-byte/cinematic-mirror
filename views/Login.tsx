@@ -10,7 +10,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
   const { t } = useLanguage();
-  const [email, setEmail] = useState("director@studio.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
