@@ -84,12 +84,16 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         .catch(() => {
           setError(t('dashboard.cameraError'));
         });
-    } else {
+    }
+
+    // 清理：离开视频模式时关闭摄像头
+    return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
       }
-    }
+    };
   }, [mode]);
 
   useEffect(() => {
@@ -149,12 +153,10 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       });
     }
 
-    // 清理：离开视频模式时停止识别
+    // 清理：离开视频模式时停止语音识别
     return () => {
-      if (mode !== 'video') {
-        stopContinuousRecognition();
-        disposeSpeechRecognizer();
-      }
+      stopContinuousRecognition();
+      disposeSpeechRecognizer();
     };
   }, [selectedProfile, mode]);
 
