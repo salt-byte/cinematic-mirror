@@ -31,6 +31,21 @@ class GeminiLiveService {
     private isConnected = false;
 
     /**
+     * 初始化音频上下文（必须在用户交互时调用）
+     */
+    initAudioContext(): void {
+        if (!this.audioContext) {
+            this.audioContext = new AudioContext({ sampleRate: 24000 });
+            console.log('🔊 AudioContext initialized');
+        }
+        // iOS 需要 resume
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+            console.log('🔊 AudioContext resumed');
+        }
+    }
+
+    /**
      * 连接到 Gemini Live API
      */
     async connect(config: LiveSessionConfig): Promise<void> {
@@ -222,8 +237,19 @@ class GeminiLiveService {
 
         this.isPlaying = true;
 
+        // 确保 AudioContext 已初始化并恢复
         if (!this.audioContext) {
             this.audioContext = new AudioContext({ sampleRate: 24000 });
+        }
+
+        // iOS 需要在用户交互后恢复 AudioContext
+        if (this.audioContext.state === 'suspended') {
+            try {
+                await this.audioContext.resume();
+                console.log('🔊 AudioContext resumed for playback');
+            } catch (e) {
+                console.error('Failed to resume AudioContext:', e);
+            }
         }
 
         while (this.audioQueue.length > 0) {
@@ -244,6 +270,8 @@ class GeminiLiveService {
                 const source = this.audioContext.createBufferSource();
                 source.buffer = audioBuffer;
                 source.connect(this.audioContext.destination);
+
+                console.log('🔊 Playing audio chunk:', floatData.length, 'samples');
 
                 await new Promise<void>(resolve => {
                     source.onended = () => resolve();

@@ -133,19 +133,26 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
 
   // 视频咨询初始化 - Gemini 2.0 Live API
   useEffect(() => {
+    // 只有视频模式才启动 Live API
     if (selectedProfile && mode === 'video') {
       initLiveSession();
     }
 
-    // 清理：离开视频模式时断开连接
+    // 清理：只在离开视频模式时断开连接
     return () => {
-      cleanupLiveSession();
+      // 只有当 Live API 确实在运行时才清理
+      if (geminiLive.isSessionActive()) {
+        cleanupLiveSession();
+      }
     };
   }, [selectedProfile, mode]);
 
   // 初始化 Live API 会话
   const initLiveSession = async () => {
     if (!selectedProfile) return;
+
+    // iOS 需要在用户交互时初始化 AudioContext
+    geminiLive.initAudioContext();
 
     setLoading(true);
     setError('');
