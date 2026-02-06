@@ -27,9 +27,9 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
    };
 
    return (
-      <div className="flex-1 overflow-y-auto pb-60 bg-parchment-base animate-in fade-in duration-1000 no-scrollbar relative">
+      <div className="flex-1 overflow-y-auto bg-parchment-base animate-in fade-in duration-1000 no-scrollbar relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 240px)' }}>
          {/* 档案顶部：绝密印记 */}
-         <header className="pt-16 px-10 flex justify-between items-end border-b border-walnut/10 pb-8 relative">
+         <header className="px-10 flex justify-between items-end border-b border-walnut/10 pb-8 relative" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)' }}>
             <div className="space-y-2">
                <div className="flex items-center gap-2">
                   <span className="bg-vintageRed text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm tracking-[0.2em] uppercase">{t('result.topSecret')}</span>
@@ -130,7 +130,7 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
                                     Role: {getText(match.name, character?.nameEn)}
                                  </p>
                                  <p className="text-[12px] font-serif text-parchment-base/40 italic leading-[2] pt-4">
-                                    “{match.description}”
+                                    "{match.description}"
                                  </p>
                               </div>
                            </div>
@@ -142,7 +142,7 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
          </section>
 
          {/* 底部按钮：物理重感 */}
-         <div className="fixed bottom-0 left-0 right-0 p-10 bg-gradient-to-t from-parchment-base via-parchment-base to-transparent z-50 max-w-[430px] mx-auto">
+         <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-parchment-base via-parchment-base to-transparent z-50" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
             <button
                onClick={onContinue}
                className="w-full h-20 bg-walnut text-parchment-light shadow-2xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all group"

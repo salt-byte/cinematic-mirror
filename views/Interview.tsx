@@ -13,12 +13,13 @@ interface ParsedMessage {
 interface UserInfo {
   name: string;
   gender: 'male' | 'female' | '';
+  avatar: string; // base64 头像
 }
 
 const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }> = ({ onComplete }) => {
   const { t, language } = useLanguage();
   const [showIntro, setShowIntro] = useState(true);
-  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', gender: '' });
+  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', gender: '', avatar: '' });
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; parts: ParsedMessage[] }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,43 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   const [error, setError] = useState("");
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 处理头像上传
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 限制文件大小 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      setError(t('interview.avatarTooLarge'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // 压缩图片到 300x300
+        const canvas = document.createElement('canvas');
+        const size = 300;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // 居中裁剪
+          const scale = Math.max(size / img.width, size / img.height);
+          const x = (size - img.width * scale) / 2;
+          const y = (size - img.height * scale) / 2;
+          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+          const compressed = canvas.toDataURL('image/jpeg', 0.8);
+          setUserInfo(prev => ({ ...prev, avatar: compressed }));
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // 解析 AI 回复，分离场记和对话
   // 格式：动作描写 [SPLIT] 对话内容
@@ -142,12 +180,44 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   // 开场弹窗 - 输入名字和选择性别
   if (showIntro) {
     return (
-      <div className="flex-1 flex flex-col min-h-[100dvh] overflow-auto bg-parchment-base">
+      <div className="flex-1 flex flex-col min-h-[100dvh] overflow-auto bg-parchment-base" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="bg-white shadow-2xl border border-walnut/10 p-8 max-w-sm w-full space-y-8">
+            {/* 头像上传 */}
+            <div className="flex flex-col items-center space-y-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="relative group"
+              >
+                <div className={`size-24 rounded-full border-2 border-dashed overflow-hidden transition-all ${userInfo.avatar ? 'border-vintageRed' : 'border-walnut/20 hover:border-walnut/40'}`}>
+                  {userInfo.avatar ? (
+                    <img src={userInfo.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-walnut/5 flex flex-col items-center justify-center">
+                      <span className="material-symbols-outlined text-3xl text-walnut/20">add_a_photo</span>
+                    </div>
+                  )}
+                </div>
+                {userInfo.avatar && (
+                  <div className="absolute -bottom-1 -right-1 size-7 bg-vintageRed rounded-full flex items-center justify-center shadow-lg">
+                    <span className="material-symbols-outlined text-white text-sm">edit</span>
+                  </div>
+                )}
+              </button>
+              <p className="text-[9px] text-walnut/40 font-mono uppercase tracking-wider">
+                {t('interview.uploadAvatar')}
+              </p>
+            </div>
+
             {/* 标题 */}
             <div className="text-center space-y-2">
-              <span className="material-symbols-outlined text-4xl text-walnut/20">movie_filter</span>
               <h2 className="text-xl font-retro font-black text-walnut tracking-widest">{t('interview.registrationTitle')}</h2>
               <p className="text-[10px] font-serif text-walnut/50 italic">
                 {t('interview.registrationSubtitle')}
@@ -219,13 +289,13 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
     );
   }
 
-  const currentSceneName = translations.interview.sceneNames[language][round - 1] || '对话';
-  const sceneNumber = ['一', '二', '三', '四', '五', '六', '七', '八'][round - 1] || round;
+  const currentSceneName = translations.interview.sceneNames[language][round - 1] || t('interview.defaultSceneName');
+  const sceneNumber = translations.interview.sceneNumbers[language][round - 1] || round;
 
   return (
     <div className="flex-1 flex flex-col min-h-[100dvh] overflow-hidden bg-parchment-base">
       {/* 顶部导航 */}
-      <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-light shrink-0">
+      <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-light shrink-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <button className="text-walnut/30">
           <span className="material-symbols-outlined text-xl">calendar_view_day</span>
         </button>

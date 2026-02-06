@@ -43,6 +43,9 @@ async function request<T>(
 // =====================================================
 
 export async function register(email: string, password: string) {
+  // 新用户注册，先清空本地档案（全新开始）
+  clearLocalArchives();
+
   const result = await request<{ user: any; token: string }>('/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
@@ -50,13 +53,13 @@ export async function register(email: string, password: string) {
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
 
-  // 新用户注册后，同步本地档案到服务器（如果有的话）
-  await syncArchivesAfterAuth();
-
   return result;
 }
 
 export async function login(email: string, password: string) {
+  // 登录前先清空本地档案（准备加载该用户的档案）
+  clearLocalArchives();
+
   const result = await request<{ user: any; token: string }>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
@@ -64,8 +67,8 @@ export async function login(email: string, password: string) {
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
 
-  // 登录后同步档案
-  await syncArchivesAfterAuth();
+  // 登录后从服务器加载该用户的档案
+  await loadUserArchives();
 
   return result;
 }
@@ -73,6 +76,31 @@ export async function login(email: string, password: string) {
 export function logout() {
   authToken = null;
   localStorage.removeItem('cinematic_token');
+  // 登出时清空本地档案
+  clearLocalArchives();
+}
+
+// 清空本地档案缓存
+function clearLocalArchives() {
+  localStorage.removeItem('cinematic_archives');
+  localStorage.removeItem('cinematic_mirror_profile');
+}
+
+// 从服务器加载用户档案到本地
+async function loadUserArchives(): Promise<void> {
+  try {
+    const serverProfiles = await getUserProfiles();
+    if (serverProfiles && serverProfiles.length > 0) {
+      // 格式化并保存到本地
+      const normalized = serverProfiles.map(normalizeProfile);
+      localStorage.setItem('cinematic_archives', JSON.stringify(normalized));
+      // 设置最新的为当前活跃档案
+      localStorage.setItem('cinematic_mirror_profile', JSON.stringify(normalized[0]));
+      console.log(`[档案] 从服务器加载了 ${normalized.length} 个档案`);
+    }
+  } catch (error) {
+    console.warn('[档案] 加载用户档案失败:', error);
+  }
 }
 
 export async function forgotPassword(email: string): Promise<{ message: string }> {

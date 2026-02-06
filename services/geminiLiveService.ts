@@ -1,16 +1,14 @@
 /**
  * Gemini Live API 服务
- * 使用 @google/genai SDK 的 ai.live.connect 实现实时音视频对话
+ * 参考工作代码重写，实现实时音视频对话
  */
 
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// 实时多模态模型
 const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
 
-// 获取 API Key
 const getApiKey = (): string => {
-    // @ts-ignore - Vite 环境变量
+    // @ts-ignore
     return import.meta.env?.VITE_GEMINI_API_KEY || '';
 };
 
@@ -22,6 +20,7 @@ export interface LiveSessionConfig {
     onError?: (error: Error) => void;
     onConnected?: () => void;
     onDisconnected?: () => void;
+    onInterrupted?: () => void;
 }
 
 class GeminiLiveService {
@@ -29,14 +28,13 @@ class GeminiLiveService {
     private config: LiveSessionConfig = {};
     private audioContext: AudioContext | null = null;
     private isConnected = false;
+    private nextStartTime = 0;
+    private activeSources: Set<AudioBufferSourceNode> = new Set();
 
-    /**
-     * 初始化音频上下文（必须在用户交互时调用）
-     */
     initAudioContext(): void {
         if (!this.audioContext) {
-            this.audioContext = new AudioContext({ sampleRate: 24000 });
-            console.log('🔊 AudioContext initialized');
+            this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+            console.log('🔊 AudioContext initialized (24000Hz)');
         }
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
@@ -44,15 +42,12 @@ class GeminiLiveService {
         }
     }
 
-    /**
-     * 连接到 Gemini Live API
-     */
     async connect(config: LiveSessionConfig): Promise<void> {
         this.config = config;
 
         const apiKey = getApiKey();
         if (!apiKey) {
-            throw new Error('Missing Gemini API Key. Please set VITE_GEMINI_API_KEY.');
+            throw new Error('Missing Gemini API Key');
         }
 
         try {
@@ -64,6 +59,7 @@ class GeminiLiveService {
                     onopen: () => {
                         console.log('✅ Live API connected');
                         this.isConnected = true;
+                        this.nextStartTime = 0;
                         this.config.onConnected?.();
                     },
                     onmessage: (message: any) => {
@@ -80,68 +76,144 @@ class GeminiLiveService {
                     }
                 },
                 config: {
-                    responseModalities: [Modality.AUDIO, Modality.TEXT],
-                    systemInstruction: config.systemInstruction || '你是一位专业的服装造型顾问，会根据用户的外表给出穿搭建议。请用中文回复。',
+                    responseModalities: [Modality.AUDIO],
+                    systemInstruction: config.systemInstruction || '你是一位专业的服装造型顾问。请用中文回复，语气温暖专业。',
                     speechConfig: {
                         voiceConfig: {
                             prebuiltVoiceConfig: {
-                                voiceName: config.voiceName || 'Puck'
+                                voiceName: config.voiceName || 'Zephyr'
                             }
                         }
-                    }
+                    },
+                    // 关键：启用转录
+                    outputAudioTranscription: {},
+                    inputAudioTranscription: {},
                 }
             });
 
         } catch (error: any) {
-            console.error('Failed to connect to Live API:', error);
+            console.error('Failed to connect:', error);
             throw error;
         }
     }
 
-    /**
-     * 处理服务器消息
-     */
     private handleMessage(message: any): void {
         try {
-            // 处理文本响应
-            if (message.text) {
-                this.config.onTextResponse?.(message.text);
+            // 处理中断
+            if (message.serverContent?.interrupted) {
+                console.log('⚡ Interrupted');
+                this.stopAllAudio();
+                this.config.onInterrupted?.();
+                return;
             }
 
-            // 处理转录内容
-            if (message.serverContent?.modelTurn?.parts) {
-                for (const part of message.serverContent.modelTurn.parts) {
-                    if (part.text) {
-                        this.config.onTextResponse?.(part.text);
-                    }
-                    if (part.inlineData?.data) {
-                        const audioData = this.base64ToArrayBuffer(part.inlineData.data);
-                        this.config.onAudioData?.(audioData);
-                        this.playAudio(audioData);
-                    }
-                }
+            // 处理音频数据 - 关键路径
+            const audioPart = message.serverContent?.modelTurn?.parts?.[0];
+            if (audioPart?.inlineData?.data) {
+                const base64Audio = audioPart.inlineData.data;
+                console.log('🔊 Got audio data, length:', base64Audio.length);
+                this.playBase64Audio(base64Audio);
             }
 
-            // 处理直接音频数据
-            if (message.data && message.data instanceof ArrayBuffer) {
-                this.config.onAudioData?.(message.data);
-                this.playAudio(message.data);
+            // 处理输出转录（AI说的话）
+            if (message.serverContent?.outputTranscription?.text) {
+                const text = message.serverContent.outputTranscription.text;
+                console.log('📝 AI transcript:', text);
+                this.config.onTextResponse?.(text);
             }
+
+            // 处理输入转录（用户说的话）
+            if (message.serverContent?.inputTranscription?.text) {
+                console.log('🎤 User transcript:', message.serverContent.inputTranscription.text);
+            }
+
+            // 处理回合完成
+            if (message.serverContent?.turnComplete) {
+                console.log('✔️ Turn complete');
+            }
+
         } catch (error) {
             console.error('Error handling message:', error);
         }
     }
 
-    /**
-     * 发送音频数据
-     */
+    private async playBase64Audio(base64: string): Promise<void> {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+        }
+
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+
+        try {
+            // 解码 base64
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            // PCM 16-bit 转 AudioBuffer
+            const dataInt16 = new Int16Array(bytes.buffer);
+            const sampleRate = 24000;
+            const channels = 1;
+            const frameCount = dataInt16.length / channels;
+
+            const audioBuffer = this.audioContext.createBuffer(channels, frameCount, sampleRate);
+            const channelData = audioBuffer.getChannelData(0);
+
+            for (let i = 0; i < frameCount; i++) {
+                channelData[i] = dataInt16[i] / 32768.0;
+            }
+
+            // 使用队列播放，避免音频重叠
+            this.nextStartTime = Math.max(this.nextStartTime, this.audioContext.currentTime);
+
+            const source = this.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(this.audioContext.destination);
+            source.start(this.nextStartTime);
+
+            this.nextStartTime += audioBuffer.duration;
+            this.activeSources.add(source);
+
+            this.config.onAudioData?.(bytes.buffer);
+
+            source.onended = () => {
+                this.activeSources.delete(source);
+            };
+
+            console.log('🔊 Playing audio, duration:', audioBuffer.duration.toFixed(2), 's');
+
+        } catch (error) {
+            console.error('Error playing audio:', error);
+        }
+    }
+
+    private stopAllAudio(): void {
+        this.activeSources.forEach(source => {
+            try { source.stop(); } catch (e) {}
+        });
+        this.activeSources.clear();
+        this.nextStartTime = 0;
+    }
+
     sendAudio(audioData: ArrayBuffer): void {
         if (!this.isConnected || !this.session) return;
 
         try {
+            // 转换为 base64
+            const bytes = new Uint8Array(audioData);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+
             this.session.sendRealtimeInput({
-                audio: {
-                    data: this.arrayBufferToBase64(audioData),
+                media: {
+                    data: base64,
                     mimeType: 'audio/pcm;rate=16000'
                 }
             });
@@ -150,15 +222,11 @@ class GeminiLiveService {
         }
     }
 
-    /**
-     * 发送视频帧（图片）
-     */
     sendVideoFrame(imageData: string): void {
         if (!this.isConnected || !this.session) return;
 
         try {
             const base64Image = imageData.replace(/^data:image\/\w+;base64,/, '');
-
             this.session.sendRealtimeInput({
                 media: {
                     data: base64Image,
@@ -170,70 +238,21 @@ class GeminiLiveService {
         }
     }
 
-    /**
-     * 发送文本消息
-     */
     sendText(text: string): void {
         if (!this.isConnected || !this.session) return;
 
         try {
-            this.session.sendClientContent({
-                turns: [{
-                    role: 'user',
-                    parts: [{ text }]
-                }],
-                turnComplete: true
-            });
+            this.session.sendRealtimeInput({ text });
         } catch (error) {
             console.error('Error sending text:', error);
         }
     }
 
-    /**
-     * 播放音频
-     */
-    private async playAudio(audioData: ArrayBuffer): Promise<void> {
-        if (!this.audioContext) {
-            this.audioContext = new AudioContext({ sampleRate: 24000 });
-        }
-
-        if (this.audioContext.state === 'suspended') {
-            await this.audioContext.resume();
-        }
-
-        try {
-            // PCM 16-bit 转 Float32
-            const pcmData = new Int16Array(audioData);
-            const floatData = new Float32Array(pcmData.length);
-
-            for (let i = 0; i < pcmData.length; i++) {
-                floatData[i] = pcmData[i] / 32768;
-            }
-
-            const audioBuffer = this.audioContext.createBuffer(1, floatData.length, 24000);
-            audioBuffer.getChannelData(0).set(floatData);
-
-            const source = this.audioContext.createBufferSource();
-            source.buffer = audioBuffer;
-            source.connect(this.audioContext.destination);
-            source.start();
-
-            console.log('🔊 Playing audio:', floatData.length, 'samples');
-        } catch (error) {
-            console.error('Error playing audio:', error);
-        }
-    }
-
-    /**
-     * 断开连接
-     */
     disconnect(): void {
+        this.stopAllAudio();
+
         if (this.session) {
-            try {
-                this.session.close();
-            } catch (e) {
-                // Ignore close errors
-            }
+            try { this.session.close(); } catch (e) {}
             this.session = null;
         }
         this.isConnected = false;
@@ -244,33 +263,10 @@ class GeminiLiveService {
         }
     }
 
-    /**
-     * 检查是否已连接
-     */
     isSessionActive(): boolean {
         return this.isConnected;
     }
-
-    // 工具函数
-    private arrayBufferToBase64(buffer: ArrayBuffer): string {
-        const bytes = new Uint8Array(buffer);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return btoa(binary);
-    }
-
-    private base64ToArrayBuffer(base64: string): ArrayBuffer {
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-            bytes[i] = binary.charCodeAt(i);
-        }
-        return bytes.buffer;
-    }
 }
 
-// 导出单例
 export const geminiLive = new GeminiLiveService();
 export default geminiLive;

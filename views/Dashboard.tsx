@@ -161,15 +161,20 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。`
         : '';
 
-      const systemInstruction = `你是影中镜的专业造型顾问导演。你正在与一位寻求穿搭建议的用户进行视频对话。
+      const systemInstruction = `你是"陆野"，影中镜的专业造型顾问导演，一位温暖而专业的形象设计师。
 ${characterContext}
-请根据用户的外表、穿着给出专业的穿搭和形象建议。回复要简洁自然，像真人对话一样。使用中文回复。`;
+你正在与用户进行视频对话，可以看到他们的实时画面。
+请根据用户的外表、穿着、气质给出专业的穿搭和形象建议。
+语气要温暖自然，像朋友聊天一样，但保持专业度。
+回复要简洁，每次只说1-2句话，像真人对话一样自然。
+使用中文回复。`;
 
       // 连接 Live API
       await geminiLive.connect({
         systemInstruction,
-        voiceName: 'Puck',
+        voiceName: 'Orus', // 有磁性的男声
         onTextResponse: (text) => {
+          // 累积转录文本
           setMessages(prev => {
             const last = prev[prev.length - 1];
             if (last?.role === 'model') {
@@ -177,6 +182,7 @@ ${characterContext}
             }
             return [...prev, { role: 'model', text }];
           });
+          setIsAiSpeaking(true);
         },
         onAudioData: () => {
           setIsAiSpeaking(true);
@@ -185,10 +191,21 @@ ${characterContext}
           console.log('✅ Live API connected');
           setLoading(false);
           startMediaCapture();
+          // 发送初始提示让 AI 先开口
+          setTimeout(() => {
+            geminiLive.sendText(language === 'en'
+              ? '(Session started. Greet the user warmly and ask about their outfit today.)'
+              : '（会话开始。请温暖地问候用户，询问他们今天的穿搭。）'
+            );
+          }, 500);
         },
         onDisconnected: () => {
           setIsAiSpeaking(false);
           setIsRecording(false);
+        },
+        onInterrupted: () => {
+          // 用户打断了 AI
+          setIsAiSpeaking(false);
         },
         onError: (err) => {
           console.error('Live API error:', err);
@@ -197,10 +214,7 @@ ${characterContext}
         }
       });
 
-      const welcomeText = language === 'en'
-        ? 'Connected! I can see you now. Tell me about your outfit today.'
-        : '已连接！我现在能看到你了。和我说说你今天的穿搭吧。';
-      setMessages([{ role: 'model', text: welcomeText }]);
+      setMessages([]);
 
     } catch (err: any) {
       console.error('Failed to init live session:', err);
@@ -301,8 +315,19 @@ ${characterContext}
   const handleRoleSelect = (p: PersonalityProfile) => {
     setSelectedProfile(p);
     setMode('select_mode');
-    setMessages([]);
+    setMessages([]); // 清空消息
     setError("");
+  };
+
+  // 切换咨询模式时清空消息
+  const handleModeChange = (newMode: 'text' | 'video') => {
+    // 先清理之前的会话
+    if (mode === 'video' && geminiLive.isSessionActive()) {
+      cleanupLiveSession();
+    }
+    setMessages([]); // 清空消息，确保两个模式独立
+    setError("");
+    setMode(newMode);
   };
 
   // 文字咨询发送
@@ -377,14 +402,14 @@ ${characterContext}
             <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">{t('dashboard.selectMode')}</p>
           </div>
           <div className="flex flex-col gap-10 w-full max-w-xs">
-            <button onClick={() => setMode('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
+            <button onClick={() => handleModeChange('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
               <div className="text-left space-y-1">
                 <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.textChatTitle')}</h4>
                 <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.textChatDesc')}</p>
               </div>
               <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">auto_stories</span>
             </button>
-            <button onClick={() => setMode('video')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
+            <button onClick={() => handleModeChange('video')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
               <div className="text-left space-y-1">
                 <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.videoChatTitle')}</h4>
                 <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.videoChatDesc')}</p>
@@ -397,109 +422,104 @@ ${characterContext}
     );
   }
 
-  // 视频咨询模式
+  // 视频咨询模式 - 全屏视频通话样式
   if (mode === 'video') {
-    return (
-      <div className="flex-1 flex flex-col h-screen bg-ink relative">
-        {/* 视频画面 - 小窗口 */}
-        <div className="absolute top-4 right-4 w-28 h-36 bg-black rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl z-20">
-          <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
-          <canvas ref={canvasRef} className="hidden" />
-          <div className="absolute top-2 left-2 flex items-center gap-1">
-            <div className="size-2 bg-red-500 rounded-full animate-pulse" />
-          </div>
-        </div>
+    // 获取最新的一条 AI 消息用于显示
+    const latestModelMessage = [...messages].reverse().find(m => m.role === 'model');
 
-        {/* 顶部导航 */}
-        <header className="px-6 py-4 flex items-center justify-between bg-ink/80 backdrop-blur shrink-0 z-10">
-          <button onClick={() => setMode('select_mode')} className="text-white/40">
-            <span className="material-symbols-outlined">arrow_back</span>
+    return (
+      <div className="fixed inset-0 bg-black z-50">
+        {/* 全屏视频背景 */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover -scale-x-100"
+        />
+        <canvas ref={canvasRef} className="hidden" />
+
+        {/* 渐变遮罩 - 顶部和底部 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
+
+        {/* 顶部导航栏 */}
+        <div className="absolute top-0 left-0 right-0 px-4 flex items-center justify-between z-10" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+          <button onClick={() => setMode('select_mode')} className="size-10 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
+            <span className="material-symbols-outlined text-white">close</span>
           </button>
           <div className="text-center">
-            <h1 className="text-lg font-retro font-black text-white/90 tracking-widest">{t('interview.title')}</h1>
-            <p className="text-[9px] text-white/40 tracking-[0.2em]">{t('dashboard.videoMode')}</p>
+            <h1 className="text-sm font-retro font-black text-white tracking-widest drop-shadow-lg">{t('interview.title')}</h1>
+            <p className="text-[9px] text-white/60">{t('dashboard.videoMode')}</p>
           </div>
-          <div className="w-6" />
-        </header>
-
-        {/* 消息区域 */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-6 no-scrollbar pb-32">
-          {error && (
-            <div className="text-center py-4">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
-
-          {messages.map((msg, i) => (
-            <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              {msg.role === 'model' ? (
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-vintageRed/80 tracking-widest">{t('interview.title')}</p>
-                  <div className="bg-white/10 backdrop-blur px-5 py-4 rounded-lg max-w-[90%] space-y-2">
-                    {parseModelResponse(msg.text).map((part, idx) => (
-                      part.type === 'action' ? (
-                        <p key={idx} className="text-[11px] text-white/40 italic leading-relaxed">
-                          {part.content}
-                        </p>
-                      ) : (
-                        <p key={idx} className="text-[14px] text-white/90 leading-relaxed">
-                          {part.content}
-                        </p>
-                      )
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex justify-end">
-                  <div className="bg-vintageRed/80 px-5 py-4 rounded-lg max-w-[80%]">
-                    <p className="text-[14px] text-white leading-relaxed">
-                      {msg.text}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {loading && (
-            <div className="space-y-2">
-              <p className="text-xs font-bold text-vintageRed/80 tracking-widest">{t('interview.title')}</p>
-              <div className="bg-white/10 backdrop-blur px-5 py-4 rounded-lg">
-                <p className="text-white/50 text-sm">{t('dashboard.observing')}</p>
-              </div>
-            </div>
-          )}
+          <div className="size-10 flex items-center justify-center">
+            {isRecording && <div className="size-3 bg-red-500 rounded-full animate-pulse shadow-lg" />}
+          </div>
         </div>
 
-        {/* 输入区域 - 实时语音对话 */}
-        <div className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto px-4 pb-6 pt-3 bg-gradient-to-t from-ink via-ink to-transparent">
+        {/* AI 回复气泡 - 显示在中下部 */}
+        {latestModelMessage && (
+          <div className="absolute left-4 right-4 bottom-44 z-10">
+            <div className="bg-black/50 backdrop-blur-xl rounded-2xl px-5 py-4 border border-white/10 shadow-2xl">
+              <p className="text-[10px] font-bold text-vintageRed mb-2 tracking-widest">{t('interview.title')}</p>
+              {parseModelResponse(latestModelMessage.text).map((part, idx) => (
+                part.type === 'action' ? (
+                  <p key={idx} className="text-[11px] text-white/50 italic mb-1">{part.content}</p>
+                ) : (
+                  <p key={idx} className="text-[14px] text-white leading-relaxed">{part.content}</p>
+                )
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 加载状态 */}
+        {loading && !latestModelMessage && (
+          <div className="absolute left-4 right-4 bottom-44 z-10">
+            <div className="bg-black/50 backdrop-blur-xl rounded-2xl px-5 py-4 border border-white/10">
+              <p className="text-white/50 text-[13px]">{t('dashboard.observing')}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 错误提示 */}
+        {error && (
+          <div className="absolute left-4 right-4 top-24 z-10">
+            <div className="bg-red-500/80 backdrop-blur rounded-lg px-4 py-3">
+              <p className="text-white text-sm text-center">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 底部控制区域 */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 z-10" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}>
           {/* 状态显示 */}
-          <div className="text-center mb-3 min-h-[24px]">
+          <div className="text-center mb-4">
             {isAiSpeaking && (
-              <span className="text-white/60 text-sm">🔊 {t('dashboard.aiSpeaking')}</span>
+              <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white text-[12px]">
+                <span className="material-symbols-outlined text-[16px] animate-pulse">volume_up</span>
+                {t('dashboard.aiSpeaking')}
+              </span>
             )}
             {isRecording && !isAiSpeaking && !loading && (
-              <span className="text-vintageRed text-sm animate-pulse">🎤 {t('dashboard.listening')}</span>
+              <span className="inline-flex items-center gap-2 bg-vintageRed/80 px-4 py-2 rounded-full text-white text-[12px] animate-pulse">
+                <span className="material-symbols-outlined text-[16px]">mic</span>
+                {t('dashboard.listening')}
+              </span>
             )}
             {loading && (
-              <span className="text-white/40 text-sm">{t('dashboard.thinking')}</span>
+              <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-white/60 text-[12px]">
+                {t('dashboard.thinking')}
+              </span>
             )}
           </div>
 
-          {/* 实时识别文字显示 */}
-          {recognizingText && (
-            <div className="bg-white/10 backdrop-blur-xl px-4 py-3 rounded-lg mb-3 border border-white/10">
-              <p className="text-white/70 text-sm">{recognizingText}</p>
-            </div>
-          )}
-
-          {/* 也保留手动输入，以防语音不方便 */}
-          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl px-4 py-3 rounded-full border border-white/10">
-            <span className={`material-symbols-outlined text-sm ${isRecording ? 'text-vintageRed animate-pulse' : 'text-white/30'}`}>
+          {/* 输入框 */}
+          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl px-4 py-3 rounded-full border border-white/20">
+            <span className={`material-symbols-outlined text-xl ${isRecording ? 'text-vintageRed' : 'text-white/40'}`}>
               {isRecording ? 'hearing' : 'mic'}
             </span>
             <input
-              className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 outline-none"
+              className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/40 outline-none"
               placeholder={isRecording ? t('dashboard.speakOrType') : t('dashboard.typeToSend')}
               value={input}
               disabled={loading || isAiSpeaking}
@@ -509,9 +529,9 @@ ${characterContext}
             <button
               onClick={handleLiveTextSend}
               disabled={loading || !input.trim() || isAiSpeaking}
-              className="text-white/50 hover:text-white disabled:opacity-20 transition-colors"
+              className="size-10 rounded-full bg-vintageRed flex items-center justify-center disabled:opacity-30 transition-opacity"
             >
-              <span className="material-symbols-outlined">send</span>
+              <span className="material-symbols-outlined text-white">send</span>
             </button>
           </div>
         </div>
@@ -581,11 +601,12 @@ ${characterContext}
         )}
       </div>
 
-      {/* 输入区域 */}
-      <div className="fixed bottom-24 left-0 right-0 max-w-[430px] mx-auto px-6">
-        <div className="flex items-center gap-3 bg-white shadow-xl px-5 py-4 border border-walnut/5">
+      {/* 输入区域 - 移动端适配 */}
+      <div className="fixed bottom-0 left-0 right-0 px-4 bg-gradient-to-t from-parchment-base via-parchment-base to-transparent z-50"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)' }}>
+        <div className="flex items-center gap-3 bg-white shadow-xl px-4 py-3 border border-walnut/5 rounded-lg">
           <input
-            className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none"
+            className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none min-w-0"
             placeholder={t('dashboard.askAdvice')}
             value={input}
             disabled={loading}
@@ -595,7 +616,7 @@ ${characterContext}
           <button
             onClick={handleTextSend}
             disabled={loading || !input.trim()}
-            className="text-walnut/30 hover:text-vintageRed disabled:opacity-20 transition-colors"
+            className="text-walnut/30 hover:text-vintageRed disabled:opacity-20 transition-colors flex-shrink-0"
           >
             <span className="material-symbols-outlined">send</span>
           </button>

@@ -40,7 +40,7 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col desk-texture relative overflow-hidden p-6 pb-20">
+    <div className="flex-1 flex flex-col desk-texture relative overflow-hidden p-6 pb-20" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)' }}>
       <header className="flex items-center gap-4 mb-10 z-10">
         <button onClick={onBack} className="text-walnut/40 hover:text-walnut transition-colors">
           <span className="material-symbols-outlined">arrow_back_ios</span>

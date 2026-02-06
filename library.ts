@@ -28,7 +28,7 @@ export interface MovieCharacter {
 }
 
 
-export const MOVIE_DATABASE: MovieCharacter[] = [
+export const FEMALE_MOVIE_DATABASE: MovieCharacter[] = [
   {
     id: "clueless-cher",
     name: "雪儿",
@@ -1158,3 +1158,232 @@ export const MOVIE_DATABASE: MovieCharacter[] = [
     ]
   }
 ];
+
+// 男性电影角色数据库 - 占位数据，后续可填充真实数据
+export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
+  {
+    id: "gatsby_thegreatgatsby",
+    name: "盖茨比",
+    nameEn: "Gatsby",
+    movie: "了不起的盖茨比",
+    movieEn: "The Great Gatsby",
+    traits: ["极致深情", "完美主义", "过去的囚徒", "梦想家", "阶级跨越者", "孤独", "表演型人格"],
+    traitsEn: ["Deeply Romantic", "Perfectionist", "Prisoner of the Past", "Dreamer", "Social Climber", "Lonely", "Performative"],
+    stylings: [
+      {
+        title: "粉色西装的最后幻梦",
+        titleEn: "The Final Illusion of the Pink Suit",
+        subtitle: "新贵绅士 · 亚麻材质 · 易碎的完美主义",
+        subtitleEn: "Nouveau Riche Gentleman · Linen Texture · Fragile Perfectionism",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Gatsby/pink.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvR2F0c2J5L3BpbmsuanBnIiwiaWF0IjoxNzY5OTIxMjg5LCJleHAiOjIwODUyODEyODl9.TKn8q2Oqn9x7s1rU4CCv558x5uXoKjNnKyR5yG7FwQs",
+        palette: [
+          { hex: "#E8C3BA", name: "梦幻粉", enName: "Dreamy Pink" },
+          { hex: "#FFFFFF", name: "极简白", enName: "Minimal White" },
+          { hex: "#8E2F38", name: "勃艮第红", enName: "Burgundy" },
+          { hex: "#C9A06A", name: "奢金", enName: "Luxury Gold" },
+          { hex: "#2A2A2A", name: "正装黑", enName: "Formal Black" }
+        ],
+        materials: ["亚麻平纹西装料", "高支棉衬衫", "丝光领带", "牛津皮鞋"],
+        materialsEn: ["Linen plain weave suit fabric", "High thread count cotton shirt", "Mercerized tie", "Oxford shoes"],
+        tailoring: [
+          "三件套剪裁严丝合缝，强调极致的体面与秩序",
+          "粉色西装在传统男装语境中突兀而浪漫，象征对旧世界的挑衅",
+          "高领衬衫与宽领带填充颈部线条，增加视觉上的隆重感",
+          "裤线笔直，不容许一丝褶皱，映射人物内心的完美主义强迫"
+        ],
+        tailoringEn: [
+          "Three-piece suit tailored to perfection, emphasizing extreme decency and order",
+          "Pink suit is jarring yet romantic in traditional menswear context, symbolizing provocation to the old world",
+          "High collar shirt and wide tie fill the neck line, adding visual grandeur",
+          "Pants creased perfectly straight, allowing no wrinkles, mirroring inner perfectionist obsession"
+        ],
+        scriptSnippet: "他站在台阶上等待，粉色西装在夏日的阳光下显眼得近乎虚幻。他试图用这身装扮告诉黛西，他已经拥有了想要的一切，包括这种不被定义的颜色。",
+        scriptSnippetEn: "He waits on the steps, pink suit visible to the point of illusion in the summer sun. He tries to tell Daisy with this outfit that he has everything he wanted, including this undefined color.",
+        directorNote: "这套造型是盖茨比悲剧底色的外化。粉色在那个年代代表工人阶级或暴发户的审美（汤姆讽刺过），但他把它穿得像皇室礼服一样隆重。这是一种拼命想要融入上流社会却又无意中暴露了自己局外人身份的矛盾。穿着时要表现出一种小心翼翼的骄傲，仿佛只要衣服不乱，梦就不会醒。",
+        directorNoteEn: "Externalization of Gatsby's tragic undertone. Pink represented working class or nouveau riche aesthetics, but he wears it grandly like royal attire. Wear with careful pride, as if as long as clothes are neat, the dream won't break."
+      },
+      {
+        title: "银灰派对主人的疏离感",
+        titleEn: "The Detachment of the Silver-Grey Party Host",
+        subtitle: "奢华晚宴 · 丝绸光泽 · 站在人群之外的孤独",
+        subtitleEn: "Luxury Gala · Silk Sheen · Loneliness Standing Outside the Crowd",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Gatsby/silver.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvR2F0c2J5L3NpbHZlci5qcGciLCJpYXQiOjE3Njk5MjEzMjIsImV4cCI6MjA4NTI4MTMyMn0.uTKTWvHKP7-Ie528y1fH8-L-uFDrGg-wKi84yNqHj5M",
+        palette: [
+          { hex: "#B8B8B8", name: "冷银灰", enName: "Cold Silver Grey" },
+          { hex: "#0F0F0F", name: "极致黑", enName: "Ultimate Black" },
+          { hex: "#FFFFFF", name: "衬衫白", enName: "Shirt White" },
+          { hex: "#C9A06A", name: "香槟金", enName: "Champagne Gold" }
+        ],
+        materials: ["丝光混纺西装面料", "高支棉礼服衬衫", "真丝领结", "漆皮牛津鞋"],
+        materialsEn: ["Mercerized blend suit fabric", "High thread count formal shirt", "Silk bow tie", "Patent Oxford shoes"],
+        tailoring: [
+          "银灰色单排扣西装带微光感，在灯光下若隐若现",
+          "剪裁偏修身但不紧绷，保持贵族式的从容感",
+          "领结替代领带，增添正式场合的仪式感",
+          "整体色调偏冷，与派对的热闹形成疏离对比"
+        ],
+        tailoringEn: [
+          "Silver-grey single-breasted suit with subtle sheen under lights",
+          "Slim fit but not tight, maintaining aristocratic composure",
+          "Bow tie adds ceremony to formal occasions",
+          "Overall cool tones contrast with party warmth, creating detachment"
+        ],
+        scriptSnippet: "派对上人声鼎沸，他站在角落，手里端着香槟却从不喝。银灰色让他看起来像一尊雕像，存在于喧嚣之中却不属于它。",
+        scriptSnippetEn: "The party roars, he stands in the corner holding champagne but never drinks. Silver-grey makes him look like a statue, existing in the noise but not belonging.",
+        directorNote: "这套造型强调盖茨比的孤独本质。他是派对的主人，却是人群中最孤独的人。银灰色既奢华又冰冷，完美诠释了他的处境：拥有一切却感受不到温度。表演时眼神要飘忽，仿佛在找寻人群中唯一重要的那个人。",
+        directorNoteEn: "This look emphasizes Gatsby's lonely nature. He's the host but the loneliest. Silver-grey is luxurious yet cold, perfect for his situation: having everything but feeling nothing. Eyes should wander, seeking the only important one."
+      }
+    ]
+  },
+  {
+    id: "tylerdurden_fightclub",
+    name: "泰勒·德顿",
+    nameEn: "Tyler Durden",
+    movie: "搏击俱乐部",
+    movieEn: "Fight Club",
+    traits: ["反叛者", "虚无主义", "魅力型领袖", "自我毁灭", "反消费主义", "原始男性力量", "混乱制造者"],
+    traitsEn: ["Rebel", "Nihilist", "Charismatic Leader", "Self-Destructive", "Anti-Consumerism", "Primal Masculinity", "Chaos Agent"],
+    stylings: [
+      {
+        title: "红色皮夹克的反叛宣言",
+        titleEn: "The Rebellion Manifesto in Red Leather",
+        subtitle: "地下王者 · 复古摇滚 · 解构消费主义",
+        subtitleEn: "Underground King · Vintage Rock · Deconstructing Consumerism",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/TylerDurden/red.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVHlsZXJEdXJkZW4vcmVkLmpwZyIsImlhdCI6MTc2OTkyMTM1NiwiZXhwIjoyMDg1MjgxMzU2fQ.GiOH9_Cc6ow4qX5g1IYwHHnGnWbnwEGpgEVYs9flMTY",
+        palette: [
+          { hex: "#8B0000", name: "血红", enName: "Blood Red" },
+          { hex: "#2A2A2A", name: "阴影黑", enName: "Shadow Black" },
+          { hex: "#C9A06A", name: "旧皮棕", enName: "Aged Leather" },
+          { hex: "#FFFFFF", name: "汗衫白", enName: "Tank White" }
+        ],
+        materials: ["做旧真皮", "棉质汗衫", "牛仔布", "金属扣件"],
+        materialsEn: ["Distressed leather", "Cotton tank top", "Denim", "Metal hardware"],
+        tailoring: [
+          "皮夹克故意做旧，带着使用过的痕迹和故事感",
+          "内搭简单汗衫，强调身体线条而非装饰",
+          "整体剪裁偏宽松，拒绝任何束缚感",
+          "颜色对比强烈，红与黑的碰撞象征内心的冲突"
+        ],
+        tailoringEn: [
+          "Leather jacket intentionally distressed with story of wear",
+          "Simple tank top underneath, emphasizing body over decoration",
+          "Overall loose fit, rejecting any sense of constraint",
+          "Strong color contrast, red and black collision symbolizes inner conflict"
+        ],
+        scriptSnippet: "他站在搏击俱乐部的阴影里，红色皮衣像一面旗帜。他告诉他们：你不是你的工作，不是你银行里的存款，不是你穿的衣服。",
+        scriptSnippetEn: "He stands in Fight Club's shadows, red leather like a flag. He tells them: you are not your job, not your bank balance, not the clothes you wear.",
+        directorNote: "这套造型是泰勒反体制态度的视觉化。红色皮夹克在90年代的极简主义中显得格格不入，但这正是他想要的——一个拒绝被定义的符号。穿着时要带着一种危险的松弛感，仿佛随时准备引爆什么。",
+        directorNoteEn: "This look visualizes Tyler's anti-establishment attitude. Red leather jacket is out of place in 90s minimalism, but that's the point—a symbol refusing definition. Wear with dangerous relaxation, as if ready to detonate something."
+      },
+      {
+        title: "网眼背心的原始状态",
+        titleEn: "The Primal State in Mesh Tank",
+        subtitle: "搏击场核心 · 去除一切装饰 · 身体即资本",
+        subtitleEn: "Fight Pit Core · Stripped of All Decoration · Body as Capital",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/TylerDurden/mesh.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVHlsZXJEdXJkZW4vbWVzaC5qcGciLCJpYXQiOjE3Njk5MjEzODUsImV4cCI6MjA4NTI4MTM4NX0.ILv66kCFB0R2QRGaHH_-eQNnwXKRqzABHXcVxmMHqfY",
+        palette: [
+          { hex: "#4A4A4A", name: "网眼灰", enName: "Mesh Grey" },
+          { hex: "#C9A06A", name: "肤色", enName: "Skin Tone" },
+          { hex: "#2A2A2A", name: "地下室黑", enName: "Basement Black" }
+        ],
+        materials: ["网眼棉布", "做旧牛仔裤", "绷带（可选）"],
+        materialsEn: ["Mesh cotton", "Distressed jeans", "Bandages (optional)"],
+        tailoring: [
+          "网眼背心几乎不遮挡身体，展示肌肉线条",
+          "裤子低腰松垮，带着街头的不羁感",
+          "整体去装饰化，像是从垃圾堆里捡来的",
+          "伤痕和汗水是最好的配饰"
+        ],
+        tailoringEn: [
+          "Mesh tank barely covers, displaying muscle lines",
+          "Low-waisted loose pants with street rebellion",
+          "Overall stripped of decoration, like picked from trash",
+          "Scars and sweat are the best accessories"
+        ],
+        scriptSnippet: "他在搏击场中央，汗水顺着网眼背心流下来。他不需要名牌，因为他的伤疤和肌肉就是最好的logo。",
+        scriptSnippetEn: "Center of the fight pit, sweat running down the mesh tank. Needs no brands because scars and muscles are the best logo.",
+        directorNote: "这是泰勒最原始的状态。去掉皮衣的伪装，只剩下最直接的暴力载体。表演重点是眼神的狂热和动作的爆发力，展现一种原始的、不受文明驯化的野兽状态。",
+        directorNoteEn: "Tyler's most primal state. Stripped of jacket mask, only direct carrier of violence remains. Focus on fanaticism in eyes and explosive action, showing primal undomesticated beast state."
+      }
+    ]
+  },
+  {
+    id: "don_draper_madmen",
+    name: "唐·德雷柏",
+    nameEn: "Don Draper",
+    movie: "广告狂人",
+    movieEn: "Mad Men",
+    traits: ["神秘", "魅力", "双重身份", "创意天才", "控制欲", "逃避者", "完美表象"],
+    traitsEn: ["Mysterious", "Charismatic", "Dual Identity", "Creative Genius", "Control Freak", "Escapist", "Perfect Facade"],
+    stylings: [
+      {
+        title: "灰色西装的沉默权力",
+        titleEn: "Silent Power in Grey Suit",
+        subtitle: "麦迪逊大道 · 60年代剪裁 · 低调的掌控感",
+        subtitleEn: "Madison Avenue · 60s Tailoring · Understated Control",
+        image: "https://picsum.photos/seed/dondraper1/400/600",
+        palette: [
+          { hex: "#5A5A5A", name: "中灰", enName: "Medium Grey" },
+          { hex: "#FFFFFF", name: "衬衫白", enName: "Shirt White" },
+          { hex: "#8B0000", name: "领带红", enName: "Tie Red" },
+          { hex: "#2A2A2A", name: "皮鞋黑", enName: "Shoe Black" }
+        ],
+        materials: ["精纺羊毛西装", "高支棉府绸衬衫", "真丝领带", "小牛皮皮鞋"],
+        materialsEn: ["Worsted wool suit", "High thread count poplin shirt", "Silk tie", "Calfskin shoes"],
+        tailoring: [
+          "窄驳领单排扣西装，典型60年代美式剪裁",
+          "肩线自然但有力，不过分夸张",
+          "裤子高腰无褶，展现修长比例",
+          "整体线条干净利落，没有多余装饰"
+        ],
+        tailoringEn: [
+          "Narrow lapel single-breasted suit, typical 60s American cut",
+          "Natural but strong shoulder line, not exaggerated",
+          "High-waisted flat-front pants for long proportions",
+          "Overall clean lines with no excess decoration"
+        ],
+        scriptSnippet: "他走进会议室，灰色西装让他看起来像会议桌的延伸。他不需要说话，存在本身就是一种宣言。",
+        scriptSnippetEn: "He walks into the conference room, grey suit making him an extension of the table. No need to speak, his presence is a statement.",
+        directorNote: "Don Draper的穿着哲学是：永远不要成为房间里穿得最显眼的人，但要成为最被记住的人。灰色代表了他精心构建的正常人外壳，而红色领带是唯一允许自己流露的一点野心。",
+        directorNoteEn: "Don's philosophy: never be the most flashy in the room, but be the most remembered. Grey represents his carefully built normal facade, red tie the only allowed hint of ambition."
+      }
+    ]
+  },
+  {
+    id: "placeholder_male_1",
+    name: "待补充角色1",
+    nameEn: "Placeholder Character 1",
+    movie: "待补充电影",
+    movieEn: "Placeholder Movie",
+    traits: ["占位", "待填充"],
+    traitsEn: ["Placeholder", "To be filled"],
+    stylings: [
+      {
+        title: "占位造型",
+        titleEn: "Placeholder Styling",
+        subtitle: "待补充",
+        subtitleEn: "To be filled",
+        image: "https://picsum.photos/seed/placeholder1/400/600",
+        palette: [
+          { hex: "#808080", name: "灰色", enName: "Grey" }
+        ],
+        materials: ["待补充"],
+        materialsEn: ["To be filled"],
+        tailoring: ["待补充"],
+        tailoringEn: ["To be filled"],
+        scriptSnippet: "待补充场景描述。",
+        scriptSnippetEn: "Scene description to be filled.",
+        directorNote: "待补充导演点评。",
+        directorNoteEn: "Director's note to be filled."
+      }
+    ]
+  }
+];
+
+// 合并数据库
+export const MOVIE_DATABASE = [...FEMALE_MOVIE_DATABASE, ...MALE_MOVIE_DATABASE];
+
+// 根据性别获取对应数据库
+export const getDatabase = (gender: string): MovieCharacter[] => {
+  return gender === 'male' ? MALE_MOVIE_DATABASE : FEMALE_MOVIE_DATABASE;
+};

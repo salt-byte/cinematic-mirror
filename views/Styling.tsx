@@ -122,7 +122,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
   }
 
   return (
-    <div className="flex flex-col h-full bg-parchment-base pb-40">
+    <div className="flex flex-col bg-parchment-base pb-8">
       {/* 页面标题 */}
       <header className="px-6 py-6 text-center space-y-2">
         <div className="text-[8px] font-mono tracking-[0.6em] text-walnut/30 uppercase">{t('styling.department')}</div>

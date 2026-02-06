@@ -37,7 +37,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      setError(t('login.errorEmpty'));
+      setError(t('login.forgotPasswordEmailRequired'));
       return;
     }
     setForgotLoading(true);
@@ -54,9 +54,9 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden">
-      {/* 顶部海报区域 */}
-      <div className="relative w-full h-56 shrink-0">
+    <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      {/* 顶部海报区域 - 延伸到状态栏 */}
+      <div className="relative w-full shrink-0" style={{ height: 'calc(env(safe-area-inset-top, 0px) + 224px)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div
           className="absolute inset-0 bg-center bg-cover grayscale sepia-[0.3] brightness-75"
           style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAQTp2Xnb9Mq1T1VHa-SDuOoAaWLhEFnqwApjOL-fJi3k83SxgGvancGV-hkaGhXn3OjPMHE-4tszvZyQvlTEFBA7QmLa9zbI0JOrtP-LQyiT4FMZxXWjQW_RKdY22Z0Nh1f1-YFTxbeRdWUWcXdlrFz2mfS6XIneAAgtkChbAmjyWWpeVh_FKfY7jizCt_1vsqOfo8cvB6p-tk4Zu3kzW7Pb7FN8htiO1Bh9X_n2YLDa60WqEYe1aSJXjsUOTBLJgmA_Ay8SsSs1I')" }}

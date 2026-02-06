@@ -5,9 +5,11 @@ const config: CapacitorConfig = {
   appName: '影中镜',
   webDir: 'dist',
   ios: {
-    contentInset: 'automatic',
+    contentInset: 'never',
     allowsLinkPreview: false,
-    scrollEnabled: true
+    scrollEnabled: true,
+    preferredContentMode: 'mobile',
+    backgroundColor: '#e8d5b5'
   },
   server: {
     iosScheme: 'capacitor'

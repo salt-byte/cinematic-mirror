@@ -12,29 +12,50 @@ import Plaza from './views/Plaza';
 import Styling from './views/Styling';
 import ProfileView from './views/Profile';
 import { LanguageProvider, LanguageSwitcher, useLanguage } from './i18n/LanguageContext';
+import { isLoggedIn } from './apiService';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(View.WELCOME);
-  const [profile, setProfile] = useState<PersonalityProfile | null>(() => {
-    // 优先读取当前活跃的档案
-    const saved = localStorage.getItem('cinematic_mirror_profile');
-    if (saved) return JSON.parse(saved);
+  const [profile, setProfile] = useState<PersonalityProfile | null>(null);
 
-    // 如果没有活跃档案，自动加载最近的档案
+  // 从 localStorage 加载档案
+  const reloadProfile = () => {
+    const saved = localStorage.getItem('cinematic_mirror_profile');
+    if (saved) {
+      setProfile(JSON.parse(saved));
+      return;
+    }
     const archives = localStorage.getItem('cinematic_archives');
     if (archives) {
       const list = JSON.parse(archives);
       if (list.length > 0) {
-        // 返回最新的档案
         const latest = list[0];
         localStorage.setItem('cinematic_mirror_profile', JSON.stringify(latest));
-        return latest;
+        setProfile(latest);
+        return;
       }
     }
-    return null;
-  });
+    setProfile(null);
+  };
+
+  // 初始化时加载
+  useEffect(() => {
+    reloadProfile();
+  }, []);
 
   const navigate = (view: View) => setCurrentView(view);
+
+  // 登录成功后调用，重新加载用户档案
+  const handleLoginSuccess = () => {
+    reloadProfile();
+    navigate(View.STYLING);
+  };
+
+  // 登出后调用，清空状态
+  const handleLogout = () => {
+    setProfile(null);
+    navigate(View.WELCOME);
+  };
 
   const handleInterviewComplete = (newProfile: PersonalityProfile) => {
     setProfile(newProfile);
@@ -57,6 +78,15 @@ const App: React.FC = () => {
     navigate(View.RESULT);
   };
 
+  // 已登录用户直接进入试镜，无需再登录
+  const handleNewRole = () => {
+    if (isLoggedIn()) {
+      navigate(View.INTERVIEW);
+    } else {
+      navigate(View.LOGIN);
+    }
+  };
+
   const RenderView = () => {
     const { t } = useLanguage();
 
@@ -64,7 +94,7 @@ const App: React.FC = () => {
       case View.WELCOME:
         return <Welcome onStart={() => navigate(View.LOGIN)} />;
       case View.LOGIN:
-        return <Login onDirectorLogin={() => navigate(View.STYLING)} onGoToRegister={() => navigate(View.REGISTER)} />;
+        return <Login onDirectorLogin={handleLoginSuccess} onGoToRegister={() => navigate(View.REGISTER)} />;
       case View.REGISTER:
         return <Register onBack={() => navigate(View.LOGIN)} onComplete={() => navigate(View.INTERVIEW)} />;
       case View.INTERVIEW:
@@ -77,7 +107,7 @@ const App: React.FC = () => {
       case View.PLAZA:
       case View.STYLING:
       case View.PROFILE:
-        return <DashboardContent view={currentView} navigate={navigate} profile={profile} onViewArchive={handleViewArchive} />;
+        return <DashboardContent view={currentView} navigate={navigate} profile={profile} onViewArchive={handleViewArchive} onNewRole={handleNewRole} onLogout={handleLogout} />;
       default:
         return <Welcome onStart={() => navigate(View.LOGIN)} />;
     }
@@ -85,11 +115,23 @@ const App: React.FC = () => {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen desk-texture text-walnut flex flex-col">
+      <div className="min-h-screen min-h-dvh desk-texture text-walnut flex flex-col">
         <RenderView />
       </div>
     </LanguageProvider>
   );
+};
+
+// 获取用户头像
+const getUserAvatar = (profileId?: string): string => {
+  const userInfoStr = localStorage.getItem('cinematic_user_info');
+  if (userInfoStr) {
+    try {
+      const userInfo = JSON.parse(userInfoStr);
+      if (userInfo.avatar) return userInfo.avatar;
+    } catch (e) {}
+  }
+  return `https://picsum.photos/seed/${profileId || 'user'}/100/100`;
 };
 
 const DashboardContent: React.FC<{
@@ -97,12 +139,15 @@ const DashboardContent: React.FC<{
   navigate: (v: View) => void;
   profile: PersonalityProfile | null;
   onViewArchive: (p: PersonalityProfile) => void;
-}> = ({ view, navigate, profile, onViewArchive }) => {
+  onNewRole?: () => void;
+  onLogout?: () => void;
+}> = ({ view, navigate, profile, onViewArchive, onNewRole, onLogout }) => {
   const { t } = useLanguage();
+  const userAvatar = getUserAvatar(profile?.id);
 
   return (
     <div className="flex flex-col flex-1 h-screen overflow-hidden relative">
-      <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-base shrink-0 z-40">
+      <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-base shrink-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-walnut text-xl font-light">history_edu</span>
           <div className="flex flex-col">
@@ -113,21 +158,19 @@ const DashboardContent: React.FC<{
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
           <button onClick={() => navigate(View.PROFILE)} className="size-9 rounded-full border border-walnut/20 overflow-hidden shadow-vintage active:scale-95 transition-transform">
-            <img src={`https://picsum.photos/seed/${profile?.id || 'user'}/100/100`} alt="Avatar" className="w-full h-full object-cover grayscale sepia-[0.3] brightness-90" />
+            <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover" />
           </button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden relative">
-        <div className="h-full overflow-y-auto no-scrollbar">
-          {view === View.STYLING && <Styling profile={profile} />}
-          {view === View.DASHBOARD && <Dashboard profile={profile} />}
-          {view === View.PLAZA && <Plaza />}
-          {view === View.PROFILE && <ProfileView profile={profile} onNewRole={() => navigate(View.INTERVIEW)} onSelectArchive={onViewArchive} onLogout={() => navigate(View.WELCOME)} />}
-        </div>
+      <main className="flex-1 overflow-y-auto no-scrollbar relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)' }}>
+        {view === View.STYLING && <Styling profile={profile} />}
+        {view === View.DASHBOARD && <Dashboard profile={profile} />}
+        {view === View.PLAZA && <Plaza />}
+        {view === View.PROFILE && <ProfileView profile={profile} onNewRole={onNewRole || (() => navigate(View.INTERVIEW))} onSelectArchive={onViewArchive} onLogout={onLogout || (() => navigate(View.WELCOME))} />}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-parchment-light/95 backdrop-blur-xl border-t border-walnut/10 px-6 pt-4 pb-8 flex justify-around items-center z-50 shadow-[0_-15px_50px_rgba(61,43,31,0.15)]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-parchment-light/95 backdrop-blur-xl border-t border-walnut/10 px-6 pt-3 flex justify-around items-center z-50 shadow-[0_-15px_50px_rgba(61,43,31,0.15)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6px)' }}>
         <NavItem icon="auto_stories" label={t('nav.styling')} active={view === View.STYLING} onClick={() => navigate(View.STYLING)} />
         <NavItem icon="ink_pen" label={t('nav.consult')} active={view === View.DASHBOARD} onClick={() => navigate(View.DASHBOARD)} />
         <NavItem icon="explore" label={t('nav.plaza')} active={view === View.PLAZA} onClick={() => navigate(View.PLAZA)} />

@@ -6,6 +6,18 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { logout } from '../apiService';
 import { MOVIE_DATABASE } from '../library';
 
+// 获取用户上传的头像
+const getUserAvatar = (): string | null => {
+  const userInfoStr = localStorage.getItem('cinematic_user_info');
+  if (userInfoStr) {
+    try {
+      const userInfo = JSON.parse(userInfoStr);
+      if (userInfo.avatar) return userInfo.avatar;
+    } catch (e) {}
+  }
+  return null;
+};
+
 // 获取人格档案对应的第一个匹配角色的第一张造型图片
 const getProfileImage = (profile: PersonalityProfile | null): string => {
   if (!profile?.matches || profile.matches.length === 0) {
@@ -33,14 +45,12 @@ const ProfileView: React.FC<{
 }> = ({ profile, onNewRole, onSelectArchive, onLogout }) => {
   const { t } = useLanguage();
   const [collection, setCollection] = useState<PersonalityProfile[]>([]);
+  const userAvatar = getUserAvatar();
 
   useEffect(() => {
+    // 只读取档案库，不在这里写入（由 App.tsx 的 handleInterviewComplete 负责写入）
     const saved = localStorage.getItem('cinematic_archives');
-    let existing = saved ? JSON.parse(saved) : [];
-    if (profile && !existing.find((p: any) => p.id === profile.id)) {
-      existing = [profile, ...existing];
-      localStorage.setItem('cinematic_archives', JSON.stringify(existing));
-    }
+    const existing = saved ? JSON.parse(saved) : [];
     setCollection(existing);
   }, [profile]);
 
@@ -71,7 +81,7 @@ const ProfileView: React.FC<{
           <div className="flex flex-col items-center">
             <div className="relative mb-8">
               <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
-                <img src={getProfileImage(profile)} alt="" className="w-32 h-32 object-cover grayscale brightness-90" />
+                <img src={userAvatar || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
                 <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
               </div>
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
@@ -124,7 +134,7 @@ const ProfileView: React.FC<{
       </div>
 
       {/* 底部按钮：物理标签风格 */}
-      <div className="fixed bottom-32 left-0 right-0 px-8 z-40 max-w-[430px] mx-auto">
+      <div className="fixed bottom-24 left-0 right-0 px-6 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="relative group">
           <button
             onClick={onNewRole}

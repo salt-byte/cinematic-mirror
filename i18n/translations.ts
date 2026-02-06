@@ -60,6 +60,7 @@ export const translations = {
     registerNow: { zh: '立刻注册账号', en: 'Register Now' },
     registerHint: { zh: 'New talent must register with the archives before the first interview session.', en: 'New talent must register with the archives before the first interview session.' },
     forgotPassword: { zh: '忘记密码？', en: 'Forgot password?' },
+    forgotPasswordEmailRequired: { zh: '请先填写邮箱', en: 'Please enter your email first' },
     forgotPasswordSent: { zh: '重置链接已发送到您的邮箱', en: 'Reset link sent to your email' },
     forgotPasswordError: { zh: '发送失败，请检查邮箱', en: 'Failed to send, please check your email' },
     logout: { zh: '退出登录', en: 'Logout' },
@@ -87,6 +88,8 @@ export const translations = {
     female: { zh: '女', en: 'Female' },
     male: { zh: '男', en: 'Male' },
     errorEmpty: { zh: '请填写名字并选择性别', en: 'Please enter name and gender' },
+    uploadAvatar: { zh: '上传头像', en: 'Upload Avatar' },
+    avatarTooLarge: { zh: '图片大小不能超过5MB', en: 'Image must be under 5MB' },
     startAudition: { zh: '开始试镜', en: 'Start Audition' },
     castingSession: { zh: 'CASTING SESSION · STUDIO ARCHIVES', en: 'CASTING SESSION · STUDIO ARCHIVES' },
     scene: { zh: '第{n}场：{name}', en: 'Scene {n}: {name}' },
@@ -94,6 +97,11 @@ export const translations = {
       zh: ['内在风景', '行为轨迹', '记忆碎片', '困境抉择', '信念之光', '灵魂底色', '最终定格', '谢幕'],
       en: ['Inner Landscape', 'Behavior Pattern', 'Memory Fragments', 'Dilemma Choice', 'Light of Faith', 'Soul Essence', 'Final Frame', 'Curtain Call']
     },
+    sceneNumbers: {
+      zh: ['一', '二', '三', '四', '五', '六', '七', '八'],
+      en: ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+    },
+    defaultSceneName: { zh: '对话', en: 'Dialogue' },
     thinking: { zh: '正在思考...', en: 'Thinking...' },
     generatingProfile: { zh: '生成人格档案中...', en: 'Generating personality profile...' },
     inputPlaceholder: { zh: '说点什么...', en: 'Say something...' },
@@ -209,6 +217,13 @@ export const translations = {
     styling: { zh: '造型演绎', en: 'Styling' },
     consult: { zh: '导演咨询', en: 'Consult' },
     plaza: { zh: '电影广场', en: 'Plaza' },
+  },
+
+  // 显影中
+  developing: {
+    badge: { zh: '显影中', en: 'Developing' },
+    title: { zh: '正在显影您的电影人格...', en: 'Developing your cinematic persona...' },
+    scanning: { zh: 'SCANNING FILM GRAINS // NEGATIVE PROCESSING', en: 'SCANNING FILM GRAINS // NEGATIVE PROCESSING' },
   },
 
   // 语言切换

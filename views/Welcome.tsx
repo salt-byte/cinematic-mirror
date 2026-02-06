@@ -11,9 +11,9 @@ const Welcome: React.FC<WelcomeProps> = ({ onStart }) => {
   const { t } = useLanguage();
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-12 relative">
+    <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-12 relative" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}>
       {/* Language Switcher - Top Right */}
-      <div className="absolute top-6 right-6 z-50">
+      <div className="absolute right-6 z-50" style={{ top: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
         <LanguageSwitcher />
       </div>
 
