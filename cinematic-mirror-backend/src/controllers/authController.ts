@@ -90,6 +90,33 @@ export class AuthController {
       sendError(res, error.message, 400);
     }
   }
+
+  // 忘记密码
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        sendError(res, '请填写邮箱', 400);
+        return;
+      }
+
+      // 这里实际应该发送重置密码邮件
+      // 目前简化处理，只验证邮箱格式并返回成功
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        sendError(res, '邮箱格式不正确', 400);
+        return;
+      }
+
+      // TODO: 集成邮件服务发送重置链接
+      // await userService.sendPasswordResetEmail(email);
+
+      sendSuccess(res, { message: '如果该邮箱已注册，您将收到密码重置链接' });
+    } catch (error: any) {
+      sendError(res, error.message, 500);
+    }
+  }
 }
 
 export const authController = new AuthController();

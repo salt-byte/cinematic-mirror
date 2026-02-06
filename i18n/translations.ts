@@ -59,6 +59,11 @@ export const translations = {
     findRole: { zh: '寻找你的角色', en: 'Find Your Role' },
     registerNow: { zh: '立刻注册账号', en: 'Register Now' },
     registerHint: { zh: 'New talent must register with the archives before the first interview session.', en: 'New talent must register with the archives before the first interview session.' },
+    forgotPassword: { zh: '忘记密码？', en: 'Forgot password?' },
+    forgotPasswordSent: { zh: '重置链接已发送到您的邮箱', en: 'Reset link sent to your email' },
+    forgotPasswordError: { zh: '发送失败，请检查邮箱', en: 'Failed to send, please check your email' },
+    logout: { zh: '退出登录', en: 'Logout' },
+    logoutConfirm: { zh: '确定要退出登录吗？', en: 'Are you sure you want to logout?' },
   },
 
   register: {

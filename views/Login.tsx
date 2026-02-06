@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { login } from '../apiService';
+import { login, forgotPassword } from '../apiService';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface LoginProps {
@@ -14,6 +14,8 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -22,6 +24,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
     }
     setLoading(true);
     setError("");
+    setForgotSuccess(false);
     try {
       await login(email, password);
       onDirectorLogin();
@@ -29,6 +32,24 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
       setError(err.message || t('login.errorFail'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError(t('login.errorEmpty'));
+      return;
+    }
+    setForgotLoading(true);
+    setError("");
+    setForgotSuccess(false);
+    try {
+      await forgotPassword(email);
+      setForgotSuccess(true);
+    } catch (err: any) {
+      setError(err.message || t('login.forgotPasswordError'));
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -85,8 +106,19 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
                 className="w-full h-12 bg-white/30 border-b-2 border-walnut/10 focus:border-vintageRed px-0 text-walnut font-mono transition-all outline-none"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={forgotLoading}
+                className="text-vintageRed/70 text-[11px] font-medium hover:text-vintageRed transition-colors underline"
+              >
+                {forgotLoading ? '...' : t('login.forgotPassword')}
+              </button>
             </div>
 
+            {forgotSuccess && (
+              <p className="text-green-600 text-sm font-serif text-center">{t('login.forgotPasswordSent')}</p>
+            )}
             {error && (
               <p className="text-vintageRed text-sm font-serif text-center">{error}</p>
             )}

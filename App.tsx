@@ -123,7 +123,7 @@ const DashboardContent: React.FC<{
           {view === View.STYLING && <Styling profile={profile} />}
           {view === View.DASHBOARD && <Dashboard profile={profile} />}
           {view === View.PLAZA && <Plaza />}
-          {view === View.PROFILE && <ProfileView profile={profile} onNewRole={() => navigate(View.INTERVIEW)} onSelectArchive={onViewArchive} />}
+          {view === View.PROFILE && <ProfileView profile={profile} onNewRole={() => navigate(View.INTERVIEW)} onSelectArchive={onViewArchive} onLogout={() => navigate(View.WELCOME)} />}
         </div>
       </main>
 

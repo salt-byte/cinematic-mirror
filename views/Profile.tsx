@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
+import { logout } from '../apiService';
 
 const ProfileView: React.FC<{
   profile: PersonalityProfile | null,
   onNewRole: () => void,
-  onSelectArchive: (p: PersonalityProfile) => void
-}> = ({ profile, onNewRole, onSelectArchive }) => {
+  onSelectArchive: (p: PersonalityProfile) => void,
+  onLogout?: () => void
+}> = ({ profile, onNewRole, onSelectArchive, onLogout }) => {
   const { t } = useLanguage();
   const [collection, setCollection] = useState<PersonalityProfile[]>([]);
 
@@ -22,10 +24,26 @@ const ProfileView: React.FC<{
     setCollection(existing);
   }, [profile]);
 
+  const handleLogout = () => {
+    if (confirm(t('login.logoutConfirm'))) {
+      logout();
+      onLogout?.();
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-parchment-base pb-48 no-scrollbar overflow-y-auto min-h-screen">
       {/* 顶部：当前活跃档案 */}
       <div className="px-6 pt-12 pb-10 relative">
+        {/* 登出按钮 */}
+        <button
+          onClick={handleLogout}
+          className="absolute top-4 right-4 z-30 flex items-center gap-1 px-3 py-1.5 bg-walnut/10 hover:bg-walnut/20 rounded-sm transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px] text-walnut/60">logout</span>
+          <span className="text-[10px] font-bold text-walnut/60 tracking-wider uppercase">{t('login.logout')}</span>
+        </button>
+
         <div className="absolute top-10 right-10 rotate-12 z-20">
           <Stamp text={t('profile.activeStamp')} subText={t('profile.inProgress')} className="opacity-60" />
         </div>
