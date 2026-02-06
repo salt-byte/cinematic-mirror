@@ -142,7 +142,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   // 开场弹窗 - 输入名字和选择性别
   if (showIntro) {
     return (
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-parchment-base">
+      <div className="flex-1 flex flex-col min-h-[100dvh] overflow-auto bg-parchment-base">
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="bg-white shadow-2xl border border-walnut/10 p-8 max-w-sm w-full space-y-8">
             {/* 标题 */}
@@ -223,7 +223,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   const sceneNumber = ['一', '二', '三', '四', '五', '六', '七', '八'][round - 1] || round;
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-parchment-base">
+    <div className="flex-1 flex flex-col min-h-[100dvh] overflow-hidden bg-parchment-base">
       {/* 顶部导航 */}
       <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-light shrink-0">
         <button className="text-walnut/30">
@@ -246,7 +246,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       </div>
 
       {/* 消息区域 */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-8 space-y-8 no-scrollbar pb-40">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-6 no-scrollbar" style={{ paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))' }}>
         {error && (
           <div className="text-center py-4">
             <p className="text-vintageRed text-sm">{error}</p>
@@ -301,11 +301,12 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
         )}
       </div>
 
-      {/* 输入区域 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto px-6 pb-8 pt-4 bg-gradient-to-t from-parchment-base via-parchment-base to-transparent">
-        <div className="flex items-center gap-3 bg-white shadow-xl px-5 py-4 border border-walnut/5">
+      {/* 输入区域 - 移动端适配 */}
+      <div className="fixed bottom-0 left-0 right-0 px-4 bg-gradient-to-t from-parchment-base via-parchment-base to-transparent z-50"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
+        <div className="flex items-center gap-3 bg-white shadow-xl px-4 py-3 border border-walnut/5 rounded-lg">
           <input
-            className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none"
+            className="flex-1 bg-transparent text-[15px] font-serif placeholder:text-walnut/20 text-walnut outline-none min-w-0"
             placeholder={t('interview.inputPlaceholder')}
             value={input}
             disabled={loading || isFinishing}
@@ -315,7 +316,7 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
           <button
             onClick={handleSubmit}
             disabled={loading || isFinishing || !input.trim()}
-            className="text-walnut/30 hover:text-vintageRed disabled:opacity-20 transition-colors"
+            className="text-walnut/30 hover:text-vintageRed disabled:opacity-20 transition-colors flex-shrink-0"
           >
             <span className="material-symbols-outlined">send</span>
           </button>
