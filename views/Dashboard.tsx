@@ -154,15 +154,20 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     setError('');
 
     try {
-      // 构建系统指令
+      // 构建系统指令 - 根据语言切换
       const matches = selectedProfile.matches || [];
       const firstMatch = matches[0];
-      const characterContext = firstMatch
-        ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。`
-        : '';
 
-      const systemInstruction = `你是"陆野"，影中镜的专业造型顾问导演，一位温暖而专业的形象设计师。
-${characterContext}
+      const systemInstruction = language === 'en'
+        ? `You are "Lu Ye", a professional styling consultant director at Cinematic Mirror, a warm and professional image designer.
+${firstMatch ? `The user's personality profile shows they match best with ${firstMatch.name} from "${firstMatch.movie}", with a ${firstMatch.matchRate}% match rate.` : ''}
+You're having a video conversation with the user and can see their live feed.
+Please give professional styling and image advice based on their appearance, clothing, and temperament.
+Be warm and natural, like chatting with a friend, but maintain professionalism.
+Keep responses concise, just 1-2 sentences each time, like natural human conversation.
+Respond in English.`
+        : `你是"陆野"，影中镜的专业造型顾问导演，一位温暖而专业的形象设计师。
+${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。` : ''}
 你正在与用户进行视频对话，可以看到他们的实时画面。
 请根据用户的外表、穿着、气质给出专业的穿搭和形象建议。
 语气要温暖自然，像朋友聊天一样，但保持专业度。
@@ -444,8 +449,8 @@ ${characterContext}
 
         {/* 顶部导航栏 */}
         <div className="absolute top-0 left-0 right-0 px-4 flex items-center justify-between z-10" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-          <button onClick={() => setMode('select_mode')} className="size-10 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
-            <span className="material-symbols-outlined text-white">close</span>
+          <button onClick={() => { cleanupLiveSession(); setMode('select_mode'); }} className="size-10 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
+            <span className="material-symbols-outlined text-white">arrow_back</span>
           </button>
           <div className="text-center">
             <h1 className="text-sm font-retro font-black text-white tracking-widest drop-shadow-lg">{t('interview.title')}</h1>

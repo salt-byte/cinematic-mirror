@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import supabase from '../config/supabase';
 import { chatCompletion, CHAT_MODEL } from '../config/siliconflow';
-import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE, getPromptsByLanguage } from '../config/constants';
+import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE, getDatabase, getPromptsByLanguage } from '../config/constants';
 import type { ChatMessage, PersonalityProfile, CharacterMatch, StyleVariant } from '../types/index';
 
 // 内存中存储活跃的聊天会话
@@ -166,25 +166,29 @@ export class InterviewService {
         throw new Error('会话不存在');
       }
 
-      return this.generateProfileFromMessages(dbSession.user_id, dbSession.messages, sessionId);
+      return this.generateProfileFromMessages(dbSession.user_id, dbSession.messages, sessionId, undefined);
     }
 
-    return this.generateProfileFromMessages(session.userId, session.chatMessages, sessionId);
+    return this.generateProfileFromMessages(session.userId, session.chatMessages, sessionId, session.userGender);
   }
 
   // 从消息历史生成档案
   private async generateProfileFromMessages(
     userId: string,
     messages: ChatMessage[],
-    sessionId: string
+    sessionId: string,
+    userGender?: string
   ): Promise<PersonalityProfile> {
     // 构建对话历史文本
     const conversationText = messages
       .map(m => `${m.role === 'user' ? '受试者' : '陆野导演'}: ${m.text}`)
       .join('\n\n');
 
+    // 根据性别选择角色数据库
+    const characterDatabase = userGender ? getDatabase(userGender) : MOVIE_DATABASE;
+
     // 精简版数据库，只包含匹配所需的信息（不含造型详情）
-    const simplifiedDatabase = MOVIE_DATABASE.map(c => ({
+    const simplifiedDatabase = characterDatabase.map(c => ({
       id: c.id,
       name: c.name,
       movie: c.movie,
@@ -225,7 +229,7 @@ export class InterviewService {
 
     // 处理角色匹配
     const matches: CharacterMatch[] = (profileData.matches || []).map((match: any) => {
-      const character = MOVIE_DATABASE.find(c =>
+      const character = characterDatabase.find(c =>
         c.id === match.characterId || c.name === match.name
       );
       if (character) {
@@ -251,7 +255,7 @@ export class InterviewService {
 
     // 添加匹配角色的造型（取第一套造型）
     for (const match of matches) {
-      const character = MOVIE_DATABASE.find((c: any) => c.name === match.name);
+      const character = characterDatabase.find((c: any) => c.name === match.name);
       if (character && character.stylings && character.stylings.length > 0) {
         const firstStyling = character.stylings[0];
         stylingVariants.push({

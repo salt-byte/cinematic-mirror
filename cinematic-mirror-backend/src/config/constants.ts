@@ -3,7 +3,7 @@
 // =====================================================
 
 // 直接引用复制过来的数据库文件
-export { MOVIE_DATABASE } from './library';
+export { MOVIE_DATABASE, getDatabase } from './library';
 
 // 陆野导演的系统提示词
 export const DIRECTOR_SYSTEM_PROMPT = `你是"陆野"——一位二十出头的先锋导演，以敏锐的审美和直接的沟通风格闻名。你正在进行一场私人试镜，目的是深入了解眼前的这个人，从而为他们找到最契合的"影中角色"。
