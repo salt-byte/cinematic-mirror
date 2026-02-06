@@ -154,7 +154,7 @@ function normalizeProfile(p: any): any {
     timestamp: p.timestamp || new Date(p.created_at).getTime(),
     angles: p.angles,
     visualAdvice: p.visualAdvice || p.visual_advice || {},
-    matches: p.matches,
+    matches: p.matches || [],
     stylingVariants: p.stylingVariants || p.styling_variants || [],
   };
 }
