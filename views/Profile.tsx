@@ -4,6 +4,26 @@ import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
 import { logout } from '../apiService';
+import { MOVIE_DATABASE } from '../library';
+
+// 获取人格档案对应的第一个匹配角色的第一张造型图片
+const getProfileImage = (profile: PersonalityProfile | null): string => {
+  if (!profile?.matches || profile.matches.length === 0) {
+    return `https://picsum.photos/seed/${profile?.id || 'default'}/400/400`;
+  }
+
+  const topMatch = profile.matches[0];
+  const dbCharacter = MOVIE_DATABASE.find(c =>
+    c.name === topMatch.name ||
+    c.movie === topMatch.movie
+  );
+
+  if (dbCharacter?.stylings && dbCharacter.stylings.length > 0) {
+    return dbCharacter.stylings[0].image;
+  }
+
+  return `https://picsum.photos/seed/${profile.id}/400/400`;
+};
 
 const ProfileView: React.FC<{
   profile: PersonalityProfile | null,
@@ -51,7 +71,7 @@ const ProfileView: React.FC<{
           <div className="flex flex-col items-center">
             <div className="relative mb-8">
               <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
-                <img src={`https://picsum.photos/seed/${profile?.id || 'default'}/400/400`} alt="" className="w-32 h-32 object-cover grayscale brightness-90" />
+                <img src={getProfileImage(profile)} alt="" className="w-32 h-32 object-cover grayscale brightness-90" />
                 <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
               </div>
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
@@ -84,7 +104,7 @@ const ProfileView: React.FC<{
             >
               <div className="bg-white p-1.5 pb-6 shadow-vintage border border-walnut/5 group-hover:shadow-stack transition-all">
                 <div className="aspect-[1/1] overflow-hidden mb-3 bg-ink relative">
-                  <img src={`https://picsum.photos/seed/${role.id}/300/300`} alt="" className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                  <img src={getProfileImage(role)} alt="" className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                 </div>
                 <div className="px-1 text-center">
