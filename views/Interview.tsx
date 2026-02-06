@@ -26,9 +26,28 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   const [round, setRound] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const [error, setError] = useState("");
+  const [autoStartInfo, setAutoStartInfo] = useState<UserInfo | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 检查是否已有用户信息
+  useEffect(() => {
+    const savedUserInfo = localStorage.getItem('cinematic_user_info');
+    if (savedUserInfo) {
+      try {
+        const parsed = JSON.parse(savedUserInfo);
+        // 如果已有完整的用户信息（名字和性别），标记自动开始
+        if (parsed.name && parsed.gender) {
+          setUserInfo(parsed);
+          setShowIntro(false);
+          setAutoStartInfo(parsed);
+        }
+      } catch (e) {
+        // 解析失败，显示登记页面
+      }
+    }
+  }, []);
 
   // 处理头像上传
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,15 +122,19 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
     return result;
   };
 
-  const initChat = async () => {
+  // 自动启动试镜（用于已有用户信息的情况）
+  useEffect(() => {
+    if (autoStartInfo && messages.length === 0 && !loading) {
+      startInterviewWithInfo(autoStartInfo);
+    }
+  }, [autoStartInfo]);
+
+  // 启动试镜的通用函数
+  const startInterviewWithInfo = async (info: UserInfo) => {
     setLoading(true);
     setError("");
     try {
-      // 保存用户信息到 localStorage
-      localStorage.setItem('cinematic_user_info', JSON.stringify(userInfo));
-
-      // 启动试镜，传递用户信息和语言
-      const { initialMessage } = await startInterview(userInfo.name, userInfo.gender, language);
+      const { initialMessage } = await startInterview(info.name, info.gender, language);
       const parts = parseModelResponse(initialMessage.text);
       setMessages([{ role: 'model', parts }]);
       setLoading(false);
@@ -119,6 +142,13 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
       setLoading(false);
       setError(e.message || t('common.error'));
     }
+  };
+
+  const initChat = async () => {
+    // 保存用户信息到 localStorage
+    localStorage.setItem('cinematic_user_info', JSON.stringify(userInfo));
+    // 启动试镜
+    await startInterviewWithInfo(userInfo);
   };
 
   const handleStartInterview = () => {
