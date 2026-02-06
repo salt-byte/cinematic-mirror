@@ -144,7 +144,11 @@ export class InterviewService {
 
   // 检查试镜是否结束
   private checkIfFinished(response: string, round: number): boolean {
-    const endKeywords = ['cut', 'Cut', 'CUT', '辛苦了', '今天就到这里', '试镜结束'];
+    const endKeywords = [
+      'cut', 'Cut', 'CUT',
+      '辛苦了', '今天就到这儿', '今天就到这里', '试镜结束', '大概了解你了',
+      "That's a wrap", "got a read on you", "wrap for today"
+    ];
     const hasEndKeyword = endKeywords.some(keyword => response.includes(keyword));
     // 至少 8 轮才能结束，最多 12 轮自动结束
     return (hasEndKeyword && round >= 8) || round >= 12;
