@@ -38,16 +38,28 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
 
   // 构建角色数据，从 MOVIE_DATABASE 获取完整信息
   const characters: CharacterData[] = matches.map((match: any) => {
-    const dbCharacter = MOVIE_DATABASE.find(c =>
-      c.name === match.name ||
-      c.id === match.characterId ||
-      c.movie === match.movie
-    );
+    // 更灵活的匹配逻辑
+    const dbCharacter = MOVIE_DATABASE.find(c => {
+      const nameMatch =
+        c.name === match.name ||
+        c.nameEn === match.name ||
+        c.name?.includes(match.name) ||
+        match.name?.includes(c.name);
+      const movieMatch =
+        c.movie === match.movie ||
+        c.movieEn === match.movie ||
+        c.movie?.includes(match.movie) ||
+        match.movie?.includes(c.movie);
+      return nameMatch || movieMatch;
+    });
+
+    // 调试日志
+    console.log('[Styling] 匹配角色:', match.name, match.movie, '-> 找到:', dbCharacter?.name || '未找到');
 
     return {
-      name: match.name,       // Fallback to match data
+      name: match.name,
       nameEn: dbCharacter?.nameEn,
-      movie: match.movie,     // Fallback to match data
+      movie: match.movie,
       movieEn: dbCharacter?.movieEn,
       matchRate: match.matchRate,
       description: match.description,
