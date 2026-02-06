@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CAPACITOR_DEBUG</key>
+	<key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>影中镜</string>
+	<string>影中镜</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -24,6 +24,14 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Cinematic Mirror needs access to your camera for video conversations and appearance analysis.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Cinematic Mirror needs access to your microphone for voice conversations.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cinematic Mirror needs access to your photo library for your profile image.</string>
+	<key>PreferredContentMode</key>
+	<string>mobile</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -47,17 +55,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<!-- 禁止WebView缩放，让App感觉更原生 -->
-	<key>PreferredContentMode</key>
-	<string>mobile</string>
-	<!-- 摄像头权限 - 视频对话功能 -->
-	<key>NSCameraUsageDescription</key>
-	<string>Cinematic Mirror needs camera access for video consultation and style analysis. 影中镜需要访问您的摄像头以进行视频咨询和形象分析。</string>
-	<!-- 麦克风权限 - 语音功能 -->
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Cinematic Mirror needs microphone access for voice consultation. 影中镜需要访问您的麦克风以进行语音对话。</string>
-	<!-- 相册权限 - 头像上传 -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Cinematic Mirror needs photo library access to upload your avatar. 影中镜需要访问您的相册以上传头像。</string>
 </dict>
 </plist>
