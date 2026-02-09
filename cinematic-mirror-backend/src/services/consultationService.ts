@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { chatCompletion, VISION_MODEL, SILICONFLOW_API_KEY, SILICONFLOW_BASE_URL } from '../config/siliconflow';
 import { CONSULTATION_SYSTEM_PROMPT, getPromptsByLanguage } from '../config/constants';
+import { creditsService } from './creditsService';
 import type { ChatMessage, PersonalityProfile } from '../types/index';
 
 // 内存中存储咨询会话
@@ -13,7 +14,7 @@ const consultationSessions = new Map<string, {
 
 export class ConsultationService {
   // 开始咨询会话
-  async startConsultation(profile: PersonalityProfile, language: 'zh' | 'en' = 'zh'): Promise<{
+  async startConsultation(profile: PersonalityProfile, language: 'zh' | 'en' = 'zh', userName?: string): Promise<{
     sessionId: string;
     welcomeMessage: ChatMessage;
   }> {
@@ -22,8 +23,8 @@ export class ConsultationService {
     // 获取对应语言的提示词
     const prompts = getPromptsByLanguage(language);
 
-    // 构建系统提示词
-    const systemPrompt = prompts.consultationPrompt.replace(
+    // 构建系统提示词，包含用户昵称
+    let systemPrompt = prompts.consultationPrompt.replace(
       '{PROFILE}',
       JSON.stringify({
         title: profile.title,
@@ -34,6 +35,14 @@ export class ConsultationService {
         styling_variants: profile.styling_variants
       }, null, 2)
     );
+
+    // 如果有用户昵称，添加到系统提示词
+    if (userName) {
+      const nameInstruction = language === 'en'
+        ? `\n\nThe user's name is "${userName}". Address them by name to create a friendly atmosphere.`
+        : `\n\n用户的名字是"${userName}"。请用名字称呼用户，营造亲切的氛围。`;
+      systemPrompt += nameInstruction;
+    }
 
     // 获取欢迎消息
     const welcomePrompt = language === 'en'
@@ -67,6 +76,16 @@ export class ConsultationService {
     });
 
     return { sessionId, welcomeMessage };
+  }
+
+  // 检查是否可以开始咨询（积分检查）
+  async canStartConsultation(userId: string): Promise<{ allowed: boolean; reason?: string; cost: number }> {
+    return creditsService.canStartConsultation(userId);
+  }
+
+  // 扣除咨询积分
+  async deductConsultationCredits(userId: string): Promise<void> {
+    await creditsService.deductConsultationCredits(userId);
   }
 
   // 发送咨询消息

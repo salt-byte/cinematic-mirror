@@ -8,9 +8,10 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface ResultProps {
    profile: PersonalityProfile | null;
    onContinue: () => void;
+   onBack?: () => void;
 }
 
-const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
+const Result: React.FC<ResultProps> = ({ profile, onContinue, onBack }) => {
    const { t, language } = useLanguage();
 
    if (!profile) return null;
@@ -30,6 +31,13 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue }) => {
       <div className="flex-1 overflow-y-auto bg-parchment-base animate-in fade-in duration-1000 no-scrollbar relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 240px)' }}>
          {/* 档案顶部：绝密印记 */}
          <header className="px-10 flex justify-between items-end border-b border-walnut/10 pb-8 relative" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 48px)' }}>
+            {/* 返回按钮 */}
+            {onBack && (
+               <button onClick={onBack} className="absolute top-0 left-6 z-30 flex items-center gap-1 text-walnut/40 hover:text-walnut transition-colors" style={{ marginTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
+                  <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+                  <span className="text-[11px] font-black tracking-widest uppercase">{t('common.back') || '返回'}</span>
+               </button>
+            )}
             <div className="space-y-2">
                <div className="flex items-center gap-2">
                   <span className="bg-vintageRed text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm tracking-[0.2em] uppercase">{t('result.topSecret')}</span>

@@ -67,8 +67,8 @@ export async function login(email: string, password: string) {
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
 
-  // 登录后从服务器加载该用户的档案
-  await loadUserArchives();
+  // 登录后在后台加载档案，不阻塞页面跳转
+  loadUserArchives();
 
   return result;
 }
@@ -253,9 +253,19 @@ export async function getProfile(profileId: string) {
 let currentConsultationId: string | null = null;
 
 export async function startConsultation(profileId: string, language?: 'zh' | 'en') {
+  // 获取用户昵称
+  let userName = '';
+  try {
+    const userInfoStr = localStorage.getItem('cinematic_user_info');
+    if (userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      userName = userInfo.name || '';
+    }
+  } catch (e) { }
+
   const result = await request<{ sessionId: string; welcomeMessage: any }>('/consultation/start', {
     method: 'POST',
-    body: JSON.stringify({ profileId, language: language || 'zh' }),
+    body: JSON.stringify({ profileId, language: language || 'zh', userName }),
   });
   currentConsultationId = result.sessionId;
   return result;
@@ -410,3 +420,58 @@ export async function synthesizeAndPlaySpeechWithCallback(
     onComplete?.();
   }
 }
+
+// =====================================================
+// 积分相关
+// =====================================================
+
+export interface CreditsBalance {
+  balance: number;
+  totalInterviews: number;
+  freeInterviewsRemaining: number;
+  config: {
+    INITIAL_CREDITS: number;
+    FREE_INTERVIEWS: number;
+    INTERVIEW_COST: number;
+    CONSULTATION_COST: number;
+  };
+  packages: { id: string; credits: number; price: number }[];
+}
+
+export interface CreditsCheck {
+  allowed: boolean;
+  reason?: string;
+  cost: number;
+}
+
+// 获取积分余额
+export async function getCreditsBalance(): Promise<CreditsBalance> {
+  return request<CreditsBalance>('/credits/balance');
+}
+
+// 检查是否可以开始试镜
+export async function checkCanStartInterview(): Promise<CreditsCheck> {
+  return request<CreditsCheck>('/credits/check/interview');
+}
+
+// 检查是否可以开始咨询
+export async function checkCanStartConsultation(): Promise<CreditsCheck> {
+  return request<CreditsCheck>('/credits/check/consultation');
+}
+
+// 获取积分变动历史
+export async function getCreditsHistory(limit = 20): Promise<any[]> {
+  return request<any[]>(`/credits/history?limit=${limit}`);
+}
+
+// 验证购买并充值
+export async function verifyPurchase(productId: string, transactionId: string): Promise<{
+  creditsAdded: number;
+  newBalance: number;
+}> {
+  return request<{ creditsAdded: number; newBalance: number }>('/credits/verify', {
+    method: 'POST',
+    body: JSON.stringify({ productId, transactionId }),
+  });
+}
+

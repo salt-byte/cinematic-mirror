@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import supabase from '../config/supabase';
 import { chatCompletion, CHAT_MODEL } from '../config/siliconflow';
 import { DIRECTOR_SYSTEM_PROMPT, PROFILE_GENERATION_PROMPT, MOVIE_DATABASE, getDatabase, getPromptsByLanguage } from '../config/constants';
+import { creditsService } from './creditsService';
 import type { ChatMessage, PersonalityProfile, CharacterMatch, StyleVariant } from '../types/index';
 
 // 内存中存储活跃的聊天会话
@@ -176,6 +177,11 @@ export class InterviewService {
     return this.generateProfileFromMessages(session.userId, session.chatMessages, sessionId, session.userGender);
   }
 
+  // 检查是否可以开始试镜（积分检查）
+  async canStartInterview(userId: string): Promise<{ allowed: boolean; reason?: string; cost: number }> {
+    return creditsService.canStartInterview(userId);
+  }
+
   // 从消息历史生成档案
   private async generateProfileFromMessages(
     userId: string,
@@ -336,6 +342,9 @@ export class InterviewService {
 
     // 清理内存中的会话
     activeSessions.delete(sessionId);
+
+    // 扣除积分（前3次免费，之后扣积分）
+    await creditsService.deductInterviewCredits(profile.user_id);
 
     return profile;
   }

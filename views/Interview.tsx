@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { startInterview, sendInterviewMessage, generateProfile } from '../apiService';
+import { startInterview, sendInterviewMessage, generateProfile, checkCanStartInterview } from '../apiService';
 import { PersonalityProfile, ChatMessage } from '../types';
 import { useLanguage } from '../i18n/LanguageContext';
 import { translations } from '../i18n/translations';
+import Credits from './Credits';
 
 interface ParsedMessage {
   type: 'scene' | 'dialogue';
@@ -16,38 +17,35 @@ interface UserInfo {
   avatar: string; // base64 头像
 }
 
-const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }> = ({ onComplete }) => {
+const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; onBack?: () => void }> = ({ onComplete, onBack }) => {
   const { t, language } = useLanguage();
-  const [showIntro, setShowIntro] = useState(true);
-  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', gender: '', avatar: '' });
+
+  // 同步初始化：检查 localStorage 中是否已有用户信息，避免表单闪烁
+  const [savedInfo] = useState<UserInfo | null>(() => {
+    try {
+      const saved = localStorage.getItem('cinematic_user_info');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.name && parsed.gender) return parsed;
+      }
+    } catch (e) { }
+    return null;
+  });
+
+  const [showIntro, setShowIntro] = useState(!savedInfo);
+  const [userInfo, setUserInfo] = useState<UserInfo>(savedInfo || { name: '', gender: '', avatar: '' });
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; parts: ParsedMessage[] }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [round, setRound] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const [error, setError] = useState("");
-  const [autoStartInfo, setAutoStartInfo] = useState<UserInfo | null>(null);
+  const [autoStartInfo, setAutoStartInfo] = useState<UserInfo | null>(savedInfo);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
+  const [creditsError, setCreditsError] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 检查是否已有用户信息
-  useEffect(() => {
-    const savedUserInfo = localStorage.getItem('cinematic_user_info');
-    if (savedUserInfo) {
-      try {
-        const parsed = JSON.parse(savedUserInfo);
-        // 如果已有完整的用户信息（名字和性别），标记自动开始
-        if (parsed.name && parsed.gender) {
-          setUserInfo(parsed);
-          setShowIntro(false);
-          setAutoStartInfo(parsed);
-        }
-      } catch (e) {
-        // 解析失败，显示登记页面
-      }
-    }
-  }, []);
 
   // 处理头像上传
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +131,18 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   const startInterviewWithInfo = async (info: UserInfo) => {
     setLoading(true);
     setError("");
+    setCreditsError(null);
+
     try {
+      // 检查积分
+      const creditsCheck = await checkCanStartInterview();
+      if (!creditsCheck.allowed) {
+        setLoading(false);
+        setCreditsError(creditsCheck.reason || t('interview.insufficientCredits'));
+        setShowCreditsModal(true);
+        return;
+      }
+
       const { initialMessage } = await startInterview(info.name, info.gender, language);
       const parts = parseModelResponse(initialMessage.text);
       setMessages([{ role: 'model', parts }]);
@@ -211,6 +220,15 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
   if (showIntro) {
     return (
       <div className="flex-1 flex flex-col min-h-[100dvh] overflow-auto bg-parchment-base" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        {/* 返回按钮 */}
+        {onBack && (
+          <div className="px-6 pt-4 shrink-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
+            <button onClick={onBack} className="flex items-center gap-1 text-walnut/40 hover:text-walnut transition-colors">
+              <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+              <span className="text-[11px] font-black tracking-widest uppercase">{t('common.back') || '返回'}</span>
+            </button>
+          </div>
+        )}
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="bg-white shadow-2xl border border-walnut/10 p-8 max-w-sm w-full space-y-8">
             {/* 头像上传 */}
@@ -326,16 +344,14 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
     <div className="flex-1 flex flex-col min-h-[100dvh] overflow-hidden bg-parchment-base">
       {/* 顶部导航 */}
       <header className="px-6 py-4 flex items-center justify-between border-b border-walnut/10 bg-parchment-light shrink-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
-        <button className="text-walnut/30">
-          <span className="material-symbols-outlined text-xl">calendar_view_day</span>
+        <button onClick={() => { if (onBack && confirm(t('interview.confirmLeave') || '退出将丢失当前对话，确定返回？')) onBack(); }} className="text-walnut/40 hover:text-walnut transition-colors">
+          <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
         </button>
         <div className="text-center">
           <h1 className="text-xl font-retro font-black text-walnut tracking-widest">{t('interview.title')}</h1>
           <p className="text-[10px] text-walnut/40 tracking-[0.3em]">{t('interview.subtitle')}</p>
         </div>
-        <button className="text-walnut/30">
-          <span className="material-symbols-outlined text-xl">sticky_note_2</span>
-        </button>
+        <div className="w-6" />
       </header>
 
       {/* 场次指示 */}
@@ -422,6 +438,18 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void }>
           </button>
         </div>
       </div>
+
+      {/* 积分充值弹窗 */}
+      {showCreditsModal && (
+        <Credits
+          onClose={() => {
+            setShowCreditsModal(false);
+            // 返回上一页
+            if (onBack) onBack();
+          }}
+          language={language}
+        />
+      )}
     </div>
   );
 };

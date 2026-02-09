@@ -105,6 +105,8 @@ export const translations = {
     thinking: { zh: '正在思考...', en: 'Thinking...' },
     generatingProfile: { zh: '生成人格档案中...', en: 'Generating personality profile...' },
     inputPlaceholder: { zh: '说点什么...', en: 'Say something...' },
+    confirmLeave: { zh: '退出将丢失当前对话，确定返回？', en: 'Leaving will lose the current conversation. Go back?' },
+    insufficientCredits: { zh: '积分不足，请充值后再试', en: 'Insufficient credits. Please recharge and try again.' },
   },
 
   // 结果页

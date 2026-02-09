@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { PersonalityProfile, ChatMessage } from '../types';
-import { startConsultation, sendConsultationMessage } from '../apiService';
+import { startConsultation, sendConsultationMessage, checkCanStartConsultation } from '../apiService';
 import { geminiLive } from '../services/geminiLiveService';
 import { ParchmentCard } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
+import Credits from './Credits';
 
 interface ParsedMessage {
   type: 'action' | 'dialogue';
@@ -61,6 +62,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
   const [recognizingText, setRecognizingText] = useState(""); // 实时识别中的文字
   const [isAiSpeaking, setIsAiSpeaking] = useState(false); // AI正在说话
   const pendingMessageRef = useRef<string | null>(null); // 待发送的消息
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -118,6 +120,14 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
         setLoading(true);
         setError("");
         try {
+          // 检查积分
+          const creditsCheck = await checkCanStartConsultation();
+          if (!creditsCheck.allowed) {
+            setLoading(false);
+            setShowCreditsModal(true);
+            return;
+          }
+
           const { welcomeMessage } = await startConsultation(selectedProfile.id, language);
           setMessages([{ role: 'model', text: welcomeMessage.text }]);
           setLoading(false);
@@ -154,12 +164,23 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     setError('');
 
     try {
+      // 获取用户昵称
+      let userName = '';
+      try {
+        const userInfoStr = localStorage.getItem('cinematic_user_info');
+        if (userInfoStr) {
+          const userInfo = JSON.parse(userInfoStr);
+          userName = userInfo.name || '';
+        }
+      } catch (e) { }
+
       // 构建系统指令 - 根据语言切换
       const matches = selectedProfile.matches || [];
       const firstMatch = matches[0];
 
       const systemInstruction = language === 'en'
         ? `You are "Lu Ye", a professional styling consultant director at Cinematic Mirror, a warm and professional image designer.
+${userName ? `The user's name is "${userName}". Address them by name to create a friendly atmosphere.` : ''}
 ${firstMatch ? `The user's personality profile shows they match best with ${firstMatch.name} from "${firstMatch.movie}", with a ${firstMatch.matchRate}% match rate.` : ''}
 You're having a video conversation with the user and can see their live feed.
 Please give professional styling and image advice based on their appearance, clothing, and temperament.
@@ -167,6 +188,7 @@ Be warm and natural, like chatting with a friend, but maintain professionalism.
 Keep responses concise, just 1-2 sentences each time, like natural human conversation.
 Respond in English.`
         : `你是"陆野"，影中镜的专业造型顾问导演，一位温暖而专业的形象设计师。
+${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营造亲切的氛围。` : ''}
 ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。` : ''}
 你正在与用户进行视频对话，可以看到他们的实时画面。
 请根据用户的外表、穿着、气质给出专业的穿搭和形象建议。
@@ -627,6 +649,17 @@ ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${first
           </button>
         </div>
       </div>
+
+      {/* 积分充值弹窗 */}
+      {showCreditsModal && (
+        <Credits
+          onClose={() => {
+            setShowCreditsModal(false);
+            setMode('pick_role');
+          }}
+          language={language}
+        />
+      )}
     </div>
   );
 };

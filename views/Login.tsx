@@ -6,9 +6,10 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface LoginProps {
   onDirectorLogin: () => void;
   onGoToRegister: () => void;
+  onBack: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
+const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }) => {
   const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -61,6 +62,10 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister }) => {
           className="absolute inset-0 bg-center bg-cover grayscale sepia-[0.3] brightness-75"
           style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAQTp2Xnb9Mq1T1VHa-SDuOoAaWLhEFnqwApjOL-fJi3k83SxgGvancGV-hkaGhXn3OjPMHE-4tszvZyQvlTEFBA7QmLa9zbI0JOrtP-LQyiT4FMZxXWjQW_RKdY22Z0Nh1f1-YFTxbeRdWUWcXdlrFz2mfS6XIneAAgtkChbAmjyWWpeVh_FKfY7jizCt_1vsqOfo8cvB6p-tk4Zu3kzW7Pb7FN8htiO1Bh9X_n2YLDa60WqEYe1aSJXjsUOTBLJgmA_Ay8SsSs1I')" }}
         ></div>
+        {/* 返回按钮 */}
+        <button onClick={onBack} className="absolute top-4 left-4 z-20 size-10 rounded-full bg-black/30 backdrop-blur flex items-center justify-center active:scale-95 transition-transform" style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}>
+          <span className="material-symbols-outlined text-white">arrow_back</span>
+        </button>
         <div className="absolute inset-0 bg-gradient-to-t from-parchment-base via-transparent to-black/60"></div>
         <div className="absolute bottom-8 left-8 right-8">
           <div className="flex items-center gap-2 mb-2">

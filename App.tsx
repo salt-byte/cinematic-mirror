@@ -15,7 +15,11 @@ import { LanguageProvider, LanguageSwitcher, useLanguage } from './i18n/Language
 import { isLoggedIn } from './apiService';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<View>(View.WELCOME);
+  // 启动时检测：已登录用户直接进主页，跳过 Welcome 和 Login
+  const [currentView, setCurrentView] = useState<View>(() => {
+    return isLoggedIn() ? View.STYLING : View.WELCOME;
+  });
+  const [previousView, setPreviousView] = useState<View | null>(null);
   const [profile, setProfile] = useState<PersonalityProfile | null>(null);
 
   // 从 localStorage 加载档案
@@ -43,7 +47,20 @@ const App: React.FC = () => {
     reloadProfile();
   }, []);
 
-  const navigate = (view: View) => setCurrentView(view);
+  const navigate = (view: View) => {
+    setPreviousView(currentView);
+    setCurrentView(view);
+  };
+
+  // 返回上一页，fallback 到主页或欢迎页
+  const goBack = () => {
+    if (previousView) {
+      setCurrentView(previousView);
+      setPreviousView(null);
+    } else {
+      setCurrentView(isLoggedIn() ? View.STYLING : View.WELCOME);
+    }
+  };
 
   // 登录成功后调用，重新加载用户档案
   const handleLoginSuccess = () => {
@@ -69,7 +86,8 @@ const App: React.FC = () => {
 
     navigate(View.DEVELOPING);
     setTimeout(() => {
-      navigate(View.RESULT);
+      // 直接切换到结果页，不更新 previousView（避免"返回"到 Developing）
+      setCurrentView(View.RESULT);
     }, 3000);
   };
 
@@ -94,15 +112,15 @@ const App: React.FC = () => {
       case View.WELCOME:
         return <Welcome onStart={() => navigate(View.LOGIN)} />;
       case View.LOGIN:
-        return <Login onDirectorLogin={handleLoginSuccess} onGoToRegister={() => navigate(View.REGISTER)} />;
+        return <Login onDirectorLogin={handleLoginSuccess} onGoToRegister={() => navigate(View.REGISTER)} onBack={() => navigate(View.WELCOME)} />;
       case View.REGISTER:
         return <Register onBack={() => navigate(View.LOGIN)} onComplete={() => navigate(View.INTERVIEW)} />;
       case View.INTERVIEW:
-        return <Interview onComplete={handleInterviewComplete} />;
+        return <Interview onComplete={handleInterviewComplete} onBack={goBack} />;
       case View.DEVELOPING:
         return <Developing />;
       case View.RESULT:
-        return <Result profile={profile} onContinue={() => navigate(View.STYLING)} />;
+        return <Result profile={profile} onContinue={() => navigate(View.STYLING)} onBack={goBack} />;
       case View.DASHBOARD:
       case View.PLAZA:
       case View.STYLING:

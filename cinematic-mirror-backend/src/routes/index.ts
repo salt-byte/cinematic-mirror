@@ -4,6 +4,7 @@ import interviewRoutes from './interviewRoutes';
 import consultationRoutes from './consultationRoutes';
 import plazaRoutes from './plazaRoutes';
 import ttsRoutes from './ttsRoutes';
+import creditsRoutes from './creditsRoutes';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use('/interview', interviewRoutes);
 router.use('/consultation', consultationRoutes);
 router.use('/plaza', plazaRoutes);
 router.use('/tts', ttsRoutes);
+router.use('/credits', creditsRoutes);
 
 // 健康检查
 router.get('/health', (req, res) => {

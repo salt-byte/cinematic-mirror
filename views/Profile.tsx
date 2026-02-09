@@ -3,8 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
-import { logout } from '../apiService';
+import { logout, getCurrentUser } from '../apiService';
 import { MOVIE_DATABASE } from '../library';
+
+// 用户信息接口
+interface UserInfo {
+  name?: string;
+  gender?: 'male' | 'female';
+  avatar?: string;
+}
+
+interface UserAccount {
+  email?: string;
+  nickname?: string;
+  created_at?: string;
+}
 
 // 获取用户上传的头像
 const getUserAvatar = (): string | null => {
@@ -13,7 +26,7 @@ const getUserAvatar = (): string | null => {
     try {
       const userInfo = JSON.parse(userInfoStr);
       if (userInfo.avatar) return userInfo.avatar;
-    } catch (e) {}
+    } catch (e) { }
   }
   return null;
 };
@@ -43,16 +56,42 @@ const ProfileView: React.FC<{
   onSelectArchive: (p: PersonalityProfile) => void,
   onLogout?: () => void
 }> = ({ profile, onNewRole, onSelectArchive, onLogout }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [collection, setCollection] = useState<PersonalityProfile[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
   const userAvatar = getUserAvatar();
 
   useEffect(() => {
-    // 只读取档案库，不在这里写入（由 App.tsx 的 handleInterviewComplete 负责写入）
+    // 读取档案库
     const saved = localStorage.getItem('cinematic_archives');
     const existing = saved ? JSON.parse(saved) : [];
     setCollection(existing);
+
+    // 读取用户信息 (试镜时填写的)
+    try {
+      const userInfoStr = localStorage.getItem('cinematic_user_info');
+      if (userInfoStr) {
+        setUserInfo(JSON.parse(userInfoStr));
+      }
+    } catch (e) { }
+
+    // 获取用户账号信息 (注册时的邮箱等)
+    loadUserAccount();
   }, [profile]);
+
+  const loadUserAccount = async () => {
+    try {
+      const user = await getCurrentUser();
+      setUserAccount({
+        email: user.email,
+        nickname: user.nickname,
+        created_at: user.created_at,
+      });
+    } catch (e) {
+      // 未登录或获取失败
+    }
+  };
 
   const handleLogout = () => {
     if (confirm(t('login.logoutConfirm'))) {
@@ -86,6 +125,59 @@ const ProfileView: React.FC<{
               </div>
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
             </div>
+
+            {/* 用户账号信息 */}
+            <div className="w-full mb-6 px-4">
+              <div className="border-t border-b border-walnut/10 py-4 space-y-3">
+                {/* 昵称 */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                    {language === 'en' ? 'Name' : '昵称'}
+                  </span>
+                  <span className="text-[13px] font-retro font-bold text-walnut">
+                    {userInfo?.name || userAccount?.nickname || '--'}
+                  </span>
+                </div>
+                {/* 性别 */}
+                {userInfo?.gender && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                      {language === 'en' ? 'Gender' : '性别'}
+                    </span>
+                    <span className="text-[13px] font-serif text-walnut/70 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">
+                        {userInfo.gender === 'male' ? 'male' : 'female'}
+                      </span>
+                      {userInfo.gender === 'male' ? (language === 'en' ? 'Male' : '男') : (language === 'en' ? 'Female' : '女')}
+                    </span>
+                  </div>
+                )}
+                {/* 邮箱 */}
+                {userAccount?.email && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                      {language === 'en' ? 'Email' : '邮箱'}
+                    </span>
+                    <span className="text-[11px] font-mono text-walnut/60">
+                      {userAccount.email}
+                    </span>
+                  </div>
+                )}
+                {/* 注册时间 */}
+                {userAccount?.created_at && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                      {language === 'en' ? 'Joined' : '加入时间'}
+                    </span>
+                    <span className="text-[10px] font-mono text-walnut/50">
+                      {new Date(userAccount.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'zh-CN')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 当前档案标题 */}
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em]">{profile?.title || t('profile.noRecord')}</h2>
               <p className="text-[10px] font-serif text-walnut/40 italic tracking-widest">{profile?.subtitle || t('profile.waitTake')}</p>

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from '../config/supabase';
 import { generateToken } from '../utils/jwt';
+import { creditsService } from './creditsService';
 import type { User, UserPublic } from '../types/index';
 
 export class UserService {
@@ -49,6 +50,9 @@ export class UserService {
     if (error) {
       throw new Error('注册失败: ' + error.message);
     }
+
+    // 初始化用户积分
+    await creditsService.initializeCredits(newUser.id);
 
     // 生成 JWT
     const token = generateToken({

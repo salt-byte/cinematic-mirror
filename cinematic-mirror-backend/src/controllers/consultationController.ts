@@ -8,7 +8,7 @@ export class ConsultationController {
   // 开始咨询会话
   async startConsultation(req: Request, res: Response): Promise<void> {
     try {
-      const { profileId, language } = req.body;
+      const { profileId, language, userName } = req.body;
 
       if (!profileId) {
         sendError(res, '请提供档案ID', 400);
@@ -23,7 +23,7 @@ export class ConsultationController {
         return;
       }
 
-      const result = await consultationService.startConsultation(profile, language || 'zh');
+      const result = await consultationService.startConsultation(profile, language || 'zh', userName);
       sendSuccess(res, result, '咨询开始');
     } catch (error: any) {
       sendError(res, error.message, 500);
