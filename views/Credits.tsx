@@ -196,8 +196,16 @@ export default function Credits({ onClose }: CreditsProps) {
                                 <div className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider mb-1 flex items-center gap-2">
                                     {txt('当前积分', 'Current Credits')}
                                     {credits.isMember && (
-                                        <span className="inline-flex items-center gap-1 bg-vintageRed/10 text-vintageRed text-[8px] font-bold px-2 py-0.5 tracking-wider uppercase">
-                                            👑 {txt('会员', 'PRO')}
+                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[8px] font-bold tracking-[0.15em] uppercase border"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #d4a853 0%, #f0d48a 50%, #c49a3c 100%)',
+                                                color: '#fff',
+                                                borderColor: '#c49a3c',
+                                                textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                                                boxShadow: '0 1px 3px rgba(196,154,60,0.3)',
+                                            }}>
+                                            <span className="material-symbols-outlined" style={{ fontSize: '10px' }}>workspace_premium</span>
+                                            {txt('会员', 'PRO')}
                                         </span>
                                     )}
                                 </div>
@@ -258,7 +266,9 @@ export default function Credits({ onClose }: CreditsProps) {
                                 </div>
 
                                 <div className="flex items-start gap-4 mb-4">
-                                    <div className="text-3xl">👑</div>
+                                    <div className="size-10 flex items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, #d4a853 0%, #f0d48a 50%, #c49a3c 100%)' }}>
+                                        <span className="material-symbols-outlined text-white" style={{ fontSize: '20px', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>workspace_premium</span>
+                                    </div>
                                     <div className="flex-1">
                                         <h4 className="text-lg font-retro font-black text-walnut tracking-wider">
                                             {txt(credits.membership.label, credits.membership.labelEn)}

@@ -146,8 +146,16 @@ const ProfileView: React.FC<{
                 {userInfo?.name || userAccount?.nickname || '--'}
               </h2>
               {credits?.isMember && (
-                <span className="inline-flex items-center gap-0.5 bg-vintageRed/10 text-vintageRed text-[8px] font-bold px-2 py-0.5 tracking-wider">
-                  👑 PRO
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[8px] font-bold tracking-[0.15em] uppercase border"
+                  style={{
+                    background: 'linear-gradient(135deg, #d4a853 0%, #f0d48a 50%, #c49a3c 100%)',
+                    color: '#fff',
+                    borderColor: '#c49a3c',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                    boxShadow: '0 1px 3px rgba(196,154,60,0.3)',
+                  }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '10px' }}>workspace_premium</span>
+                  PRO
                 </span>
               )}
             </div>
