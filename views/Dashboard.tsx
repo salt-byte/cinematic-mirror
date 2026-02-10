@@ -427,6 +427,9 @@ ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${first
           <div className="text-center space-y-3">
             <h2 className="text-3xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{selectedProfile?.title}</h2>
             <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">{t('dashboard.selectMode')}</p>
+            <p className="text-[9px] font-serif text-walnut/40 mt-1">
+              {language === 'en' ? '🎬 20 credits per consultation' : '🎬 每次咨询消耗 20 积分'}
+            </p>
           </div>
           <div className="flex flex-col gap-10 w-full max-w-xs">
             <button onClick={() => handleModeChange('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">

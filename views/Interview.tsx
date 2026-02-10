@@ -331,6 +331,11 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; o
             <p className="text-[8px] text-walnut/30 text-center font-mono">
               {t('interview.castingSession')}
             </p>
+            <p className="text-[9px] text-walnut/40 text-center font-serif">
+              {language === 'en'
+                ? '🎬 First 3 auditions free · Then 30 credits each'
+                : '🎬 前 3 次试镜免费 · 之后 30 积分/次'}
+            </p>
           </div>
         </div>
       </div>

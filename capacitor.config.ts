@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.cinematicmirror.app',
+  appId: 'com.worldai.cinematicmirror',
   appName: '影中镜',
   webDir: 'dist',
   ios: {

@@ -73,7 +73,7 @@ export async function verifyTransaction(
         }
 
         // 验证 Bundle ID（确保是我们的 App）
-        const expectedBundleId = process.env.APPLE_BUNDLE_ID || 'com.cinematicmirror.app';
+        const expectedBundleId = process.env.APPLE_BUNDLE_ID || 'com.worldai.cinematicmirror';
         if (decoded.bundleId && decoded.bundleId !== expectedBundleId) {
             return {
                 valid: false,
