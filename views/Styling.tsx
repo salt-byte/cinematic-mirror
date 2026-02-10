@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PersonalityProfile } from '../types';
 import { MOVIE_DATABASE, StylingOption } from '../library';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -16,13 +16,41 @@ interface CharacterData {
 
 const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) => {
   const { t, language } = useLanguage();
+  const [allProfiles, setAllProfiles] = useState<PersonalityProfile[]>([]);
+  const [activeProfileIndex, setActiveProfileIndex] = useState(0);
   const [activeCharacterIndex, setActiveCharacterIndex] = useState(0);
   const [activeStylingIndex, setActiveStylingIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const matches = profile?.matches || [];
+  // 从 localStorage 加载所有档案
+  useEffect(() => {
+    const saved = localStorage.getItem('cinematic_archives');
+    const archives: PersonalityProfile[] = saved ? JSON.parse(saved) : [];
 
-  if (!profile || matches.length === 0) {
+    // 如果当前 profile 存在但不在 archives 里，加到最前面
+    if (profile && !archives.find(a => a.id === profile.id)) {
+      archives.unshift(profile);
+    }
+
+    // 如果 archives 为空但有当前 profile，用当前 profile
+    if (archives.length === 0 && profile) {
+      archives.push(profile);
+    }
+
+    setAllProfiles(archives);
+
+    // 设置 active profile 为当前传入的 profile
+    if (profile) {
+      const idx = archives.findIndex(a => a.id === profile.id);
+      if (idx >= 0) setActiveProfileIndex(idx);
+    }
+  }, [profile]);
+
+  // 当前选中的档案
+  const currentProfile = allProfiles[activeProfileIndex] || null;
+  const matches = currentProfile?.matches || [];
+
+  if (allProfiles.length === 0 || !currentProfile || matches.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full space-y-6 bg-parchment-base min-h-screen">
         <div className="size-16 border border-walnut/10 rounded-full flex items-center justify-center">
@@ -38,7 +66,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
 
   // 构建角色数据，从 MOVIE_DATABASE 获取完整信息
   const characters: CharacterData[] = matches.map((match: any) => {
-    // 更灵活的匹配逻辑
     const dbCharacter = MOVIE_DATABASE.find(c => {
       const nameMatch =
         c.name === match.name ||
@@ -53,7 +80,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
       return nameMatch || movieMatch;
     });
 
-    // 调试日志
     console.log('[Styling] 匹配角色:', match.name, match.movie, '-> 找到:', dbCharacter?.name || '未找到');
 
     return {
@@ -70,7 +96,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
   const activeCharacter = characters[activeCharacterIndex];
   const activeStyling = activeCharacter?.stylings[activeStylingIndex];
 
-  // Helper to get bilingual text
   const getText = (zh: string, en?: string) => {
     return language === 'en' && en ? en : zh;
   };
@@ -108,6 +133,15 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
     }
   };
 
+  const handleProfileChange = (index: number) => {
+    setActiveProfileIndex(index);
+    setActiveCharacterIndex(0);
+    setActiveStylingIndex(0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ left: 0, behavior: 'instant' });
+    }
+  };
+
   if (!activeCharacter || activeCharacter.stylings.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center h-full space-y-6 bg-parchment-base min-h-screen">
@@ -128,6 +162,34 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
         <div className="text-[8px] font-mono tracking-[0.6em] text-walnut/30 uppercase">{t('styling.department')}</div>
         <h2 className="text-lg font-retro font-black text-walnut tracking-[0.15em]">{t('styling.title')}</h2>
       </header>
+
+      {/* 档案切换标签 - 仅在有多个档案时显示 */}
+      {allProfiles.length > 1 && (
+        <div className="px-4 mb-4">
+          <div className="text-[8px] font-mono tracking-[0.4em] text-walnut/30 uppercase mb-2 px-2">
+            {language === 'en' ? 'PROFILE ARCHIVE' : '档案切换'}
+          </div>
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            {allProfiles.map((p, i) => (
+              <button
+                key={p.id || i}
+                onClick={() => handleProfileChange(i)}
+                className={`shrink-0 px-4 py-2.5 transition-all border rounded-sm ${i === activeProfileIndex
+                  ? 'bg-vintageRed text-parchment-base border-vintageRed shadow-md'
+                  : 'bg-transparent text-walnut/50 border-walnut/15 hover:border-walnut/30'
+                  }`}
+              >
+                <div className="text-[11px] font-black tracking-wider truncate max-w-[120px]">
+                  {p.title || `档案 ${i + 1}`}
+                </div>
+                <div className="text-[8px] opacity-60 mt-0.5">
+                  {p.matches?.[0]?.name || ''}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 角色标签页 */}
       <div className="px-4 mb-4">
@@ -167,7 +229,7 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
         </p>
       </div>
 
-      {/* 可滑动造型区域 - 每套造型有独立的图片和分析 */}
+      {/* 可滑动造型区域 */}
       <div className="relative">
         <div
           ref={scrollRef}
@@ -180,7 +242,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
               className="w-full shrink-0 snap-center px-4"
             >
               <div className="bg-[#1a1a1a] p-1 pb-8 shadow-xl relative group">
-                {/* 胶片装饰头 */}
                 <div className="flex justify-between px-3 py-1.5 border-b border-white/5">
                   <div className="flex gap-1.5">
                     <div className="size-1.5 rounded-full bg-white/20" />
@@ -194,7 +255,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                     <div className="size-1.5 rounded-full bg-white/20" />
                   </div>
                 </div>
-                {/* 核心影像 */}
                 <div className="relative overflow-hidden aspect-[3/4] bg-ink">
                   <img
                     src={styling.image}
@@ -202,7 +262,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                     className="w-full h-full object-contain grayscale-[0.2] contrast-[1.1]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                  {/* 标题叠加 */}
                   <div className="absolute bottom-4 left-4 right-4">
                     <h3 className="text-white text-xl font-retro font-black tracking-wide drop-shadow-lg">
                       {getText(styling.title, styling.titleEn)}
@@ -217,7 +276,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
           ))}
         </div>
 
-        {/* 造型指示器 */}
         {activeCharacter.stylings.length > 1 && (
           <div className="flex justify-center gap-2 mt-4">
             {activeCharacter.stylings.map((_, i) => (
@@ -234,9 +292,9 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
         )}
       </div>
 
-      {/* 当前造型的详细分析 - 随滑动变化 */}
+      {/* 当前造型的详细分析 */}
       {activeStyling && (
-        <div className="px-6 mt-8 space-y-8 animate-in fade-in duration-300" key={`${activeCharacterIndex}-${activeStylingIndex}`}>
+        <div className="px-6 mt-8 space-y-8 animate-in fade-in duration-300" key={`${activeProfileIndex}-${activeCharacterIndex}-${activeStylingIndex}`}>
           {/* 色彩构图 */}
           <div className="space-y-4">
             <h3 className="font-black text-[9px] uppercase tracking-widest text-walnut/40 flex items-center gap-2">
@@ -257,11 +315,6 @@ const Styling: React.FC<{ profile: PersonalityProfile | null }> = ({ profile }) 
                   {activeStyling.palette?.map(p => getText(p.name, p.enName)).join(' · ')}
                 </p>
                 <p className="text-[9px] text-walnut/40 font-mono mt-1 uppercase tracking-tight">
-                  {/* Since we are mixing displays, maybe we show hex or just keep EN names? 
-                      Original was showing En names here. Now we can show the other lang or just keep En for 'code' look? 
-                      Let's stick to showing En names as 'technical code' if language includes them, or maybe just always En names in subtitle if that's the design.
-                      Actually, original used `p.enName` for the small text. Let's keep `p.enName` for the mono text as it looks like a color code.
-                  */}
                   {activeStyling.palette?.map(p => p.enName || 'Color').join(' / ')}
                 </p>
               </div>

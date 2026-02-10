@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
-import { logout, getCurrentUser } from '../apiService';
+import { logout, getCurrentUser, getCreditsBalance, CreditsBalance } from '../apiService';
 import { MOVIE_DATABASE } from '../library';
 
 // 用户信息接口
@@ -54,12 +54,14 @@ const ProfileView: React.FC<{
   profile: PersonalityProfile | null,
   onNewRole: () => void,
   onSelectArchive: (p: PersonalityProfile) => void,
-  onLogout?: () => void
-}> = ({ profile, onNewRole, onSelectArchive, onLogout }) => {
+  onLogout?: () => void,
+  onNavigateCredits?: () => void
+}> = ({ profile, onNewRole, onSelectArchive, onLogout, onNavigateCredits }) => {
   const { t, language } = useLanguage();
   const [collection, setCollection] = useState<PersonalityProfile[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
+  const [credits, setCredits] = useState<CreditsBalance | null>(null);
   const userAvatar = getUserAvatar();
 
   useEffect(() => {
@@ -78,6 +80,9 @@ const ProfileView: React.FC<{
 
     // 获取用户账号信息 (注册时的邮箱等)
     loadUserAccount();
+
+    // 加载积分余额
+    loadCredits();
   }, [profile]);
 
   const loadUserAccount = async () => {
@@ -90,6 +95,15 @@ const ProfileView: React.FC<{
       });
     } catch (e) {
       // 未登录或获取失败
+    }
+  };
+
+  const loadCredits = async () => {
+    try {
+      const data = await getCreditsBalance();
+      setCredits(data);
+    } catch (e) {
+      // 获取失败不影响页面
     }
   };
 
@@ -184,6 +198,41 @@ const ProfileView: React.FC<{
             </div>
           </div>
         </ParchmentCard>
+      </div>
+
+      {/* 积分余额卡片 */}
+      <div className="px-8 my-6">
+        <div className="bg-white/60 border border-walnut/10 p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-vintageRed text-xl">toll</span>
+              <div>
+                <div className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                  {language === 'en' ? 'Credits Balance' : '积分余额'}
+                </div>
+                <div className="text-2xl font-retro font-black text-walnut">
+                  {credits?.balance ?? '--'}
+                </div>
+              </div>
+            </div>
+            {onNavigateCredits && (
+              <button
+                onClick={onNavigateCredits}
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-vintageRed text-parchment-base text-[10px] font-black tracking-wider uppercase shadow-md active:scale-95 transition-transform"
+              >
+                <span className="material-symbols-outlined text-[14px]">add_circle</span>
+                {language === 'en' ? 'Recharge' : '充值'}
+              </button>
+            )}
+          </div>
+          {credits && credits.freeInterviewsRemaining > 0 && (
+            <div className="mt-3 pt-3 border-t border-walnut/10 text-[10px] text-walnut/50 font-serif">
+              {language === 'en'
+                ? `${credits.freeInterviewsRemaining} free interview(s) remaining`
+                : `剩余 ${credits.freeInterviewsRemaining} 次免费试镜`}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 标题：手帐贴条风格 */}

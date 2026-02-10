@@ -9,7 +9,8 @@ export enum View {
   DASHBOARD = 'dashboard',
   STYLING = 'styling',
   PLAZA = 'plaza',
-  PROFILE = 'profile'
+  PROFILE = 'profile',
+  CREDITS = 'credits'
 }
 
 export interface CharacterMatch {

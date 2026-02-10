@@ -464,14 +464,14 @@ export async function getCreditsHistory(limit = 20): Promise<any[]> {
   return request<any[]>(`/credits/history?limit=${limit}`);
 }
 
-// 验证购买并充值
-export async function verifyPurchase(productId: string, transactionId: string): Promise<{
+// 验证购买并充值（支持 Apple StoreKit 2 JWS 收据）
+export async function verifyPurchase(productId: string, transactionId: string, receipt?: string): Promise<{
   creditsAdded: number;
   newBalance: number;
 }> {
   return request<{ creditsAdded: number; newBalance: number }>('/credits/verify', {
     method: 'POST',
-    body: JSON.stringify({ productId, transactionId }),
+    body: JSON.stringify({ productId, transactionId, receipt }),
   });
 }
 

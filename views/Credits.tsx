@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCreditsBalance, verifyPurchase, CreditsBalance } from '../apiService';
+import { purchaseProduct, isNativePlatform, isStoreKitAvailable, restorePurchases, PurchaseResult } from '../services/storeKitService';
 
 interface CreditsProps {
     onClose: () => void;
@@ -10,13 +11,23 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
     const [credits, setCredits] = useState<CreditsBalance | null>(null);
     const [loading, setLoading] = useState(true);
     const [purchasing, setPurchasing] = useState<string | null>(null);
+    const [restoring, setRestoring] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [storeKitReady, setStoreKitReady] = useState(false);
 
     const t = (zh: string, en: string) => language === 'en' ? en : zh;
 
     useEffect(() => {
         loadCredits();
+        checkStoreKit();
     }, []);
+
+    const checkStoreKit = async () => {
+        const available = await isStoreKitAvailable();
+        setStoreKitReady(available);
+        console.log(`[积分中心] StoreKit 可用: ${available}, 原生平台: ${isNativePlatform()}`);
+    };
 
     const loadCredits = async () => {
         try {
@@ -33,30 +44,69 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
     const handlePurchase = async (packageId: string) => {
         setPurchasing(packageId);
         setError(null);
+        setSuccessMessage(null);
 
         try {
-            // TODO: 集成真实的 iOS 内购
-            // 目前使用模拟的交易 ID
-            const mockTransactionId = `mock_${Date.now()}`;
+            // 1. 调用 StoreKit 内购（原生环境）或模拟购买（浏览器）
+            const result: PurchaseResult = await purchaseProduct(packageId);
 
-            const result = await verifyPurchase(packageId, mockTransactionId);
+            // 用户取消了购买
+            if (!result.success) {
+                if (result.cancelled) {
+                    // 用户主动取消，不显示错误
+                    return;
+                }
+                throw new Error(t('购买失败', 'Purchase failed'));
+            }
 
-            // 更新余额显示
+            // 2. 将购买凭证发送到后端验证并充值积分
+            const verifyResult = await verifyPurchase(
+                packageId,
+                result.transactionId || '',
+                result.receipt || ''
+            );
+
+            // 3. 更新余额显示
             if (credits) {
                 setCredits({
                     ...credits,
-                    balance: result.newBalance,
+                    balance: verifyResult.newBalance,
                 });
             }
 
-            alert(t(
-                `购买成功！获得 ${result.creditsAdded} 积分`,
-                `Purchase successful! Received ${result.creditsAdded} credits`
+            setSuccessMessage(t(
+                `购买成功！获得 ${verifyResult.creditsAdded} 积分`,
+                `Purchase successful! Received ${verifyResult.creditsAdded} credits`
             ));
+
+            // 3秒后清除成功消息
+            setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
             setError(err.message || t('购买失败', 'Purchase failed'));
         } finally {
             setPurchasing(null);
+        }
+    };
+
+    const handleRestore = async () => {
+        setRestoring(true);
+        setError(null);
+
+        try {
+            const transactions = await restorePurchases();
+            if (transactions.length === 0) {
+                setSuccessMessage(t('没有可恢复的购买记录', 'No purchases to restore'));
+            } else {
+                setSuccessMessage(t(
+                    `已恢复 ${transactions.length} 笔交易`,
+                    `Restored ${transactions.length} transactions`
+                ));
+            }
+            setTimeout(() => setSuccessMessage(null), 3000);
+        } catch (err: any) {
+            setError(err.message || t('恢复失败', 'Restore failed'));
+        } finally {
+            setRestoring(false);
         }
     };
 
@@ -176,6 +226,22 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                         </div>
                     </div>
 
+                    {/* 成功消息 */}
+                    {successMessage && (
+                        <div style={{
+                            marginBottom: '16px',
+                            padding: '12px 16px',
+                            background: 'rgba(76,175,80,0.2)',
+                            borderRadius: '8px',
+                            color: '#81c784',
+                            fontSize: '14px',
+                            textAlign: 'center',
+                            border: '1px solid rgba(76,175,80,0.3)',
+                        }}>
+                            ✓ {successMessage}
+                        </div>
+                    )}
+
                     {/* 套餐列表 */}
                     <h3 style={{ color: '#fff', fontSize: '16px', marginBottom: '16px', fontWeight: 600 }}>
                         {t('积分套餐', 'Credit Packages')}
@@ -201,7 +267,7 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                                 </div>
                                 <button
                                     onClick={() => handlePurchase(pkg.id)}
-                                    disabled={purchasing !== null}
+                                    disabled={purchasing !== null || restoring}
                                     style={{
                                         background: purchasing === pkg.id
                                             ? 'rgba(255,255,255,0.2)'
@@ -212,8 +278,8 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                                         color: '#fff',
                                         fontSize: '14px',
                                         fontWeight: 600,
-                                        cursor: purchasing !== null ? 'not-allowed' : 'pointer',
-                                        opacity: purchasing !== null && purchasing !== pkg.id ? 0.5 : 1,
+                                        cursor: purchasing !== null || restoring ? 'not-allowed' : 'pointer',
+                                        opacity: (purchasing !== null && purchasing !== pkg.id) || restoring ? 0.5 : 1,
                                     }}
                                 >
                                     {purchasing === pkg.id ? t('处理中...', 'Processing...') : `¥${pkg.price}`}
@@ -235,6 +301,26 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                         </div>
                     )}
 
+                    {/* 恢复购买按钮 */}
+                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                        <button
+                            onClick={handleRestore}
+                            disabled={restoring || purchasing !== null}
+                            style={{
+                                background: 'none',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '20px',
+                                padding: '10px 24px',
+                                color: 'rgba(255,255,255,0.6)',
+                                fontSize: '13px',
+                                cursor: restoring || purchasing !== null ? 'not-allowed' : 'pointer',
+                                opacity: restoring || purchasing !== null ? 0.5 : 1,
+                            }}
+                        >
+                            {restoring ? t('恢复中...', 'Restoring...') : t('恢复购买', 'Restore Purchases')}
+                        </button>
+                    </div>
+
                     {/* 底部说明 */}
                     <div style={{
                         marginTop: '24px',
@@ -246,8 +332,13 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                         lineHeight: 1.6,
                     }}>
                         {t(
-                            '提示：购买后积分立即到账，如遇问题请联系客服。',
-                            'Note: Credits will be added immediately after purchase. Contact support if you have any issues.'
+                            '提示：购买后积分立即到账。内购由 Apple 安全处理，如遇问题请联系客服。',
+                            'Note: Credits will be added immediately after purchase. Payments are securely handled by Apple. Contact support if you have any issues.'
+                        )}
+                        {!storeKitReady && isNativePlatform() && (
+                            <div style={{ marginTop: '8px', color: '#ffa726' }}>
+                                ⚠ {t('StoreKit 未就绪，请检查网络连接', 'StoreKit not ready, please check your connection')}
+                            </div>
                         )}
                     </div>
                 </div>

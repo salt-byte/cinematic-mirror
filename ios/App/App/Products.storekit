@@ -1,0 +1,74 @@
+{
+  "identifier" : "com.cinematicmirror.app.products",
+  "products" : [
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "credits_small_001",
+      "localizations" : [
+        {
+          "description" : "获得50积分，可用于试镜和导演咨询",
+          "displayName" : "50 积分",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "Get 50 credits for interviews and director consultations",
+          "displayName" : "50 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "credits_small",
+      "referenceName" : "Credits Small Pack",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "credits_medium_001",
+      "localizations" : [
+        {
+          "description" : "获得200积分，超值选择",
+          "displayName" : "200 积分",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "Get 200 credits, great value",
+          "displayName" : "200 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "credits_medium",
+      "referenceName" : "Credits Medium Pack",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "credits_large_001",
+      "localizations" : [
+        {
+          "description" : "获得400积分，最划算的选择",
+          "displayName" : "400 积分",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "Get 400 credits, best deal",
+          "displayName" : "400 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "credits_large",
+      "referenceName" : "Credits Large Pack",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "com.cinematicmirror.app",
+    "_developerTeamID" : ""
+  },
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

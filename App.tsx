@@ -11,6 +11,7 @@ import Dashboard from './views/Dashboard';
 import Plaza from './views/Plaza';
 import Styling from './views/Styling';
 import ProfileView from './views/Profile';
+import Credits from './views/Credits';
 import { LanguageProvider, LanguageSwitcher, useLanguage } from './i18n/LanguageContext';
 import { isLoggedIn } from './apiService';
 
@@ -125,6 +126,7 @@ const App: React.FC = () => {
       case View.PLAZA:
       case View.STYLING:
       case View.PROFILE:
+      case View.CREDITS:
         return <DashboardContent view={currentView} navigate={navigate} profile={profile} onViewArchive={handleViewArchive} onNewRole={handleNewRole} onLogout={handleLogout} />;
       default:
         return <Welcome onStart={() => navigate(View.LOGIN)} />;
@@ -147,7 +149,7 @@ const getUserAvatar = (profileId?: string): string => {
     try {
       const userInfo = JSON.parse(userInfoStr);
       if (userInfo.avatar) return userInfo.avatar;
-    } catch (e) {}
+    } catch (e) { }
   }
   return `https://picsum.photos/seed/${profileId || 'user'}/100/100`;
 };
@@ -185,7 +187,8 @@ const DashboardContent: React.FC<{
         {view === View.STYLING && <Styling profile={profile} />}
         {view === View.DASHBOARD && <Dashboard profile={profile} />}
         {view === View.PLAZA && <Plaza />}
-        {view === View.PROFILE && <ProfileView profile={profile} onNewRole={onNewRole || (() => navigate(View.INTERVIEW))} onSelectArchive={onViewArchive} onLogout={onLogout || (() => navigate(View.WELCOME))} />}
+        {view === View.PROFILE && <ProfileView profile={profile} onNewRole={onNewRole || (() => navigate(View.INTERVIEW))} onSelectArchive={onViewArchive} onLogout={onLogout || (() => navigate(View.WELCOME))} onNavigateCredits={() => navigate(View.CREDITS)} />}
+        {view === View.CREDITS && <Credits onClose={() => navigate(View.PROFILE)} language={undefined} />}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-parchment-light/95 backdrop-blur-xl border-t border-walnut/10 px-6 pt-3 flex justify-around items-center z-50 shadow-[0_-15px_50px_rgba(61,43,31,0.15)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6px)' }}>
