@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getCreditsBalance, verifyPurchase, CreditsBalance } from '../apiService';
 import { purchaseProduct, isNativePlatform, isStoreKitAvailable, restorePurchases, PurchaseResult } from '../services/storeKitService';
+import { useLanguage } from '../i18n/LanguageContext';
+import { ParchmentCard, Tape } from '../components/ParchmentCard';
 
 interface CreditsProps {
     onClose: () => void;
     language?: 'zh' | 'en';
 }
 
-export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
+export default function Credits({ onClose }: CreditsProps) {
+    const { t, language } = useLanguage();
     const [credits, setCredits] = useState<CreditsBalance | null>(null);
     const [loading, setLoading] = useState(true);
     const [purchasing, setPurchasing] = useState<string | null>(null);
@@ -16,7 +19,7 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [storeKitReady, setStoreKitReady] = useState(false);
 
-    const t = (zh: string, en: string) => language === 'en' ? en : zh;
+    const txt = (zh: string, en: string) => language === 'en' ? en : zh;
 
     useEffect(() => {
         loadCredits();
@@ -26,7 +29,6 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
     const checkStoreKit = async () => {
         const available = await isStoreKitAvailable();
         setStoreKitReady(available);
-        console.log(`[积分中心] StoreKit 可用: ${available}, 原生平台: ${isNativePlatform()}`);
     };
 
     const loadCredits = async () => {
@@ -35,38 +37,39 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
             const data = await getCreditsBalance();
             setCredits(data);
         } catch (err: any) {
-            setError(err.message || t('加载失败', 'Failed to load'));
+            setError(err.message || txt('加载失败', 'Failed to load'));
         } finally {
             setLoading(false);
         }
     };
 
     const handlePurchase = async (packageId: string) => {
+        if (!isNativePlatform()) {
+            setError(txt(
+                '网页版暂不支持购买，请在 iOS App 内购买积分',
+                'Web purchases are not yet supported. Please purchase credits in the iOS app.'
+            ));
+            return;
+        }
+
         setPurchasing(packageId);
         setError(null);
         setSuccessMessage(null);
 
         try {
-            // 1. 调用 StoreKit 内购（原生环境）或模拟购买（浏览器）
             const result: PurchaseResult = await purchaseProduct(packageId);
 
-            // 用户取消了购买
             if (!result.success) {
-                if (result.cancelled) {
-                    // 用户主动取消，不显示错误
-                    return;
-                }
-                throw new Error(t('购买失败', 'Purchase failed'));
+                if (result.cancelled) return;
+                throw new Error(txt('购买失败', 'Purchase failed'));
             }
 
-            // 2. 将购买凭证发送到后端验证并充值积分
             const verifyResult = await verifyPurchase(
                 packageId,
                 result.transactionId || '',
                 result.receipt || ''
             );
 
-            // 3. 更新余额显示
             if (credits) {
                 setCredits({
                     ...credits,
@@ -74,271 +77,235 @@ export default function Credits({ onClose, language = 'zh' }: CreditsProps) {
                 });
             }
 
-            setSuccessMessage(t(
+            setSuccessMessage(txt(
                 `购买成功！获得 ${verifyResult.creditsAdded} 积分`,
-                `Purchase successful! Received ${verifyResult.creditsAdded} credits`
+                `Success! Received ${verifyResult.creditsAdded} credits`
             ));
-
-            // 3秒后清除成功消息
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
-            setError(err.message || t('购买失败', 'Purchase failed'));
+            setError(err.message || txt('购买失败', 'Purchase failed'));
         } finally {
             setPurchasing(null);
         }
     };
 
     const handleRestore = async () => {
+        if (!isNativePlatform()) {
+            setError(txt(
+                '恢复购买仅在 iOS App 内可用',
+                'Restore purchases is only available in the iOS app.'
+            ));
+            return;
+        }
+
         setRestoring(true);
         setError(null);
 
         try {
             const transactions = await restorePurchases();
             if (transactions.length === 0) {
-                setSuccessMessage(t('没有可恢复的购买记录', 'No purchases to restore'));
+                setSuccessMessage(txt('没有可恢复的购买记录', 'No purchases to restore'));
             } else {
-                setSuccessMessage(t(
+                setSuccessMessage(txt(
                     `已恢复 ${transactions.length} 笔交易`,
                     `Restored ${transactions.length} transactions`
                 ));
             }
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err: any) {
-            setError(err.message || t('恢复失败', 'Restore failed'));
+            setError(err.message || txt('恢复失败', 'Restore failed'));
         } finally {
             setRestoring(false);
         }
     };
 
+    // 套餐展示信息
+    const packageLabels: Record<string, { emoji: string; label: string; labelEn: string; popular?: boolean }> = {
+        credits_small: { emoji: '🎬', label: '体验装', labelEn: 'Starter' },
+        credits_medium: { emoji: '🎥', label: '进阶装', labelEn: 'Pro', popular: true },
+        credits_large: { emoji: '🏆', label: '大师装', labelEn: 'Master' },
+    };
+
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'auto',
-        }}>
+        <div className="flex-1 flex flex-col bg-parchment-base min-h-screen pb-24 overflow-y-auto no-scrollbar">
             {/* 头部 */}
-            <div style={{
-                padding: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
-            }}>
+            <header className="px-6 pt-6 pb-4 flex items-center gap-4">
                 <button
                     onClick={onClose}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#fff',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        padding: '8px 16px',
-                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-walnut/10 hover:bg-walnut/20 rounded-sm transition-colors"
                 >
-                    ← {t('返回', 'Back')}
+                    <span className="material-symbols-outlined text-[16px] text-walnut/60">arrow_back</span>
+                    <span className="text-[10px] font-bold text-walnut/60 tracking-wider uppercase">
+                        {txt('返回', 'Back')}
+                    </span>
                 </button>
-                <h1 style={{
-                    color: '#fff',
-                    fontSize: '18px',
-                    margin: 0,
-                    fontWeight: 600,
-                }}>
-                    {t('积分中心', 'Credits Center')}
-                </h1>
-                <div style={{ width: 60 }} />
-            </div>
+                <div className="flex-1 text-center">
+                    <div className="text-[8px] font-mono tracking-[0.6em] text-walnut/30 uppercase">
+                        {txt('影中镜 · 积分中心', 'CINEMATIC MIRROR · CREDITS')}
+                    </div>
+                    <h2 className="text-lg font-retro font-black text-walnut tracking-[0.15em]">
+                        {txt('积分中心', 'Credits Center')}
+                    </h2>
+                </div>
+                <div className="w-[60px]" />
+            </header>
 
             {loading ? (
-                <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                }}>
-                    {t('加载中...', 'Loading...')}
+                <div className="flex-1 flex items-center justify-center">
+                    <span className="text-walnut/40 font-serif italic text-sm">{txt('加载中...', 'Loading...')}</span>
                 </div>
             ) : error && !credits ? (
-                <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#ff6b6b',
-                }}>
-                    {error}
+                <div className="flex-1 flex items-center justify-center px-8">
+                    <div className="text-center space-y-3">
+                        <span className="material-symbols-outlined text-3xl text-walnut/20">error_outline</span>
+                        <p className="text-walnut/50 text-sm">{error}</p>
+                        <button onClick={loadCredits} className="text-vintageRed text-xs font-bold tracking-wider uppercase">
+                            {txt('重试', 'Retry')}
+                        </button>
+                    </div>
                 </div>
             ) : credits && (
-                <div style={{ padding: '20px', flex: 1 }}>
+                <div className="px-6 space-y-6">
                     {/* 余额卡片 */}
-                    <div style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        borderRadius: '16px',
-                        padding: '24px',
-                        marginBottom: '24px',
-                        boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)',
-                    }}>
-                        <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', marginBottom: '8px' }}>
-                            {t('当前积分', 'Current Credits')}
-                        </div>
-                        <div style={{ color: '#fff', fontSize: '48px', fontWeight: 700, marginBottom: '16px' }}>
-                            {credits.balance}
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            gap: '16px',
-                            fontSize: '13px',
-                            color: 'rgba(255,255,255,0.9)',
-                        }}>
+                    <ParchmentCard rotation="" className="p-6 shadow-stack relative overflow-hidden">
+                        <Tape className="-top-3 -right-5 w-16 rotate-[25deg] opacity-40" />
+                        <div className="flex items-end justify-between">
                             <div>
-                                {t('免费试镜剩余', 'Free Interviews')}：
-                                <strong>{credits.freeInterviewsRemaining}</strong>
-                                {t('次', '')}
+                                <div className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider mb-1">
+                                    {txt('当前积分', 'Current Credits')}
+                                </div>
+                                <div className="text-5xl font-retro font-black text-walnut leading-none">
+                                    {credits.balance}
+                                </div>
                             </div>
-                            <div>
-                                {t('已完成试镜', 'Total Interviews')}：
-                                <strong>{credits.totalInterviews}</strong>
-                                {t('次', '')}
+                            <div className="text-right space-y-1">
+                                <div className="text-[10px] text-walnut/50 font-serif">
+                                    {txt('已完成试镜', 'Interviews')}: <strong className="text-walnut">{credits.totalInterviews}</strong>
+                                </div>
+                                {credits.freeInterviewsRemaining > 0 && (
+                                    <div className="text-[10px] text-vintageRed font-serif font-bold">
+                                        {txt(`剩余 ${credits.freeInterviewsRemaining} 次免费`, `${credits.freeInterviewsRemaining} free left`)}
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
 
-                    {/* 消耗说明 */}
-                    <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '12px',
-                        padding: '16px',
-                        marginBottom: '24px',
-                    }}>
-                        <h3 style={{ color: '#fff', fontSize: '14px', marginBottom: '12px', fontWeight: 600 }}>
-                            {t('积分消耗说明', 'Credit Usage')}
-                        </h3>
-                        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', lineHeight: 1.8 }}>
-                            <div>• {t('新人生剧本', 'New Profile')}：{t('前3次免费，之后每次', 'First 3 free, then')} <strong style={{ color: '#ffd700' }}>{credits.config.INTERVIEW_COST}</strong> {t('积分', 'credits')}</div>
-                            <div>• {t('导演咨询', 'Director Consultation')}：{t('每次', 'Each')} <strong style={{ color: '#ffd700' }}>{credits.config.CONSULTATION_COST}</strong> {t('积分', 'credits')}</div>
+                        {/* 消耗说明 */}
+                        <div className="mt-5 pt-4 border-t border-walnut/10 grid grid-cols-2 gap-3">
+                            <div className="text-[10px] text-walnut/50 font-serif flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-[14px] text-vintageRed/50">theater_comedy</span>
+                                {txt('试镜', 'Interview')}: <strong className="text-walnut">{credits.config.INTERVIEW_COST}</strong>{txt('积分/次', '/each')}
+                            </div>
+                            <div className="text-[10px] text-walnut/50 font-serif flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-[14px] text-vintageRed/50">videocam</span>
+                                {txt('咨询', 'Consult')}: <strong className="text-walnut">{credits.config.CONSULTATION_COST}</strong>{txt('积分/次', '/each')}
+                            </div>
                         </div>
-                    </div>
+                    </ParchmentCard>
 
-                    {/* 成功消息 */}
+                    {/* 成功/错误消息 */}
                     {successMessage && (
-                        <div style={{
-                            marginBottom: '16px',
-                            padding: '12px 16px',
-                            background: 'rgba(76,175,80,0.2)',
-                            borderRadius: '8px',
-                            color: '#81c784',
-                            fontSize: '14px',
-                            textAlign: 'center',
-                            border: '1px solid rgba(76,175,80,0.3)',
-                        }}>
+                        <div className="bg-green-50 border border-green-200 p-3 text-center text-green-700 text-sm font-serif">
                             ✓ {successMessage}
                         </div>
                     )}
-
-                    {/* 套餐列表 */}
-                    <h3 style={{ color: '#fff', fontSize: '16px', marginBottom: '16px', fontWeight: 600 }}>
-                        {t('积分套餐', 'Credit Packages')}
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {credits.packages.map((pkg) => (
-                            <div
-                                key={pkg.id}
-                                style={{
-                                    background: 'rgba(255,255,255,0.08)',
-                                    borderRadius: '12px',
-                                    padding: '16px 20px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                }}
-                            >
-                                <div>
-                                    <div style={{ color: '#ffd700', fontSize: '24px', fontWeight: 700 }}>
-                                        {pkg.credits} <span style={{ fontSize: '14px', fontWeight: 400, color: 'rgba(255,255,255,0.7)' }}>{t('积分', 'credits')}</span>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => handlePurchase(pkg.id)}
-                                    disabled={purchasing !== null || restoring}
-                                    style={{
-                                        background: purchasing === pkg.id
-                                            ? 'rgba(255,255,255,0.2)'
-                                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        border: 'none',
-                                        borderRadius: '20px',
-                                        padding: '10px 24px',
-                                        color: '#fff',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        cursor: purchasing !== null || restoring ? 'not-allowed' : 'pointer',
-                                        opacity: (purchasing !== null && purchasing !== pkg.id) || restoring ? 0.5 : 1,
-                                    }}
-                                >
-                                    {purchasing === pkg.id ? t('处理中...', 'Processing...') : `¥${pkg.price}`}
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-
-                    {error && (
-                        <div style={{
-                            marginTop: '16px',
-                            padding: '12px',
-                            background: 'rgba(255,107,107,0.2)',
-                            borderRadius: '8px',
-                            color: '#ff6b6b',
-                            fontSize: '13px',
-                        }}>
+                    {error && credits && (
+                        <div className="bg-red-50 border border-red-200 p-3 text-center text-red-600 text-sm font-serif">
                             {error}
                         </div>
                     )}
 
-                    {/* 恢复购买按钮 */}
-                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                        <button
-                            onClick={handleRestore}
-                            disabled={restoring || purchasing !== null}
-                            style={{
-                                background: 'none',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                borderRadius: '20px',
-                                padding: '10px 24px',
-                                color: 'rgba(255,255,255,0.6)',
-                                fontSize: '13px',
-                                cursor: restoring || purchasing !== null ? 'not-allowed' : 'pointer',
-                                opacity: restoring || purchasing !== null ? 0.5 : 1,
-                            }}
-                        >
-                            {restoring ? t('恢复中...', 'Restoring...') : t('恢复购买', 'Restore Purchases')}
-                        </button>
+                    {/* 套餐标题 */}
+                    <div className="flex items-center gap-3">
+                        <div className="h-[1px] flex-1 bg-walnut/10" />
+                        <h3 className="text-[10px] font-retro font-black text-walnut/50 tracking-[0.4em] uppercase">
+                            {txt('积分套餐', 'Credit Packages')}
+                        </h3>
+                        <div className="h-[1px] flex-1 bg-walnut/10" />
                     </div>
 
+                    {/* 非原生平台提示 */}
+                    {!isNativePlatform() && (
+                        <div className="bg-walnut/5 border border-walnut/10 p-4 text-center">
+                            <span className="material-symbols-outlined text-walnut/30 text-xl mb-2 block">phone_iphone</span>
+                            <p className="text-[11px] text-walnut/50 font-serif">
+                                {txt('购买功能仅在 iOS App 内可用', 'Purchases are only available in the iOS app')}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* 套餐列表 */}
+                    <div className="space-y-3">
+                        {credits.packages.map((pkg) => {
+                            const info = packageLabels[pkg.id] || { emoji: '🎬', label: pkg.id, labelEn: pkg.id };
+                            return (
+                                <div
+                                    key={pkg.id}
+                                    className={`relative bg-white border p-5 transition-all active:scale-[0.98] ${info.popular
+                                            ? 'border-vintageRed/30 shadow-md'
+                                            : 'border-walnut/10 shadow-sm'
+                                        }`}
+                                >
+                                    {info.popular && (
+                                        <div className="absolute -top-2 right-4 bg-vintageRed text-parchment-base text-[8px] font-bold tracking-widest uppercase px-3 py-0.5">
+                                            {txt('推荐', 'BEST')}
+                                        </div>
+                                    )}
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-2xl">{info.emoji}</div>
+                                            <div>
+                                                <div className="text-sm font-retro font-black text-walnut tracking-wider">
+                                                    {txt(info.label, info.labelEn)}
+                                                </div>
+                                                <div className="text-[11px] text-walnut/50 font-serif mt-0.5">
+                                                    <span className="text-vintageRed font-bold text-lg">{pkg.credits}</span>
+                                                    <span className="ml-1">{txt('积分', 'credits')}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handlePurchase(pkg.id)}
+                                            disabled={purchasing !== null || restoring}
+                                            className={`px-5 py-2.5 font-black text-xs tracking-wider uppercase transition-all ${purchasing === pkg.id
+                                                    ? 'bg-walnut/20 text-walnut/50'
+                                                    : 'bg-walnut text-parchment-base shadow-md hover:shadow-lg active:translate-y-0.5'
+                                                } ${(purchasing !== null && purchasing !== pkg.id) || restoring ? 'opacity-40' : ''}`}
+                                        >
+                                            {purchasing === pkg.id
+                                                ? txt('处理中...', 'Processing...')
+                                                : `¥${pkg.price}`}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* 恢复购买 */}
+                    {isNativePlatform() && (
+                        <div className="text-center pt-2">
+                            <button
+                                onClick={handleRestore}
+                                disabled={restoring || purchasing !== null}
+                                className={`text-[11px] text-walnut/40 font-serif underline underline-offset-4 decoration-walnut/20 hover:text-walnut/60 transition-colors ${restoring || purchasing !== null ? 'opacity-40 cursor-not-allowed' : ''
+                                    }`}
+                            >
+                                {restoring ? txt('恢复中...', 'Restoring...') : txt('恢复购买', 'Restore Purchases')}
+                            </button>
+                        </div>
+                    )}
+
                     {/* 底部说明 */}
-                    <div style={{
-                        marginTop: '24px',
-                        padding: '16px',
-                        background: 'rgba(255,215,0,0.1)',
-                        borderRadius: '12px',
-                        color: 'rgba(255,255,255,0.6)',
-                        fontSize: '12px',
-                        lineHeight: 1.6,
-                    }}>
-                        {t(
-                            '提示：购买后积分立即到账。内购由 Apple 安全处理，如遇问题请联系客服。',
-                            'Note: Credits will be added immediately after purchase. Payments are securely handled by Apple. Contact support if you have any issues.'
-                        )}
+                    <div className="text-[9px] text-walnut/30 font-serif text-center leading-relaxed pb-4 space-y-1">
+                        <p>{txt(
+                            '购买后积分立即到账 · 内购由 Apple 安全处理',
+                            'Credits added instantly · Payments securely handled by Apple'
+                        )}</p>
                         {!storeKitReady && isNativePlatform() && (
-                            <div style={{ marginTop: '8px', color: '#ffa726' }}>
-                                ⚠ {t('StoreKit 未就绪，请检查网络连接', 'StoreKit not ready, please check your connection')}
-                            </div>
+                            <p className="text-orange-400">
+                                ⚠ {txt('StoreKit 未就绪，请检查网络', 'StoreKit not ready, check connection')}
+                            </p>
                         )}
                     </div>
                 </div>
