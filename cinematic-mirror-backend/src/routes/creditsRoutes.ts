@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { creditsService, CREDITS_CONFIG, CREDIT_PACKAGES } from '../services/creditsService';
+import { creditsService, CREDITS_CONFIG, CREDIT_PACKAGES, MEMBERSHIP_CONFIG } from '../services/creditsService';
 import { verifyTransaction, isTransactionProcessed, markTransactionProcessed } from '../services/appleVerifyService';
 import { authMiddleware } from '../middleware/auth';
 
@@ -19,6 +19,7 @@ router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
                 freeInterviewsRemaining: Math.max(0, CREDITS_CONFIG.FREE_INTERVIEWS - totalInterviews),
                 config: CREDITS_CONFIG,
                 packages: CREDIT_PACKAGES,
+                membership: MEMBERSHIP_CONFIG,
             },
         });
     } catch (error: any) {

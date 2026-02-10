@@ -435,7 +435,23 @@ export interface CreditsBalance {
     INTERVIEW_COST: number;
     CONSULTATION_COST: number;
   };
-  packages: { id: string; credits: number; price: number }[];
+  packages: { id: string; credits: number; priceCNY: number; priceUSD: number; label: string; labelEn: string }[];
+  membership: {
+    productId: string;
+    priceCNY: number;
+    priceUSD: number;
+    label: string;
+    labelEn: string;
+    benefits: {
+      monthlyInterviews: number;
+      monthlyConsultations: number;
+      monthlyBonusCredits: number;
+    };
+    benefitLabels: {
+      zh: string[];
+      en: string[];
+    };
+  };
 }
 
 export interface CreditsCheck {

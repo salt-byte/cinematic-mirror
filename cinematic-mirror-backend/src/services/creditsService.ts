@@ -12,12 +12,40 @@ export const CREDITS_CONFIG = {
     CONSULTATION_COST: 20,          // 导演咨询消耗积分
 };
 
-// 积分套餐
+// 积分套餐（双语 + 双币种）
 export const CREDIT_PACKAGES = [
-    { id: 'credits_small', credits: 50, price: 6 },
-    { id: 'credits_medium', credits: 200, price: 18 },
-    { id: 'credits_large', credits: 400, price: 30 },
+    { id: 'credits_small', credits: 50, priceCNY: 6, priceUSD: 0.99, label: '体验装', labelEn: 'Starter' },
+    { id: 'credits_medium', credits: 200, priceCNY: 18, priceUSD: 2.99, label: '进阶装', labelEn: 'Pro' },
+    { id: 'credits_large', credits: 400, priceCNY: 30, priceUSD: 3.99, label: '大师装', labelEn: 'Master' },
 ];
+
+// 月会员配置
+export const MEMBERSHIP_CONFIG = {
+    productId: 'membership_monthly',
+    priceCNY: 30,
+    priceUSD: 3.99,
+    label: '月度会员',
+    labelEn: 'Monthly Pro',
+    benefits: {
+        monthlyInterviews: 5,         // 每月免费试镜次数
+        monthlyConsultations: 10,      // 每月免费导演咨询次数
+        monthlyBonusCredits: 100,      // 每月赠送积分
+    },
+    benefitLabels: {
+        zh: [
+            '每月 5 次免费试镜',
+            '每月 10 次免费导演咨询',
+            '每月赠送 100 积分',
+            '会员专属标识',
+        ],
+        en: [
+            '5 free auditions per month',
+            '10 free director consultations per month',
+            '100 bonus credits monthly',
+            'Exclusive member badge',
+        ],
+    },
+};
 
 export interface UserCredits {
     id: string;
@@ -32,7 +60,7 @@ export interface CreditTransaction {
     id: string;
     user_id: string;
     amount: number;
-    type: 'purchase' | 'consume_interview' | 'consume_consultation' | 'bonus' | 'initial';
+    type: 'purchase' | 'consume_interview' | 'consume_consultation' | 'bonus' | 'initial' | 'membership_bonus';
     description: string;
     created_at: string;
 }

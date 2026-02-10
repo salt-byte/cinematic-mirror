@@ -256,8 +256,8 @@ const ProfileView: React.FC<{
               className={`relative group block w-full transition-all active:scale-95 ${i % 2 === 0 ? 'rotate-[-2deg]' : 'rotate-[2deg] mt-4'}`}
             >
               <div className="bg-white p-1.5 pb-6 shadow-vintage border border-walnut/5 group-hover:shadow-stack transition-all">
-                <div className="aspect-[1/1] overflow-hidden mb-3 bg-ink relative">
-                  <img src={getProfileImage(role)} alt="" className="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                <div className="aspect-[3/4] overflow-hidden mb-3 bg-parchment-base relative">
+                  <img src={getProfileImage(role)} alt="" className="w-full h-full object-contain grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
                 </div>
                 <div className="px-1 text-center">
