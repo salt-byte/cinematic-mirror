@@ -140,10 +140,17 @@ const ProfileView: React.FC<{
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
             </div>
 
-            {/* 昵称（主标题） */}
-            <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em] mb-1">
-              {userInfo?.name || userAccount?.nickname || '--'}
-            </h2>
+            {/* 昵称（主标题）+ 会员标识 */}
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em]">
+                {userInfo?.name || userAccount?.nickname || '--'}
+              </h2>
+              {credits?.isMember && (
+                <span className="inline-flex items-center gap-0.5 bg-vintageRed/10 text-vintageRed text-[8px] font-bold px-2 py-0.5 tracking-wider">
+                  👑 PRO
+                </span>
+              )}
+            </div>
 
             {/* 副标题：收录数量 */}
             <p className="text-[11px] font-serif text-walnut/40 italic tracking-widest mb-6">

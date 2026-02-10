@@ -193,8 +193,13 @@ export default function Credits({ onClose }: CreditsProps) {
                         <Tape className="-top-3 -right-5 w-16 rotate-[25deg] opacity-40" />
                         <div className="flex items-end justify-between">
                             <div>
-                                <div className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider mb-1">
+                                <div className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider mb-1 flex items-center gap-2">
                                     {txt('当前积分', 'Current Credits')}
+                                    {credits.isMember && (
+                                        <span className="inline-flex items-center gap-1 bg-vintageRed/10 text-vintageRed text-[8px] font-bold px-2 py-0.5 tracking-wider uppercase">
+                                            👑 {txt('会员', 'PRO')}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="text-5xl font-retro font-black text-walnut leading-none">
                                     {credits.balance}
@@ -248,8 +253,8 @@ export default function Credits({ onClose }: CreditsProps) {
 
                             <div className="relative bg-gradient-to-br from-walnut/[0.06] to-vintageRed/[0.04] border-2 border-vintageRed/20 p-6 shadow-md overflow-hidden">
                                 {/* 角标 */}
-                                <div className="absolute top-0 right-0 bg-vintageRed text-parchment-base text-[7px] font-bold tracking-widest uppercase px-4 py-1">
-                                    {txt('推荐', 'RECOMMENDED')}
+                                <div className={`absolute top-0 right-0 text-parchment-base text-[7px] font-bold tracking-widest uppercase px-4 py-1 ${credits.isMember ? 'bg-walnut' : 'bg-vintageRed'}`}>
+                                    {credits.isMember ? txt('已开通', 'ACTIVE') : txt('推荐', 'RECOMMENDED')}
                                 </div>
 
                                 <div className="flex items-start gap-4 mb-4">
@@ -258,37 +263,51 @@ export default function Credits({ onClose }: CreditsProps) {
                                         <h4 className="text-lg font-retro font-black text-walnut tracking-wider">
                                             {txt(credits.membership.label, credits.membership.labelEn)}
                                         </h4>
-                                        <div className="text-vintageRed text-xl font-black mt-1">
-                                            {price(credits.membership.priceCNY, credits.membership.priceUSD)}
-                                            <span className="text-[11px] text-walnut/40 font-normal ml-1">
-                                                /{txt('月', 'mo')}
-                                            </span>
-                                        </div>
+                                        {credits.isMember ? (
+                                            <div className="text-walnut/60 text-[12px] font-serif mt-1">
+                                                {credits.memberExpiry && (
+                                                    <span>{txt('有效期至 ', 'Valid until ')}{new Date(credits.memberExpiry).toLocaleDateString()}</span>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="text-vintageRed text-xl font-black mt-1">
+                                                {price(credits.membership.priceCNY, credits.membership.priceUSD)}
+                                                <span className="text-[11px] text-walnut/40 font-normal ml-1">
+                                                    /{txt('月', 'mo')}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* 权益列表 */}
                                 <div className="space-y-2.5 mb-5">
                                     {(isEn ? credits.membership.benefitLabels.en : credits.membership.benefitLabels.zh).map((benefit, i) => (
-                                        <div key={i} className="flex items-center gap-2.5 text-[12px] text-walnut/70 font-serif">
-                                            <span className="text-vintageRed text-[10px]">✦</span>
+                                        <div key={i} className={`flex items-center gap-2.5 text-[12px] font-serif ${credits.isMember ? 'text-walnut/80' : 'text-walnut/70'}`}>
+                                            <span className={`text-[10px] ${credits.isMember ? 'text-green-600' : 'text-vintageRed'}`}>{credits.isMember ? '✓' : '✦'}</span>
                                             {benefit}
                                         </div>
                                     ))}
                                 </div>
 
-                                <button
-                                    onClick={handleSubscribe}
-                                    disabled={purchasing !== null || restoring}
-                                    className={`w-full py-3.5 font-retro font-black text-sm tracking-[0.2em] uppercase transition-all ${purchasing === credits.membership.productId
+                                {credits.isMember ? (
+                                    <div className="w-full py-3 bg-walnut/5 text-center text-[11px] text-walnut/40 font-serif tracking-wider">
+                                        {txt('当前为活跃会员', 'Active membership')}
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={handleSubscribe}
+                                        disabled={purchasing !== null || restoring}
+                                        className={`w-full py-3.5 font-retro font-black text-sm tracking-[0.2em] uppercase transition-all ${purchasing === credits.membership.productId
                                             ? 'bg-walnut/20 text-walnut/50'
                                             : 'bg-vintageRed text-parchment-base shadow-lg hover:shadow-xl active:translate-y-0.5'
-                                        } ${purchasing !== null && purchasing !== credits.membership.productId ? 'opacity-40' : ''}`}
-                                >
-                                    {purchasing === credits.membership.productId
-                                        ? txt('处理中...', 'Processing...')
-                                        : txt('立即订阅', 'Subscribe Now')}
-                                </button>
+                                            } ${purchasing !== null && purchasing !== credits.membership.productId ? 'opacity-40' : ''}`}
+                                    >
+                                        {purchasing === credits.membership.productId
+                                            ? txt('处理中...', 'Processing...')
+                                            : txt('立即订阅', 'Subscribe Now')}
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}
@@ -340,8 +359,8 @@ export default function Credits({ onClose }: CreditsProps) {
                                             onClick={() => handlePurchase(pkg.id)}
                                             disabled={purchasing !== null || restoring}
                                             className={`px-5 py-2.5 font-black text-xs tracking-wider uppercase transition-all ${purchasing === pkg.id
-                                                    ? 'bg-walnut/20 text-walnut/50'
-                                                    : 'bg-walnut text-parchment-base shadow-md hover:shadow-lg active:translate-y-0.5'
+                                                ? 'bg-walnut/20 text-walnut/50'
+                                                : 'bg-walnut text-parchment-base shadow-md hover:shadow-lg active:translate-y-0.5'
                                                 } ${(purchasing !== null && purchasing !== pkg.id) || restoring ? 'opacity-40' : ''}`}
                                         >
                                             {purchasing === pkg.id

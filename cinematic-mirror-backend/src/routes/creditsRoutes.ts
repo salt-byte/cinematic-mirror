@@ -83,9 +83,11 @@ router.post('/verify', authMiddleware, async (req: Request, res: Response) => {
             return res.status(400).json({ success: false, error: '缺少购买信息' });
         }
 
-        // 1. 查找对应的积分包
+        // 1. 查找对应的积分包 或 会员订阅
         const creditPackage = CREDIT_PACKAGES.find(p => p.id === productId);
-        if (!creditPackage) {
+        const isMembership = productId === MEMBERSHIP_CONFIG.productId;
+
+        if (!creditPackage && !isMembership) {
             return res.status(400).json({ success: false, error: '无效的产品ID' });
         }
 
@@ -111,19 +113,40 @@ router.post('/verify', authMiddleware, async (req: Request, res: Response) => {
         // 4. 标记交易为已处理
         markTransactionProcessed(transactionId);
 
-        // 5. 增加积分
-        await creditsService.addCredits(userId, creditPackage.credits, productId);
+        // 5. 根据产品类型处理
+        if (isMembership) {
+            // 会员订阅：添加赠送积分 + 记录会员状态
+            const bonusCredits = MEMBERSHIP_CONFIG.benefits.monthlyBonusCredits;
+            await creditsService.addCredits(userId, bonusCredits, 'membership_bonus');
 
-        const { balance } = await creditsService.getBalance(userId);
+            const { balance } = await creditsService.getBalance(userId);
 
-        res.json({
-            success: true,
-            data: {
-                creditsAdded: creditPackage.credits,
-                newBalance: balance,
-                environment: verification.environment,
-            },
-        });
+            res.json({
+                success: true,
+                data: {
+                    type: 'membership',
+                    creditsAdded: bonusCredits,
+                    newBalance: balance,
+                    environment: verification.environment,
+                    membershipActive: true,
+                },
+            });
+        } else if (creditPackage) {
+            // 积分套餐：直接充值
+            await creditsService.addCredits(userId, creditPackage.credits, productId);
+
+            const { balance } = await creditsService.getBalance(userId);
+
+            res.json({
+                success: true,
+                data: {
+                    type: 'credits',
+                    creditsAdded: creditPackage.credits,
+                    newBalance: balance,
+                    environment: verification.environment,
+                },
+            });
+        }
     } catch (error: any) {
         console.error('[积分验证] 处理失败:', error);
         res.status(500).json({ success: false, error: error.message });

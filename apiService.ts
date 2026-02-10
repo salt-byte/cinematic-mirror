@@ -429,6 +429,8 @@ export interface CreditsBalance {
   balance: number;
   totalInterviews: number;
   freeInterviewsRemaining: number;
+  isMember?: boolean;
+  memberExpiry?: string;
   config: {
     INITIAL_CREDITS: number;
     FREE_INTERVIEWS: number;
