@@ -132,7 +132,7 @@ const ProfileView: React.FC<{
         </div>
         <ParchmentCard rotation="rotate-[-1deg]" className="p-8 shadow-stack">
           <div className="flex flex-col items-center">
-            <div className="relative mb-8">
+            <div className="relative mb-6">
               <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
                 <img src={userAvatar || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
                 <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
@@ -140,18 +140,37 @@ const ProfileView: React.FC<{
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
             </div>
 
-            {/* 用户账号信息 */}
-            <div className="w-full mb-6 px-4">
-              <div className="border-t border-b border-walnut/10 py-4 space-y-3">
-                {/* 昵称 */}
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
-                    {language === 'en' ? 'Name' : '昵称'}
-                  </span>
-                  <span className="text-[13px] font-retro font-bold text-walnut">
-                    {userInfo?.name || userAccount?.nickname || '--'}
-                  </span>
-                </div>
+            {/* 昵称（主标题） */}
+            <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em] mb-1">
+              {userInfo?.name || userAccount?.nickname || '--'}
+            </h2>
+
+            {/* 当前档案标题（副标题） */}
+            {profile?.title && (
+              <p className="text-[11px] font-serif text-walnut/40 italic tracking-widest mb-6">
+                「{profile.title}」
+              </p>
+            )}
+            {!profile?.title && (
+              <p className="text-[10px] font-serif text-walnut/40 italic tracking-widest mb-6">
+                {t('profile.waitTake')}
+              </p>
+            )}
+
+            {/* 用户信息 */}
+            <div className="w-full px-4">
+              <div className="border-t border-walnut/10 pt-4 space-y-3">
+                {/* 邮箱 */}
+                {userAccount?.email && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
+                      {language === 'en' ? 'Email' : '邮箱'}
+                    </span>
+                    <span className="text-[11px] font-mono text-walnut/60">
+                      {userAccount.email}
+                    </span>
+                  </div>
+                )}
                 {/* 性别 */}
                 {userInfo?.gender && (
                   <div className="flex items-center justify-between">
@@ -163,17 +182,6 @@ const ProfileView: React.FC<{
                         {userInfo.gender === 'male' ? 'male' : 'female'}
                       </span>
                       {userInfo.gender === 'male' ? (language === 'en' ? 'Male' : '男') : (language === 'en' ? 'Female' : '女')}
-                    </span>
-                  </div>
-                )}
-                {/* 邮箱 */}
-                {userAccount?.email && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-mono text-walnut/40 uppercase tracking-wider">
-                      {language === 'en' ? 'Email' : '邮箱'}
-                    </span>
-                    <span className="text-[11px] font-mono text-walnut/60">
-                      {userAccount.email}
                     </span>
                   </div>
                 )}
@@ -189,12 +197,6 @@ const ProfileView: React.FC<{
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* 当前档案标题 */}
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em]">{profile?.title || t('profile.noRecord')}</h2>
-              <p className="text-[10px] font-serif text-walnut/40 italic tracking-widest">{profile?.subtitle || t('profile.waitTake')}</p>
             </div>
           </div>
         </ParchmentCard>
