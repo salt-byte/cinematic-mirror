@@ -145,17 +145,12 @@ const ProfileView: React.FC<{
               {userInfo?.name || userAccount?.nickname || '--'}
             </h2>
 
-            {/* 当前档案标题（副标题） */}
-            {profile?.title && (
-              <p className="text-[11px] font-serif text-walnut/40 italic tracking-widest mb-6">
-                「{profile.title}」
-              </p>
-            )}
-            {!profile?.title && (
-              <p className="text-[10px] font-serif text-walnut/40 italic tracking-widest mb-6">
-                {t('profile.waitTake')}
-              </p>
-            )}
+            {/* 副标题：收录数量 */}
+            <p className="text-[11px] font-serif text-walnut/40 italic tracking-widest mb-6">
+              {collection.length > 0
+                ? (language === 'en' ? `${collection.length} archives collected` : `已收录 ${collection.length} 部作品`)
+                : t('profile.waitTake')}
+            </p>
 
             {/* 用户信息 */}
             <div className="w-full px-4">
