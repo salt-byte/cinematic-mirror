@@ -157,7 +157,7 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
               <span className="text-[10px] font-black tracking-[0.3em] mb-2 opacity-60">{t('login.castingAudition')}</span>
               <span className="text-3xl font-black tracking-tight uppercase font-retro">{t('login.findRole')}</span>
               <div className="mt-3 flex items-center gap-2">
-                <span className="text-[9px] font-bold text-vintageRed/60 tracking-widest uppercase italic">{t('login.registerNow')}</span>
+                <span className="text-[14px] font-bold text-vintageRed/60 tracking-widest uppercase italic">{t('login.registerNow')}</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </div>
             </div>
