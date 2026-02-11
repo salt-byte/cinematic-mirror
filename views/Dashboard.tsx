@@ -5,6 +5,7 @@ import { startConsultation, sendConsultationMessage, checkCanStartConsultation }
 import { geminiLive } from '../services/geminiLiveService';
 import { ParchmentCard } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
+import { MOVIE_DATABASE } from '../library';
 import Credits from './Credits';
 
 interface ParsedMessage {
@@ -53,7 +54,8 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
   const { t, language } = useLanguage();
   const [selectedProfile, setSelectedProfile] = useState<PersonalityProfile | null>(null);
   const [archives, setArchives] = useState<PersonalityProfile[]>([]);
-  const [mode, setMode] = useState<'pick_role' | 'select_mode' | 'text' | 'video'>('pick_role');
+  const [mode, setMode] = useState<'pick_role' | 'select_mode' | 'text' | 'video'>('select_mode');
+  const [pendingMode, setPendingMode] = useState<'text' | 'video' | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,6 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
     const saved = localStorage.getItem('cinematic_archives');
     const allArchives = saved ? JSON.parse(saved) : [];
     setArchives(allArchives);
-    if (allArchives.length === 0) setMode('pick_role');
   }, []);
 
   useEffect(() => {
@@ -178,20 +179,40 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
       const matches = selectedProfile.matches || [];
       const firstMatch = matches[0];
 
+      // 注入匹配角色的造型上下文
+      let characterContext = '';
+      if (firstMatch) {
+        const dbChar = MOVIE_DATABASE.find(c => c.name === firstMatch.name || c.nameEn === firstMatch.name);
+        if (dbChar && dbChar.stylings.length > 0) {
+          const s = dbChar.stylings[0];
+          const paletteStr = s.palette.map(p => language === 'en' ? `${p.enName}(${p.hex})` : `${p.name}(${p.hex})`).join(', ');
+          const note = language === 'en' ? (s.directorNoteEn || s.directorNote) : s.directorNote;
+          characterContext = language === 'en'
+            ? `\nThe user matches ${dbChar.nameEn || dbChar.name} from "${dbChar.movieEn || dbChar.movie}" (${firstMatch.matchRate}% match).\nStyling anchor: ${s.titleEn || s.title}\nColor palette: ${paletteStr}\nDesign philosophy: ${note}`
+            : `\n用户匹配角色是${dbChar.name}（${dbChar.movie}），匹配度${firstMatch.matchRate}%。\n造型锚点：${s.title}\n色系参考：${paletteStr}\n设计思路：${note}`;
+        } else {
+          characterContext = language === 'en'
+            ? `\nThe user matches ${firstMatch.name} from "${firstMatch.movie}" (${firstMatch.matchRate}% match).`
+            : `\n用户匹配角色是${firstMatch.name}（${firstMatch.movie}），匹配度${firstMatch.matchRate}%。`;
+        }
+      }
+
       const systemInstruction = language === 'en'
-        ? `You are "Lu Ye", a professional styling consultant director at Cinematic Mirror, a warm and professional image designer.
-${userName ? `The user's name is "${userName}". Address them by name to create a friendly atmosphere.` : ''}
-${firstMatch ? `The user's personality profile shows they match best with ${firstMatch.name} from "${firstMatch.movie}", with a ${firstMatch.matchRate}% match rate.` : ''}
+        ? `You are "Lu Ye", a seasoned cinema costume designer with deep knowledge of film aesthetics and wardrobe design.
+You're versed in the costume language of every cinematic era — from Golden Age Hollywood to the French New Wave, from Wong Kar-wai to Wes Anderson.
+${userName ? `The user's name is "${userName}". Address them by name to create a friendly atmosphere.` : ''}${characterContext}
 You're having a video conversation with the user and can see their live feed.
 Please give professional styling and image advice based on their appearance, clothing, and temperament.
+Use the matched character's styling language as a starting point, but boldly extend to broader cinematic aesthetics.
 Be warm and natural, like chatting with a friend, but maintain professionalism.
 Keep responses concise, just 1-2 sentences each time, like natural human conversation.
 Respond in English.`
-        : `你是"陆野"，影中镜的专业造型顾问导演，一位温暖而专业的形象设计师。
-${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营造亲切的氛围。` : ''}
-${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${firstMatch.movie}）最为匹配，匹配度${firstMatch.matchRate}%。` : ''}
+        : `你是"陆野"，一位资深电影造型师，拥有深厚的电影美学素养和服装设计功底。
+你熟悉各个时代经典电影的服装设计语言，从王家卫到韦斯·安德森，从黄金好莱坞到法国新浪潮。
+${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营造亲切的氛围。` : ''}${characterContext}
 你正在与用户进行视频对话，可以看到他们的实时画面。
 请根据用户的外表、穿着、气质给出专业的穿搭和形象建议。
+以匹配角色的造型语言为起点，但大胆延伸到更广阔的电影美学。
 语气要温暖自然，像朋友聊天一样，但保持专业度。
 回复要简洁，每次只说1-2句话，像真人对话一样自然。
 使用中文回复。`;
@@ -339,20 +360,34 @@ ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${first
     geminiLive.sendText(userMsg);
   };
 
+  // 用户在 pick_role 页选完角色后，自动进入之前选的模式
   const handleRoleSelect = (p: PersonalityProfile) => {
     setSelectedProfile(p);
-    setMode('select_mode');
-    setMessages([]); // 清空消息
+    setMessages([]);
     setError("");
+    // 直接进入之前选好的模式
+    if (pendingMode) {
+      setMode(pendingMode);
+    }
   };
 
-  // 切换咨询模式时清空消息
+  // 用户在 select_mode 页选好模式后，跳到选角色
+  const handleModeSelect = (chosenMode: 'text' | 'video') => {
+    if (archives.length === 0) {
+      // 没有存档，提示先去试镜
+      setError(language === 'en' ? 'Please complete an audition first to create a character profile.' : '请先完成试镜以创建角色档案。');
+      return;
+    }
+    setPendingMode(chosenMode);
+    setMode('pick_role');
+  };
+
+  // 切换咨询模式时清空消息（从会话内切换时使用）
   const handleModeChange = (newMode: 'text' | 'video') => {
-    // 先清理之前的会话
     if (mode === 'video' && geminiLive.isSessionActive()) {
       cleanupLiveSession();
     }
-    setMessages([]); // 清空消息，确保两个模式独立
+    setMessages([]);
     setError("");
     setMode(newMode);
   };
@@ -376,21 +411,78 @@ ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${first
     }
   };
 
-  if (archives.length === 0) {
+  if (mode === 'select_mode') {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-parchment-base h-screen">
-        <ParchmentCard className="p-8">
-          <span className="material-symbols-outlined text-4xl text-walnut/10 mb-4 font-light">folder_off</span>
-          <h3 className="text-sm font-retro font-black text-walnut/60 mb-2 uppercase tracking-widest">{t('dashboard.noFiles')}</h3>
-          <p className="font-serif text-[10px] text-walnut/30 italic">{t('dashboard.startAudition')}</p>
-        </ParchmentCard>
+      <div className="flex-1 flex flex-col bg-parchment-base h-screen relative">
+        <div className="flex-1 flex flex-col items-center justify-center p-12 space-y-16">
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{t('dashboard.consultTitle')}</h2>
+            <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">{t('dashboard.selectMode')}</p>
+            <p className="text-[9px] font-serif text-walnut/40 mt-1">
+              {language === 'en' ? '🎬 20 credits per consultation' : '🎬 每次咨询消耗 20 积分'}
+            </p>
+          </div>
+
+          {error && (
+            <div className="text-center">
+              <p className="text-vintageRed text-sm font-serif">{error}</p>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-8 w-full max-w-xs">
+            {/* 视频咨询 —— 主推 */}
+            <button onClick={() => handleModeSelect('video')} className="group relative paper-texture p-6 border-2 border-vintageRed/20 hover:border-vintageRed/50 active:scale-[0.98] transition-all">
+              <div className="absolute -top-2 right-4 bg-vintageRed text-parchment-base text-[7px] font-bold tracking-widest uppercase px-3 py-0.5">
+                {language === 'en' ? 'RECOMMENDED' : '推荐'}
+              </div>
+              <div className="flex items-center gap-5">
+                <div className="size-12 rounded-full bg-vintageRed/10 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-vintageRed text-2xl">videocam</span>
+                </div>
+                <div className="text-left space-y-1 flex-1">
+                  <h4 className="font-black text-base text-walnut tracking-widest uppercase">{t('dashboard.videoChatTitle')}</h4>
+                  <p className="text-[9px] text-walnut/30 font-serif italic">{t('dashboard.videoChatDesc')}</p>
+                </div>
+              </div>
+            </button>
+
+            {/* 文字咨询 */}
+            <button onClick={() => handleModeSelect('text')} className="group flex items-center gap-5 border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
+              <div className="size-10 rounded-full bg-walnut/5 flex items-center justify-center">
+                <span className="material-symbols-outlined text-walnut/30 group-hover:text-vintageRed text-xl">auto_stories</span>
+              </div>
+              <div className="text-left space-y-1 flex-1">
+                <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.textChatTitle')}</h4>
+                <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.textChatDesc')}</p>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (mode === 'pick_role') {
+    if (archives.length === 0) {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-parchment-base h-screen">
+          <ParchmentCard className="p-8">
+            <span className="material-symbols-outlined text-4xl text-walnut/10 mb-4 font-light">folder_off</span>
+            <h3 className="text-sm font-retro font-black text-walnut/60 mb-2 uppercase tracking-widest">{t('dashboard.noFiles')}</h3>
+            <p className="font-serif text-[10px] text-walnut/30 italic">{t('dashboard.startAudition')}</p>
+          </ParchmentCard>
+        </div>
+      );
+    }
+
     return (
       <div className="flex-1 flex flex-col bg-parchment-base h-screen p-10 overflow-y-auto no-scrollbar">
+        <div className="mb-4">
+          <button onClick={() => { setMode('select_mode'); setError(''); }} className="flex items-center gap-1 text-walnut/40 hover:text-walnut transition-colors">
+            <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+            <span className="text-[11px] font-black tracking-widest uppercase">{language === 'en' ? 'Back' : '返回'}</span>
+          </button>
+        </div>
         <header className="mb-16 text-center">
           <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{t('dashboard.consultTitle')}</h2>
           <p className="text-[8px] font-mono text-vintageRed/60 font-bold mt-3 tracking-[0.4em] uppercase">{t('dashboard.archiveSelect')}</p>
@@ -412,41 +504,6 @@ ${firstMatch ? `用户的人格档案显示他们与${firstMatch.name}（${first
               </div>
             </button>
           ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (mode === 'select_mode') {
-    return (
-      <div className="flex-1 flex flex-col bg-parchment-base h-screen relative">
-        <div className="absolute top-10 left-10">
-          <button onClick={() => setMode('pick_role')} className="material-symbols-outlined text-walnut/20 hover:text-walnut text-sm">arrow_back</button>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-12 space-y-20">
-          <div className="text-center space-y-3">
-            <h2 className="text-3xl font-retro font-black text-walnut tracking-[0.3em] uppercase">{selectedProfile?.title}</h2>
-            <p className="text-[9px] font-serif text-walnut/30 italic tracking-widest">{t('dashboard.selectMode')}</p>
-            <p className="text-[9px] font-serif text-walnut/40 mt-1">
-              {language === 'en' ? '🎬 20 credits per consultation' : '🎬 每次咨询消耗 20 积分'}
-            </p>
-          </div>
-          <div className="flex flex-col gap-10 w-full max-w-xs">
-            <button onClick={() => handleModeChange('text')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
-              <div className="text-left space-y-1">
-                <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.textChatTitle')}</h4>
-                <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.textChatDesc')}</p>
-              </div>
-              <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">auto_stories</span>
-            </button>
-            <button onClick={() => handleModeChange('video')} className="group flex items-center justify-between border-b border-walnut/10 pb-6 active:scale-[0.98] transition-all">
-              <div className="text-left space-y-1">
-                <h4 className="font-black text-sm text-walnut/60 tracking-widest uppercase">{t('dashboard.videoChatTitle')}</h4>
-                <p className="text-[9px] text-walnut/20 font-serif italic">{t('dashboard.videoChatDesc')}</p>
-              </div>
-              <span className="material-symbols-outlined text-walnut/10 group-hover:text-vintageRed">videocam</span>
-            </button>
-          </div>
         </div>
       </div>
     );

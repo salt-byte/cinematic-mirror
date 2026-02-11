@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { chatCompletion, VISION_MODEL, SILICONFLOW_API_KEY, SILICONFLOW_BASE_URL } from '../config/siliconflow';
 import { CONSULTATION_SYSTEM_PROMPT, getPromptsByLanguage } from '../config/constants';
+import { MOVIE_DATABASE } from '../config/library';
 import { creditsService } from './creditsService';
 import type { ChatMessage, PersonalityProfile } from '../types/index';
 
@@ -35,6 +36,22 @@ export class ConsultationService {
         styling_variants: profile.styling_variants
       }, null, 2)
     );
+
+    // 注入匹配角色的造型上下文（directorNote + palette）
+    const firstMatch = profile.matches?.[0];
+    let characterContext = language === 'en' ? 'No matched character data available.' : '暂无匹配角色数据。';
+    if (firstMatch) {
+      const dbChar = MOVIE_DATABASE.find(c => c.name === firstMatch.name || c.nameEn === firstMatch.name);
+      if (dbChar && dbChar.stylings.length > 0) {
+        const s = dbChar.stylings[0];
+        const paletteStr = s.palette.map(p => language === 'en' ? `${p.enName}(${p.hex})` : `${p.name}(${p.hex})`).join(', ');
+        const note = language === 'en' ? (s.directorNoteEn || s.directorNote) : s.directorNote;
+        characterContext = language === 'en'
+          ? `Character: ${dbChar.nameEn || dbChar.name} from "${dbChar.movieEn || dbChar.movie}"\nStyling Direction: ${s.titleEn || s.title}\nColor Palette: ${paletteStr}\nDirector's Design Note: ${note}`
+          : `角色：${dbChar.name}（${dbChar.movie}）\n造型方向：${s.title}\n色系参考：${paletteStr}\n造型设计思路：${note}`;
+      }
+    }
+    systemPrompt = systemPrompt.replace('{CHARACTER_CONTEXT}', characterContext);
 
     // 如果有用户昵称，添加到系统提示词
     if (userName) {
