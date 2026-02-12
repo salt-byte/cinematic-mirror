@@ -66,8 +66,8 @@ export interface CreditTransaction {
 }
 
 export class CreditsService {
-    // 获取用户积分余额
-    async getBalance(userId: string): Promise<{ balance: number; totalInterviews: number }> {
+    // 获取用户积分余额 + 会员状态
+    async getBalance(userId: string): Promise<{ balance: number; totalInterviews: number; isMember: boolean; memberExpiry: string | null }> {
         const { data, error } = await supabase
             .from('user_credits')
             .select('balance, total_interviews')
@@ -77,10 +77,33 @@ export class CreditsService {
         if (error || !data) {
             // 如果不存在，创建初始记录
             await this.initializeCredits(userId);
-            return { balance: CREDITS_CONFIG.INITIAL_CREDITS, totalInterviews: 0 };
+            return { balance: CREDITS_CONFIG.INITIAL_CREDITS, totalInterviews: 0, isMember: false, memberExpiry: null };
         }
 
-        return { balance: data.balance, totalInterviews: data.total_interviews };
+        // 检查会员状态：查看最近30天内是否有 membership_bonus 交易
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const { data: memberTx } = await supabase
+            .from('credit_transactions')
+            .select('created_at')
+            .eq('user_id', userId)
+            .eq('type', 'membership_bonus')
+            .gte('created_at', thirtyDaysAgo.toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        let isMember = false;
+        let memberExpiry: string | null = null;
+
+        if (memberTx && memberTx.length > 0) {
+            isMember = true;
+            const purchaseDate = new Date(memberTx[0].created_at);
+            purchaseDate.setDate(purchaseDate.getDate() + 30);
+            memberExpiry = purchaseDate.toISOString();
+        }
+
+        return { balance: data.balance, totalInterviews: data.total_interviews, isMember, memberExpiry };
     }
 
     // 为新用户初始化积分

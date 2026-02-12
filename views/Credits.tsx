@@ -72,9 +72,8 @@ export default function Credits({ onClose }: CreditsProps) {
                 result.receipt || ''
             );
 
-            if (credits) {
-                setCredits({ ...credits, balance: verifyResult.newBalance });
-            }
+            // 购买成功后，完整重新加载积分状态
+            await loadCredits();
 
             setSuccessMessage(txt(
                 `购买成功！获得 ${verifyResult.creditsAdded} 积分`,
@@ -109,15 +108,14 @@ export default function Credits({ onClose }: CreditsProps) {
                 throw new Error(txt('订阅失败', 'Subscription failed'));
             }
 
-            const verifyResult = await verifyPurchase(
+            await verifyPurchase(
                 membershipId,
                 result.transactionId || '',
                 result.receipt || ''
             );
 
-            if (credits) {
-                setCredits({ ...credits, balance: verifyResult.newBalance });
-            }
+            // 订阅成功后，完整重新加载积分和会员状态
+            await loadCredits();
 
             setSuccessMessage(txt('订阅成功！会员权益已生效', 'Subscribed! Benefits are now active'));
             setTimeout(() => setSuccessMessage(null), 3000);
@@ -138,6 +136,10 @@ export default function Credits({ onClose }: CreditsProps) {
         setError(null);
         try {
             const transactions = await restorePurchases();
+
+            // 恢复购买后，完整重新加载积分状态
+            await loadCredits();
+
             setSuccessMessage(transactions.length === 0
                 ? txt('没有可恢复的购买记录', 'No purchases to restore')
                 : txt(`已恢复 ${transactions.length} 笔交易`, `Restored ${transactions.length} transactions`)

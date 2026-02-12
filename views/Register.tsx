@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
-import { register } from '../apiService';
+import { register, clearLocalArchives } from '../apiService';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface RegisterProps {
@@ -15,6 +15,11 @@ const Register: React.FC<RegisterProps> = ({ onBack, onComplete }) => {
     email: "",
     password: ""
   });
+
+  // 进入注册页面时，强制清空之前可能残留的状态
+  useEffect(() => {
+    clearLocalArchives();
+  }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 

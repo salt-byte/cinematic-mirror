@@ -9,7 +9,7 @@ const router = Router();
 router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
     try {
         const userId = (req as any).user.userId;
-        const { balance, totalInterviews } = await creditsService.getBalance(userId);
+        const { balance, totalInterviews, isMember, memberExpiry } = await creditsService.getBalance(userId);
 
         res.json({
             success: true,
@@ -17,6 +17,8 @@ router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
                 balance,
                 totalInterviews,
                 freeInterviewsRemaining: Math.max(0, CREDITS_CONFIG.FREE_INTERVIEWS - totalInterviews),
+                isMember,
+                memberExpiry,
                 config: CREDITS_CONFIG,
                 packages: CREDIT_PACKAGES,
                 membership: MEMBERSHIP_CONFIG,

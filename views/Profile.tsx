@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
-import { logout, getCurrentUser, getCreditsBalance, CreditsBalance } from '../apiService';
+import { logout, getCurrentUser, getCreditsBalance, updateProfile, CreditsBalance } from '../apiService';
 import { MOVIE_DATABASE } from '../library';
 
 // 用户信息接口
@@ -63,6 +63,35 @@ const ProfileView: React.FC<{
   const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
   const [credits, setCredits] = useState<CreditsBalance | null>(null);
   const userAvatar = getUserAvatar();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+
+  const handleUpdateProfile = async () => {
+    if (!editName.trim()) return;
+
+    try {
+      // 1. 调用后端更新
+      await updateProfile({ nickname: editName });
+
+      // 2. 更新本地显示 (userAccount)
+      setUserAccount(prev => prev ? { ...prev, nickname: editName } : null);
+
+      // 3. 更新本地存储 (userInfo - 兼容旧逻辑)
+      const newUserInfo = { ...userInfo, name: editName };
+      setUserInfo(newUserInfo as UserInfo);
+      localStorage.setItem('cinematic_user_info', JSON.stringify(newUserInfo));
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert(t('common.error') || 'Update failed');
+    }
+  };
+
+  const startEditing = () => {
+    setEditName(userInfo?.name || userAccount?.nickname || "");
+    setIsEditing(true);
+  };
 
   useEffect(() => {
     // 读取档案库
@@ -141,10 +170,37 @@ const ProfileView: React.FC<{
             </div>
 
             {/* 昵称（主标题）+ 会员标识 */}
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em]">
-                {userInfo?.name || userAccount?.nickname || '--'}
-              </h2>
+            <div className="flex items-center justify-center gap-2 mb-1 min-h-[40px]">
+              {isEditing ? (
+                <div className="flex items-center gap-2 animate-in fade-in zoom-in duration-200">
+                  <input
+                    autoFocus
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-32 bg-white/50 border-b-2 border-vintageRed text-center text-xl font-retro font-black text-walnut focus:outline-none"
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile()}
+                  />
+                  <button onClick={handleUpdateProfile} className="p-1 text-vintageRed hover:bg-vintageRed/10 rounded-full transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">check</span>
+                  </button>
+                  <button onClick={() => setIsEditing(false)} className="p-1 text-walnut/40 hover:text-walnut hover:bg-black/5 rounded-full transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="group relative flex items-center justify-center gap-2">
+                  <h2 className="text-2xl font-retro font-black text-walnut tracking-[0.1em]">
+                    {userInfo?.name || userAccount?.nickname || '--'}
+                  </h2>
+                  <button
+                    onClick={startEditing}
+                    className="opacity-0 group-hover:opacity-100 p-1 text-walnut/30 hover:text-vintageRed transition-all absolute -right-8"
+                    title={language === 'en' ? "Edit Nickname" : "修改昵称"}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">edit</span>
+                  </button>
+                </div>
+              )}
               {credits?.isMember && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[8px] font-bold tracking-[0.15em] uppercase border"
                   style={{

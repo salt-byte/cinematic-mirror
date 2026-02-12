@@ -72,6 +72,7 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const frameIntervalRef = useRef<number | null>(null);
+  const [showTranscript, setShowTranscript] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('cinematic_archives');
@@ -578,7 +579,7 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
         )}
 
         {/* 底部控制区域 */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 z-10" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}>
+        <div className="absolute bottom-0 left-0 right-0 px-4 z-10" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }}>
           {/* 状态显示 */}
           <div className="text-center mb-4">
             {isAiSpeaking && (
@@ -600,28 +601,76 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
             )}
           </div>
 
-          {/* 输入框 */}
-          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl px-4 py-3 rounded-full border border-white/20">
-            <span className={`material-symbols-outlined text-xl ${isRecording ? 'text-vintageRed' : 'text-white/40'}`}>
-              {isRecording ? 'hearing' : 'mic'}
-            </span>
-            <input
-              className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/40 outline-none"
-              placeholder={isRecording ? t('dashboard.speakOrType') : t('dashboard.typeToSend')}
-              value={input}
-              disabled={loading || isAiSpeaking}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLiveTextSend()}
-            />
+          <div className="flex items-center justify-between gap-4 mb-4">
+            {/* 挂断按钮 */}
             <button
-              onClick={handleLiveTextSend}
-              disabled={loading || !input.trim() || isAiSpeaking}
-              className="size-10 rounded-full bg-vintageRed flex items-center justify-center disabled:opacity-30 transition-opacity"
+              onClick={() => { cleanupLiveSession(); setMode('select_mode'); }}
+              className="size-14 rounded-full bg-red-600/90 backdrop-blur flex items-center justify-center shadow-lg active:scale-95 transition-transform"
             >
-              <span className="material-symbols-outlined text-white">send</span>
+              <span className="material-symbols-outlined text-white text-2xl">call_end</span>
+            </button>
+
+            {/* 输入框 */}
+            <div className="flex-1 flex items-center gap-3 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/20 h-14">
+              <input
+                className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/40 outline-none"
+                placeholder={isRecording ? t('dashboard.speakOrType') : t('dashboard.typeToSend')}
+                value={input}
+                disabled={loading || isAiSpeaking}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLiveTextSend()}
+              />
+              <button
+                onClick={handleLiveTextSend}
+                disabled={loading || !input.trim() || isAiSpeaking}
+                className="size-10 rounded-full bg-white/10 flex items-center justify-center disabled:opacity-30 transition-opacity hover:bg-white/20"
+              >
+                <span className="material-symbols-outlined text-white">send</span>
+              </button>
+            </div>
+
+            {/* 剧本/记录按钮 */}
+            <button
+              onClick={() => setShowTranscript(true)}
+              className="size-14 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/20 active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-white">description</span>
             </button>
           </div>
         </div>
+
+        {/* 剧本/记录弹窗 */}
+        {showTranscript && (
+          <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col animate-in fade-in slide-in-from-bottom-10 duration-300">
+            <div className="px-6 py-4 flex items-center justify-between border-b border-white/10" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)' }}>
+              <h3 className="text-white font-retro font-bold tracking-widest uppercase">{t('dashboard.textChatTitle')}</h3>
+              <button onClick={() => setShowTranscript(false)} className="size-8 rounded-full bg-white/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-sm">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-5 py-3 ${msg.role === 'user' ? 'bg-white/10 text-white' : 'bg-white/5 text-white/80 border border-white/10'}`}>
+                    {msg.role === 'model' ? (
+                      <div className="space-y-1">
+                        {parseModelResponse(msg.text).map((part, idx) => (
+                          part.type === 'action' ? (
+                            <p key={idx} className="text-[11px] text-white/40 italic">{part.content}</p>
+                          ) : (
+                            <p key={idx} className="text-[14px] leading-relaxed">{part.content}</p>
+                          )
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[14px]">{msg.text}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
