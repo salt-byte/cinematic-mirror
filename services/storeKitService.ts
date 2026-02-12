@@ -44,11 +44,12 @@ export interface RestoredTransaction {
     purchaseDate: string;
 }
 
-// 所有可购买的产品 ID（与后端 CREDIT_PACKAGES 一致）
+// 所有可购买的产品 ID（与后端 CREDIT_PACKAGES + MEMBERSHIP_CONFIG 一致）
 export const PRODUCT_IDS = [
-    'credits_small',   // 50 积分 - ¥6
-    'credits_medium',  // 200 积分 - ¥18
-    'credits_large',   // 400 积分 - ¥30
+    'credits_small',       // 50 积分 - ¥6
+    'credits_medium',      // 200 积分 - ¥18
+    'credits_large',       // 400 积分 - ¥30
+    'membership_monthly',  // 月度会员 - ¥30/月
 ];
 
 // 注册原生插件

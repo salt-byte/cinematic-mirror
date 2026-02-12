@@ -66,7 +66,52 @@
     "_applicationInternalID" : "com.cinematicmirror.app",
     "_developerTeamID" : ""
   },
-  "subscriptionGroups" : [],
+  "subscriptionGroups" : [
+    {
+      "id" : "membership_group",
+      "localizations" : [
+        {
+          "description" : "影中镜月度会员",
+          "displayName" : "影中镜会员",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "Cinematic Mirror Monthly Pro",
+          "displayName" : "Cinematic Mirror Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Membership",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "3.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "membership_monthly_001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "每月5次免费试镜 + 10次导演咨询 + 100积分",
+              "displayName" : "月度会员",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "5 free auditions + 10 consultations + 100 credits monthly",
+              "displayName" : "Monthly Pro",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "membership_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Membership",
+          "subscriptionGroupID" : "membership_group",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
   "version" : {
     "major" : 3,
     "minor" : 0

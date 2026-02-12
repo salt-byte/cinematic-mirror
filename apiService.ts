@@ -13,29 +13,43 @@ let authToken: string | null = localStorage.getItem('cinematic_token');
 // 通用请求函数
 async function request<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit & { timeout?: number } = {}
 ): Promise<T> {
+  const { timeout = 30000, ...fetchOptions } = options;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
+    ...(fetchOptions.headers as Record<string, string>),
   };
 
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      ...fetchOptions,
+      headers,
+      signal: controller.signal,
+    });
 
-  if (!data.success) {
-    throw new Error(data.error || '请求失败');
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || '请求失败');
+    }
+
+    return data.data;
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      throw new Error('请求超时，服务器可能正在启动，请稍后重试');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return data.data;
 }
 
 // =====================================================
@@ -498,13 +512,29 @@ export async function getCreditsHistory(limit = 20): Promise<any[]> {
 }
 
 // 验证购买并充值（支持 Apple StoreKit 2 JWS 收据）
+// 带重试机制：Render 冷启动可能导致首次请求超时
 export async function verifyPurchase(productId: string, transactionId: string, receipt?: string): Promise<{
   creditsAdded: number;
   newBalance: number;
 }> {
-  return request<{ creditsAdded: number; newBalance: number }>('/credits/verify', {
-    method: 'POST',
-    body: JSON.stringify({ productId, transactionId, receipt }),
-  });
+  const maxRetries = 3;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await request<{ creditsAdded: number; newBalance: number }>('/credits/verify', {
+        method: 'POST',
+        body: JSON.stringify({ productId, transactionId, receipt }),
+        timeout: 60000, // 60秒超时，给 Render 冷启动留够时间
+      });
+    } catch (err: any) {
+      if (attempt === maxRetries) throw err;
+      // 超时或网络错误才重试，业务错误直接抛出
+      if (!err.message?.includes('超时') && !err.message?.includes('Failed to fetch') && !err.message?.includes('NetworkError')) {
+        throw err;
+      }
+      // 重试前等待 2 秒
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+  throw new Error('验证失败，请稍后在积分页面点击"恢复购买"');
 }
 
