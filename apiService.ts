@@ -43,8 +43,12 @@ async function request<T>(
 // =====================================================
 
 export async function register(email: string, password: string) {
-  // 新用户注册，先清空本地档案（全新开始）
+  // 新用户注册，务必完全清空本地状态
   clearLocalArchives();
+  authToken = null; // 清除内存中的 token
+
+  // 标记为新注册用户，Interview 页面据此判断不复用旧缓存
+  sessionStorage.setItem('cinematic_fresh_register', '1');
 
   const result = await request<{ user: any; token: string }>('/auth/register', {
     method: 'POST',
@@ -81,13 +85,17 @@ export function logout() {
 }
 
 // 清空本地档案缓存
-function clearLocalArchives() {
-  localStorage.removeItem('cinematic_archives');
-  localStorage.removeItem('cinematic_mirror_profile');
+export function clearLocalArchives() {
+  // 先写空再删除，规避 iOS Capacitor WebView 的 removeItem 延迟生效问题
+  const keys = ['cinematic_archives', 'cinematic_mirror_profile', 'cinematic_user_info', 'cinematic_token'];
+  keys.forEach(key => {
+    localStorage.setItem(key, '');
+    localStorage.removeItem(key);
+  });
 }
 
 // 从服务器加载用户档案到本地
-async function loadUserArchives(): Promise<void> {
+export async function loadUserArchives(): Promise<void> {
   try {
     const serverProfiles = await getUserProfiles();
     if (serverProfiles && serverProfiles.length > 0) {
@@ -112,6 +120,13 @@ export async function forgotPassword(email: string): Promise<{ message: string }
 
 export async function getCurrentUser() {
   return request<any>('/auth/me');
+}
+
+export async function updateProfile(data: { nickname?: string; avatar_url?: string }) {
+  return request<any>('/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
 }
 
 export function isLoggedIn(): boolean {

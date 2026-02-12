@@ -21,7 +21,14 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; o
   const { t, language } = useLanguage();
 
   // 同步初始化：检查 localStorage 中是否已有用户信息，避免表单闪烁
+  // 新注册用户必须重新填写，不复用旧缓存
   const [savedInfo] = useState<UserInfo | null>(() => {
+    // 新注册用户：强制清空残留缓存，显示空白表单
+    if (sessionStorage.getItem('cinematic_fresh_register')) {
+      sessionStorage.removeItem('cinematic_fresh_register');
+      localStorage.removeItem('cinematic_user_info');
+      return null;
+    }
     try {
       const saved = localStorage.getItem('cinematic_user_info');
       if (saved) {

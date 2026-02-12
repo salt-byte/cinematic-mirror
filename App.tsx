@@ -69,9 +69,12 @@ const App: React.FC = () => {
     navigate(View.STYLING);
   };
 
-  // 登出后调用，清空状态
+  // 登出后调用，清空所有状态
   const handleLogout = () => {
     setProfile(null);
+    setPreviousView(null);
+    // 清除 sessionStorage 防止残留标记
+    sessionStorage.clear();
     navigate(View.WELCOME);
   };
 
