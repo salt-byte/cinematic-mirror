@@ -21,7 +21,7 @@ export const CREDIT_PACKAGES = [
 
 // 月会员配置
 export const MEMBERSHIP_CONFIG = {
-    productId: 'membership_monthly',
+    productId: 'pro_monthly',
     priceCNY: 30,
     priceUSD: 3.99,
     label: '月度会员',

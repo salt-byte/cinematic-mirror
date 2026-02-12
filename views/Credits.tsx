@@ -97,7 +97,7 @@ export default function Credits({ onClose }: CreditsProps) {
             return;
         }
 
-        const membershipId = credits?.membership?.productId || 'membership_monthly';
+        const membershipId = credits?.membership?.productId || 'pro_monthly';
         setPurchasing(membershipId);
         setError(null);
 

@@ -49,7 +49,7 @@ export const PRODUCT_IDS = [
     'credits_small',       // 50 积分 - ¥6
     'credits_medium',      // 200 积分 - ¥18
     'credits_large',       // 400 积分 - ¥30
-    'membership_monthly',  // 月度会员 - ¥30/月
+    'pro_monthly',         // 月度会员 - ¥30/月
 ];
 
 // 注册原生插件

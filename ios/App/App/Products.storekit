@@ -103,7 +103,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "membership_monthly",
+          "productID" : "pro_monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Monthly Membership",
           "subscriptionGroupID" : "membership_group",
