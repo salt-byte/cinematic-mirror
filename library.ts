@@ -1160,221 +1160,604 @@ export const FEMALE_MOVIE_DATABASE: MovieCharacter[] = [
 ];
 
 // 男性电影角色数据库 - 占位数据，后续可填充真实数据
+
 export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
   {
-    id: "gatsby_thegreatgatsby",
-    name: "盖茨比",
-    nameEn: "Gatsby",
-    movie: "了不起的盖茨比",
-    movieEn: "The Great Gatsby",
-    traits: ["极致深情", "完美主义", "过去的囚徒", "梦想家", "阶级跨越者", "孤独", "表演型人格"],
-    traitsEn: ["Deeply Romantic", "Perfectionist", "Prisoner of the Past", "Dreamer", "Social Climber", "Lonely", "Performative"],
+    id: "thomas_peakyblinders_horse",
+    name: "汤米·谢尔比",
+    nameEn: "Thomas Shelby",
+    movie: "浴血黑帮",
+    movieEn: "Peaky Blinders",
+    traits: ["冷静算计", "权力欲", "创伤后遗症", "阶级跃迁者", "控制欲极强", "孤独领袖", "锋利而克制"],
+    traitsEn: ["Calculated", "Power-Driven", "Traumatized", "Social Climber", "Highly Controlling", "Lonely Leader", "Sharp yet Restrained"],
     stylings: [
       {
-        title: "粉色西装的最后幻梦",
-        titleEn: "The Final Illusion of the Pink Suit",
-        subtitle: "新贵绅士 · 亚麻材质 · 易碎的完美主义",
-        subtitleEn: "Nouveau Riche Gentleman · Linen Texture · Fragile Perfectionism",
-        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Gatsby/pink.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvR2F0c2J5L3BpbmsuanBnIiwiaWF0IjoxNzY5OTIxMjg5LCJleHAiOjIwODUyODEyODl9.TKn8q2Oqn9x7s1rU4CCv558x5uXoKjNnKyR5yG7FwQs",
+        title: "骑士姿态下的黑色主权",
+        titleEn: "Black Sovereignty in Equestrian Poise",
+        subtitle: "战马意象 · 乡野权威 · 静默统治",
+        subtitleEn: "War Horse Symbolism · Rural Authority · Silent Dominion",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Thomas%20Shelby/p2132883914.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVGhvbWFzIFNoZWxieS9wMjEzMjg4MzkxNC5qcGciLCJpYXQiOjE3NzA3NzA4OTcsImV4cCI6MjA4NjEzMDg5N30.SIz37_1o4rHBoIsqdyNmzzLUAF3pfwPRGEkB5R8Ea10",
         palette: [
-          { hex: "#E8C3BA", name: "梦幻粉", enName: "Dreamy Pink" },
-          { hex: "#FFFFFF", name: "极简白", enName: "Minimal White" },
-          { hex: "#8E2F38", name: "勃艮第红", enName: "Burgundy" },
-          { hex: "#C9A06A", name: "奢金", enName: "Luxury Gold" },
-          { hex: "#2A2A2A", name: "正装黑", enName: "Formal Black" }
+          { hex: "#0E0E0E", name: "深夜黑", enName: "Night Black" },
+          { hex: "#4A4A4A", name: "石墨灰", enName: "Graphite Grey" },
+          { hex: "#8C8C8C", name: "尘土灰", enName: "Dust Grey" },
+          { hex: "#B5B5B5", name: "冷银", enName: "Cold Silver" }
         ],
-        materials: ["亚麻平纹西装料", "高支棉衬衫", "丝光领带", "牛津皮鞋"],
-        materialsEn: ["Linen plain weave suit fabric", "High thread count cotton shirt", "Mercerized tie", "Oxford shoes"],
+        materials: ["羊毛骑装外套", "粗花呢三件套", "高支棉衬衫", "皮革马靴", "毛呢报童帽", "马具皮革"],
+        materialsEn: ["Wool riding coat", "Tweed three-piece suit", "High-count cotton shirt", "Leather riding boots", "Wool newsboy cap", "Equestrian leather harness"],
         tailoring: [
-          "三件套剪裁严丝合缝，强调极致的体面与秩序",
-          "粉色西装在传统男装语境中突兀而浪漫，象征对旧世界的挑衅",
-          "高领衬衫与宽领带填充颈部线条，增加视觉上的隆重感",
-          "裤线笔直，不容许一丝褶皱，映射人物内心的完美主义强迫"
+          "骑装轮廓强调直立轴线，坐在马背上仍保持“像站着一样”的上身稳定",
+          "高腰裤与马靴的衔接把腿部线条拉直，形成冷硬的功能性美感",
+          "外套肩部挺括但不过分夸张，呈现一种不需要展示肌肉的权威",
+          "帽檐压低眉骨，目光被阴影包住，强化不可读的危险感与控制感"
         ],
         tailoringEn: [
-          "Three-piece suit tailored to perfection, emphasizing extreme decency and order",
-          "Pink suit is jarring yet romantic in traditional menswear context, symbolizing provocation to the old world",
-          "High collar shirt and wide tie fill the neck line, adding visual grandeur",
-          "Pants creased perfectly straight, allowing no wrinkles, mirroring inner perfectionist obsession"
+          "Riding silhouette reinforces a vertical axis; even on horseback, the torso stays stable as if standing",
+          "High-rise trousers meet boots to lengthen and straighten leg lines, creating a hard functional elegance",
+          "Structured shoulders without exaggeration, projecting authority that doesn't need muscle display",
+          "Brim lowers the brow; eyes sit in shadow, amplifying unreadable danger and control"
         ],
-        scriptSnippet: "他站在台阶上等待，粉色西装在夏日的阳光下显眼得近乎虚幻。他试图用这身装扮告诉黛西，他已经拥有了想要的一切，包括这种不被定义的颜色。",
-        scriptSnippetEn: "He waits on the steps, pink suit visible to the point of illusion in the summer sun. He tries to tell Daisy with this outfit that he has everything he wanted, including this undefined color.",
-        directorNote: "这套造型是盖茨比悲剧底色的外化。粉色在那个年代代表工人阶级或暴发户的审美（汤姆讽刺过），但他把它穿得像皇室礼服一样隆重。这是一种拼命想要融入上流社会却又无意中暴露了自己局外人身份的矛盾。穿着时要表现出一种小心翼翼的骄傲，仿佛只要衣服不乱，梦就不会醒。",
-        directorNoteEn: "Externalization of Gatsby's tragic undertone. Pink represented working class or nouveau riche aesthetics, but he wears it grandly like royal attire. Wear with careful pride, as if as long as clothes are neat, the dream won't break."
+        scriptSnippet: "黑马穿过泥地，他的外套纹理在冷光里像铁屑一样粗粝。周围是乡野与木棚，但他依旧像一把收在鞘里的刀，沉默地占据画面中心。",
+        scriptSnippetEn: "A black horse cuts through mud; the coat texture looks gritty like iron filings in cold light. Surrounded by fields and sheds, he still reads like a blade in its sheath, silently owning the frame.",
+        directorNote: "这套穿搭的关键不是“好看”，而是“统治”。把身体当成一根钉子钉在马背上，动作越少越有压迫感。让衣服的粗粝质地与泥地环境同频，形成一种从底层生长出来的权力。镜头捕捉到的应是冷、稳、准：慢速转头，短促扫视，停顿比台词更重要。",
+        directorNoteEn: "The point isn't 'looking good'—it's dominance. Pin the body to the saddle; fewer movements create more pressure. Let the rough textures rhyme with the muddy environment, suggesting power grown from the working class. On camera: cold, steady, precise—slow head turns, brief scans, and pauses that speak louder than dialogue."
       },
       {
-        title: "银灰派对主人的疏离感",
-        titleEn: "The Detachment of the Silver-Grey Party Host",
-        subtitle: "奢华晚宴 · 丝绸光泽 · 站在人群之外的孤独",
-        subtitleEn: "Luxury Gala · Silk Sheen · Loneliness Standing Outside the Crowd",
-        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Gatsby/silver.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvR2F0c2J5L3NpbHZlci5qcGciLCJpYXQiOjE3Njk5MjEzMjIsImV4cCI6MjA4NTI4MTMyMn0.uTKTWvHKP7-Ie528y1fH8-L-uFDrGg-wKi84yNqHj5M",
+        title: "森林阴影中的黑色裁决",
+        titleEn: "Black Verdict in the Forest Shadow",
+        subtitle: "深色大衣 · 冷绿调光影 · 静默处决气场",
+        subtitleEn: "Dark Overcoat · Cool Green Lighting · Silent Execution Aura",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Thomas%20Shelby/p2795722774.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVGhvbWFzIFNoZWxieS9wMjc5NTcyMjc3NC5qcGciLCJpYXQiOjE3NzA3NzEwODQsImV4cCI6MjA4NjEzMTA4NH0.aDryQeceMrEV3UUZMRU0AIRS5phVq2amIP6iLekVfnM",
         palette: [
-          { hex: "#B8B8B8", name: "冷银灰", enName: "Cold Silver Grey" },
-          { hex: "#0F0F0F", name: "极致黑", enName: "Ultimate Black" },
-          { hex: "#FFFFFF", name: "衬衫白", enName: "Shirt White" },
-          { hex: "#C9A06A", name: "香槟金", enName: "Champagne Gold" }
+          { hex: "#0A0F14", name: "深渊黑", enName: "Abyss Black" },
+          { hex: "#1E2B2F", name: "冷松绿", enName: "Pine Green" },
+          { hex: "#2C2C2C", name: "炭灰", enName: "Charcoal Grey" },
+          { hex: "#EDEDED", name: "冷白", enName: "Cold White" }
         ],
-        materials: ["丝光混纺西装面料", "高支棉礼服衬衫", "真丝领结", "漆皮牛津鞋"],
-        materialsEn: ["Mercerized blend suit fabric", "High thread count formal shirt", "Silk bow tie", "Patent Oxford shoes"],
+        materials: ["切斯特菲尔德大衣", "精纺羊毛西装", "高支棉衬衫", "真丝领带", "皮革手套", "金属怀表链"],
+        materialsEn: ["Chesterfield overcoat", "Worsted wool suit", "High-thread cotton shirt", "Silk tie", "Leather gloves", "Metal pocket watch chain"],
         tailoring: [
-          "银灰色单排扣西装带微光感，在灯光下若隐若现",
-          "剪裁偏修身但不紧绷，保持贵族式的从容感",
-          "领结替代领带，增添正式场合的仪式感",
-          "整体色调偏冷，与派对的热闹形成疏离对比"
+          "长款大衣垂直线条强化身形的压迫感，形成绝对主导的轮廓",
+          "双排扣结构增加胸前厚度，营造防御性与权威感",
+          "立体肩线干净锋利，呼应人物决断时的冷峻态度",
+          "手套与怀表链作为细节符号，暗示时间与暴力的掌控"
         ],
         tailoringEn: [
-          "Silver-grey single-breasted suit with subtle sheen under lights",
-          "Slim fit but not tight, maintaining aristocratic composure",
-          "Bow tie adds ceremony to formal occasions",
-          "Overall cool tones contrast with party warmth, creating detachment"
+          "Long overcoat vertical lines enhance physical dominance, forming an absolute leading silhouette",
+          "Double-breasted structure adds chest volume, creating defense and authority",
+          "Structured shoulders remain sharp, echoing his decisive coldness",
+          "Gloves and watch chain act as symbols of time and controlled violence"
         ],
-        scriptSnippet: "派对上人声鼎沸，他站在角落，手里端着香槟却从不喝。银灰色让他看起来像一尊雕像，存在于喧嚣之中却不属于它。",
-        scriptSnippetEn: "The party roars, he stands in the corner holding champagne but never drinks. Silver-grey makes him look like a statue, existing in the noise but not belonging.",
-        directorNote: "这套造型强调盖茨比的孤独本质。他是派对的主人，却是人群中最孤独的人。银灰色既奢华又冰冷，完美诠释了他的处境：拥有一切却感受不到温度。表演时眼神要飘忽，仿佛在找寻人群中唯一重要的那个人。",
-        directorNoteEn: "This look emphasizes Gatsby's lonely nature. He's the host but the loneliest. Silver-grey is luxurious yet cold, perfect for his situation: having everything but feeling nothing. Eyes should wander, seeking the only important one."
-      }
-    ]
-  },
-  {
-    id: "tylerdurden_fightclub",
-    name: "泰勒·德顿",
-    nameEn: "Tyler Durden",
-    movie: "搏击俱乐部",
-    movieEn: "Fight Club",
-    traits: ["反叛者", "虚无主义", "魅力型领袖", "自我毁灭", "反消费主义", "原始男性力量", "混乱制造者"],
-    traitsEn: ["Rebel", "Nihilist", "Charismatic Leader", "Self-Destructive", "Anti-Consumerism", "Primal Masculinity", "Chaos Agent"],
-    stylings: [
-      {
-        title: "红色皮夹克的反叛宣言",
-        titleEn: "The Rebellion Manifesto in Red Leather",
-        subtitle: "地下王者 · 复古摇滚 · 解构消费主义",
-        subtitleEn: "Underground King · Vintage Rock · Deconstructing Consumerism",
-        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/TylerDurden/red.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVHlsZXJEdXJkZW4vcmVkLmpwZyIsImlhdCI6MTc2OTkyMTM1NiwiZXhwIjoyMDg1MjgxMzU2fQ.GiOH9_Cc6ow4qX5g1IYwHHnGnWbnwEGpgEVYs9flMTY",
-        palette: [
-          { hex: "#8B0000", name: "血红", enName: "Blood Red" },
-          { hex: "#2A2A2A", name: "阴影黑", enName: "Shadow Black" },
-          { hex: "#C9A06A", name: "旧皮棕", enName: "Aged Leather" },
-          { hex: "#FFFFFF", name: "汗衫白", enName: "Tank White" }
-        ],
-        materials: ["做旧真皮", "棉质汗衫", "牛仔布", "金属扣件"],
-        materialsEn: ["Distressed leather", "Cotton tank top", "Denim", "Metal hardware"],
-        tailoring: [
-          "皮夹克故意做旧，带着使用过的痕迹和故事感",
-          "内搭简单汗衫，强调身体线条而非装饰",
-          "整体剪裁偏宽松，拒绝任何束缚感",
-          "颜色对比强烈，红与黑的碰撞象征内心的冲突"
-        ],
-        tailoringEn: [
-          "Leather jacket intentionally distressed with story of wear",
-          "Simple tank top underneath, emphasizing body over decoration",
-          "Overall loose fit, rejecting any sense of constraint",
-          "Strong color contrast, red and black collision symbolizes inner conflict"
-        ],
-        scriptSnippet: "他站在搏击俱乐部的阴影里，红色皮衣像一面旗帜。他告诉他们：你不是你的工作，不是你银行里的存款，不是你穿的衣服。",
-        scriptSnippetEn: "He stands in Fight Club's shadows, red leather like a flag. He tells them: you are not your job, not your bank balance, not the clothes you wear.",
-        directorNote: "这套造型是泰勒反体制态度的视觉化。红色皮夹克在90年代的极简主义中显得格格不入，但这正是他想要的——一个拒绝被定义的符号。穿着时要带着一种危险的松弛感，仿佛随时准备引爆什么。",
-        directorNoteEn: "This look visualizes Tyler's anti-establishment attitude. Red leather jacket is out of place in 90s minimalism, but that's the point—a symbol refusing definition. Wear with dangerous relaxation, as if ready to detonate something."
+        scriptSnippet: "树林深处没有风声，他站在光影交界处，帽檐遮住一半表情。大衣像一面黑色帷幕，把情绪与杀意一同收进体内。",
+        scriptSnippetEn: "There is no wind in the forest. He stands at the edge of light and shadow, brim hiding half his face. The coat becomes a black curtain, sealing both emotion and intent.",
+        directorNote: "这套造型的核心是冷静到近乎冰封的气场。环境是冷绿色调，人物必须比环境更冷。站姿稳定，双手自然下垂但保持张力。目光不要四处移动，只需轻微下压，让观众感受到一种即将发生却尚未发生的危险。大衣摆动幅度控制在最低限度，让沉默成为最强叙事。",
+        directorNoteEn: "The essence is an almost frozen calm. The environment carries cool green tones; the character must feel even colder. Maintain a stable stance, arms relaxed yet tense. Eyes barely move—slight downward pressure creates impending danger. Limit coat movement; silence becomes the strongest narrative device."
       },
       {
-        title: "网眼背心的原始状态",
-        titleEn: "The Primal State in Mesh Tank",
-        subtitle: "搏击场核心 · 去除一切装饰 · 身体即资本",
-        subtitleEn: "Fight Pit Core · Stripped of All Decoration · Body as Capital",
-        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/TylerDurden/mesh.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVHlsZXJEdXJkZW4vbWVzaC5qcGciLCJpYXQiOjE3Njk5MjEzODUsImV4cCI6MjA4NTI4MTM4NX0.ILv66kCFB0R2QRGaHH_-eQNnwXKRqzABHXcVxmMHqfY",
+        title: "室内烟雾中的蓝色秩序",
+        titleEn: "Blue Order in Interior Smoke",
+        subtitle: "藏蓝条纹三件套 · 金色怀表链 · 压抑权力",
+        subtitleEn: "Navy Pinstripe Three-Piece · Gold Watch Chain · Suppressed Authority",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Thomas%20Shelby/26.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVGhvbWFzIFNoZWxieS8yNi5qcGciLCJpYXQiOjE3NzA3NzQ1MzQsImV4cCI6MjA4NjEzNDUzNH0.hw-8qqJESYNwkXhCA6JSUtb7JGaozjAVbw9TpC91VJ0",
         palette: [
-          { hex: "#4A4A4A", name: "网眼灰", enName: "Mesh Grey" },
-          { hex: "#C9A06A", name: "肤色", enName: "Skin Tone" },
-          { hex: "#2A2A2A", name: "地下室黑", enName: "Basement Black" }
+          { hex: "#1C2A3A", name: "藏蓝", enName: "Deep Navy" },
+          { hex: "#8C6A3B", name: "古金色", enName: "Antique Gold" },
+          { hex: "#2B2B2B", name: "烟灰黑", enName: "Smoke Black" },
+          { hex: "#EDEDED", name: "衬衫冷白", enName: "Cold White" }
         ],
-        materials: ["网眼棉布", "做旧牛仔裤", "绷带（可选）"],
-        materialsEn: ["Mesh cotton", "Distressed jeans", "Bandages (optional)"],
+        materials: ["条纹羊毛西装", "羊毛马甲", "高支棉衬衫", "真丝领带", "金属怀表链"],
+        materialsEn: ["Pinstripe wool suit", "Wool waistcoat", "High-thread cotton shirt", "Silk tie", "Metal watch chain"],
         tailoring: [
-          "网眼背心几乎不遮挡身体，展示肌肉线条",
-          "裤子低腰松垮，带着街头的不羁感",
-          "整体去装饰化，像是从垃圾堆里捡来的",
-          "伤痕和汗水是最好的配饰"
+          "三件套结构形成高度秩序感，强调理性与控制",
+          "细条纹纵向延伸身形比例，制造冷峻压迫",
+          "怀表链成为视觉焦点，象征时间与命运掌控",
+          "领带与马甲紧密贴合，压缩情绪外露空间"
         ],
         tailoringEn: [
-          "Mesh tank barely covers, displaying muscle lines",
-          "Low-waisted loose pants with street rebellion",
-          "Overall stripped of decoration, like picked from trash",
-          "Scars and sweat are the best accessories"
+          "Three-piece structure creates strong order and control",
+          "Pinstripes elongate silhouette for sharp dominance",
+          "Watch chain symbolizes control over time and fate",
+          "Tie and waistcoat compress emotional exposure"
         ],
-        scriptSnippet: "他在搏击场中央，汗水顺着网眼背心流下来。他不需要名牌，因为他的伤疤和肌肉就是最好的logo。",
-        scriptSnippetEn: "Center of the fight pit, sweat running down the mesh tank. Needs no brands because scars and muscles are the best logo.",
-        directorNote: "这是泰勒最原始的状态。去掉皮衣的伪装，只剩下最直接的暴力载体。表演重点是眼神的狂热和动作的爆发力，展现一种原始的、不受文明驯化的野兽状态。",
-        directorNoteEn: "Tyler's most primal state. Stripped of jacket mask, only direct carrier of violence remains. Focus on fanaticism in eyes and explosive action, showing primal undomesticated beast state."
+        scriptSnippet: "他倚在柱旁，烟雾在空气中缓慢扩散。蓝色西装像一道冷静的墙，将所有情绪隔绝在外。",
+        scriptSnippetEn: "Leaning against the pillar, smoke drifts slowly. The navy suit stands like a calm wall, sealing emotion within.",
+        directorNote: "这套造型体现汤米的精神核心。动作缓慢，呼吸沉稳。烟雾与冷光交织，让条纹西装在阴影中呈现结构感。目光要向上或向远处延伸，表现思考而非冲动。怀表链轻微晃动，是时间与命运的隐喻。"
+      },
+      {
+        title: "街头行进的黑色统御",
+        titleEn: "Black Dominion in Street Motion",
+        subtitle: "长款黑大衣 · 报童帽 · 低温权威",
+        subtitleEn: "Long Black Overcoat · Newsboy Cap · Cold Authority",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Thomas%20Shelby/25.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvVGhvbWFzIFNoZWxieS8yNS5qcGciLCJpYXQiOjE3NzA3NzQ1NTIsImV4cCI6MjA4NjEzNDU1Mn0.kNJcwMCfTYEFanyOQZwFj8ghg6Z-77_GkN0JluLSeuQ",
+        palette: [
+          { hex: "#111111", name: "深黑", enName: "Deep Black" },
+          { hex: "#2C3E50", name: "钢铁蓝", enName: "Steel Blue" },
+          { hex: "#6A1F2B", name: "暗酒红", enName: "Dark Burgundy" },
+          { hex: "#DADADA", name: "灰白", enName: "Grey White" }
+        ],
+        materials: ["厚羊毛长大衣", "条纹三件套", "真皮手套", "毛呢报童帽", "金属怀表链"],
+        materialsEn: ["Heavy wool overcoat", "Pinstripe three-piece suit", "Leather gloves", "Wool newsboy cap", "Metal watch chain"],
+        tailoring: [
+          "长大衣垂直线条形成绝对主导轮廓",
+          "内搭条纹三件套保持结构层次感",
+          "报童帽压低眉骨，遮蔽真实情绪",
+          "皮手套强化行动感与冷酷距离"
+        ],
+        tailoringEn: [
+          "Long coat forms dominant vertical silhouette",
+          "Layered pinstripe suit maintains structure",
+          "Cap shadows the eyes, hiding emotion",
+          "Leather gloves enhance cold distance"
+        ],
+        scriptSnippet: "他走在街道中央，风掀起大衣内衬。步伐沉稳，每一步都像在宣告新的秩序。",
+        scriptSnippetEn: "He walks down the center of the street, coat lining lifted by wind. Each step announces a new order.",
+        directorNote: "这套造型强调行进中的权力。步伐节奏均匀且有重量，肩线稳定。镜头应从低角度捕捉大衣翻动的瞬间，制造威压感。整体气质必须冷而克制，让环境成为背景，他成为秩序本身。"
+      }
+
+    ]
+  },
+  {
+    id: "better_tomorrow_mark",
+    name: "小马哥",
+    nameEn: "Mark",
+    movie: "英雄本色",
+    movieEn: "A Better Tomorrow",
+    traits: ["江湖义气", "潇洒孤勇", "旧日荣光", "兄弟至上", "浪漫悲情", "自毁式骄傲"],
+    traitsEn: ["Brotherhood Loyalty", "Stylish Bravery", "Faded Glory", "Fraternal Devotion", "Romantic Tragedy", "Self-Destructive Pride"],
+    stylings: [
+      {
+        title: "墨色风衣下的江湖笑意",
+        titleEn: "Under the Dark Trench, a Gangster’s Smile",
+        subtitle: "长款风衣 · 宽领西装 · 90年代黑白气场",
+        subtitleEn: "Long Coat · Wide-Lapel Suit · 90s Monochrome Aura",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/mark/33.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbWFyay8zMy5wbmciLCJpYXQiOjE3NzA3NzYwNzksImV4cCI6MjA4NjEzNjA3OX0.M6xZVwc2coVg9dKdvDvhuB97ShtQzpEiKA0wy9mwvj0",
+        palette: [
+          { hex: "#1A1A1A", name: "深影黑", enName: "Shadow Black" },
+          { hex: "#4A4A4A", name: "烟灰", enName: "Smoke Grey" },
+          { hex: "#FFFFFF", name: "冷白衬衫", enName: "Crisp White" },
+          { hex: "#2F2F2F", name: "暗调灰", enName: "Muted Grey" }
+        ],
+        materials: ["长款呢料风衣", "粗纹羊毛西装", "白色衬衫", "宽版领带", "金属框墨镜"],
+        materialsEn: ["Long wool trench coat", "Textured wool suit", "White shirt", "Wide tie", "Metal-frame sunglasses"],
+        tailoring: [
+          "风衣轮廓宽阔，形成江湖式潇洒剪影",
+          "西装肩线略宽，强调90年代男性力量感",
+          "宽领带增加戏剧张力与时代气息",
+          "墨镜遮蔽眼神，保留神秘与自信笑意"
+        ],
+        tailoringEn: [
+          "Broad trench silhouette creates heroic outline",
+          "Wider shoulders emphasize masculine presence",
+          "Wide tie enhances dramatic tension",
+          "Sunglasses conceal gaze, keeping charisma intact"
+        ],
+        scriptSnippet: "他站在街头，嘴角带笑，墨镜反射出城市的光影。黑白影像里，他像一段未完的传奇。",
+        scriptSnippetEn: "He stands on the street with a faint smile, sunglasses reflecting city lights. In monochrome, he feels like an unfinished legend.",
+        directorNote: "这套造型的核心是潇洒与悲情的并存。站姿自然放松，双手插袋或微微后摆。风衣随着动作轻微摆动，形成标志性剪影。黑白色调强化时代质感，让人物成为画面中最坚定的存在。微笑必须带着一点讽刺与不羁。"
+      },
+      {
+        title: "风衣下的沉默担当",
+        titleEn: "Silent Responsibility Beneath the Coat",
+        subtitle: "黑色大衣 · 宽版领带 · 80年代江湖气",
+        subtitleEn: "Black Overcoat · Wide Tie · 80s Gangster Elegance",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/mark/34.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbWFyay8zNC5wbmciLCJpYXQiOjE3NzA3NzYyNjUsImV4cCI6MjA4NjEzNjI2NX0.YmwkJkhM83WPkdgvU9y9SZoS3arL7Yi6Usm-yd5i4fA",
+        palette: [
+          { hex: "#1B1B1B", name: "深黑风衣", enName: "Deep Black" },
+          { hex: "#EDEDED", name: "冷白衬衫", enName: "Crisp White" },
+          { hex: "#7A6A5A", name: "豹纹灰棕", enName: "Patterned Taupe" },
+          { hex: "#3A3A3A", name: "旧影灰", enName: "Vintage Grey" }
+        ],
+        materials: ["长款呢料大衣", "羊毛西装内搭", "宽版印花领带", "金属怀表链"],
+        materialsEn: ["Long wool overcoat", "Wool suit", "Wide printed tie", "Metal watch chain"],
+        tailoring: [
+          "大衣轮廓宽阔，形成稳重而有分量的江湖气场",
+          "宽领带强化80年代视觉语言与时代印记",
+          "西装肩线硬挺，强调责任与担当",
+          "整体比例厚重克制，象征经历风雨后的沉稳"
+        ],
+        tailoringEn: [
+          "Broad coat silhouette builds weighted presence",
+          "Wide tie reflects 80s era aesthetics",
+          "Structured shoulders emphasize responsibility",
+          "Heavy proportions symbolize endured hardship"
+        ],
+        scriptSnippet: "他抬手示意，风衣在空气中轻轻晃动。脸上带着平静，却隐藏着时代赋予的压力与选择。",
+        scriptSnippetEn: "He gestures calmly, coat shifting in the air. His face remains composed, masking the weight of his era.",
+        directorNote: "这套造型强调担当与克制。动作干脆却不张扬，站姿稳固。黑色风衣在光线下呈现厚重质感，象征江湖规则。镜头应捕捉他抬手的瞬间，让观众感受到兄弟义气与命运交织的张力。"
+      },
+      {
+        title: "长风衣里的玩世锋芒",
+        titleEn: "Defiant Charm in the Long Trench",
+        subtitle: "黑色长风衣 · 双重图案领带 · 80年代极致风格",
+        subtitleEn: "Black Trench · Dual Pattern Tie · Ultimate 80s Style",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/mark/35.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbWFyay8zNS5wbmciLCJpYXQiOjE3NzA3NzYzMzUsImV4cCI6MjA4NjEzNjMzNX0.8wfpzArLmYtC-GTYAy-74ZWNRZPdLUYbhjWZU_rckTYhttps://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Mark/trench.jpg",
+        palette: [
+          { hex: "#121212", name: "极夜黑", enName: "Midnight Black" },
+          { hex: "#4C4C4C", name: "旧西装灰", enName: "Vintage Grey" },
+          { hex: "#C9B39A", name: "暖米色衬衫", enName: "Warm Beige" },
+          { hex: "#6A5A4A", name: "复古棕调", enName: "Retro Brown" }
+        ],
+        materials: ["厚呢长风衣", "宽肩羊毛西装", "几何印花领带", "金属框墨镜"],
+        materialsEn: ["Heavy wool trench", "Wide-shoulder wool suit", "Geometric print tie", "Metal-frame sunglasses"],
+        tailoring: [
+          "风衣长度压低重心，形成标志性江湖剪影",
+          "西装肩线外扩，强化力量与气场",
+          "双图案领带叠加制造张扬时代符号",
+          "墨镜遮挡眼神，留下轻蔑与自信的微笑"
+        ],
+        tailoringEn: [
+          "Extended trench length lowers center for iconic silhouette",
+          "Expanded shoulders amplify presence",
+          "Layered patterned tie reflects bold era signature",
+          "Sunglasses conceal gaze while preserving charisma"
+        ],
+        scriptSnippet: "他低头摆弄墨镜，风衣在身侧垂落。那一瞬间，玩世不恭与宿命悲情交织成独属于他的时代轮廓。",
+        scriptSnippetEn: "He adjusts his sunglasses as the trench drapes beside him. In that moment, defiance and tragedy merge into his era’s silhouette.",
+        directorNote: "这套造型强调张扬与落寞并存。动作可以随性，低头或整理墨镜时带一点漫不经心。风衣必须形成纵向线条，增强画面张力。镜头适度拉远，突出人物与空白背景的对比，让黑色成为时代记忆的象征。"
+      },
+    ]
+  },
+  {
+    id: "greenbook_shirley_autumn",
+    name: "唐·雪利",
+    nameEn: "Don Shirley",
+    movie: "绿皮书",
+    movieEn: "Green Book",
+    traits: ["克制高贵", "孤独优雅", "理性自持", "文化自觉", "边界分明", "柔中带锋"],
+    traitsEn: ["Restrained Noble", "Elegant Solitude", "Composed Rationality", "Cultural Awareness", "Defined Boundaries", "Soft yet Sharp"],
+    stylings: [
+      {
+        title: "秋日金调中的知识分子锋芒",
+        titleEn: "Intellectual Sharpness in Autumn Gold",
+        subtitle: "格纹西装 · 高领针织 · 温润尊严",
+        subtitleEn: "Plaid Blazer · Turtleneck Knit · Warm Dignity",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Don%20Shirley/30.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvRG9uIFNoaXJsZXkvMzAucG5nIiwiaWF0IjoxNzcwNzc1NzIyLCJleHAiOjIwODYxMzU3MjJ9.FdGob0Z8loaietF4fTh_2AoEr9gKdryV0aXCfgFy1I4",
+        palette: [
+          { hex: "#B07A2C", name: "秋金棕", enName: "Autumn Gold" },
+          { hex: "#C89E3D", name: "琥珀黄", enName: "Amber Mustard" },
+          { hex: "#1E1E1E", name: "墨黑", enName: "Ink Black" },
+          { hex: "#F4F4F2", name: "冷白口袋巾", enName: "Crisp White" }
+        ],
+        materials: ["羊毛格纹西装外套", "细针织高领衫", "精纺长裤", "皮革表带腕表"],
+        materialsEn: ["Wool plaid blazer", "Fine knit turtleneck", "Worsted trousers", "Leather-strap watch"],
+        tailoring: [
+          "格纹结构强化肩线与理性秩序感",
+          "高领针织压缩颈部线条，呈现沉静自持的气质",
+          "色彩同频叠加形成温暖却内敛的视觉层次",
+          "整体比例干净克制，强调知识分子的端正姿态"
+        ],
+        tailoringEn: [
+          "Plaid structure strengthens shoulders and rational order",
+          "Turtleneck compresses neckline for composed presence",
+          "Layered warm tones create restrained depth",
+          "Clean proportions emphasize intellectual posture"
+        ],
+        scriptSnippet: "他坐在公园长椅旁，金色树叶在身后静静飘落。格纹西装在秋日薄雾里显得温暖，却掩不住眼神中的孤独。",
+        scriptSnippetEn: "Seated by the park table, golden leaves drift behind him. The plaid blazer feels warm in autumn haze, yet cannot conceal the solitude in his gaze.",
+        directorNote: "这套造型强调温度与距离的并存。姿态要端正，背部挺直，动作细微而有节制。秋金色调与环境呼应，但人物气质必须保持克制与清醒。镜头应停留在眼神与手部细节，让观众感受到内心的复杂与优雅之间的张力。"
+      },
+      {
+        title: "车厢光影中的理性秩序",
+        titleEn: "Rational Order in Car Light",
+        subtitle: "菱格针织背心 · 白衬衫黑领带 · 知识阶层克制美学",
+        subtitleEn: "Argyle Vest · White Shirt Black Tie · Intellectual Restraint",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Don%20Shirley/31.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvRG9uIFNoaXJsZXkvMzEucG5nIiwiaWF0IjoxNzcwNzc1ODY5LCJleHAiOjIwODYxMzU4Njl9.dcswNa5Y3-WpLsfnX7jSNrySOD-QysxJeUWw4gtVG40",
+        palette: [
+          { hex: "#1F1F1F", name: "墨黑", enName: "Ink Black" },
+          { hex: "#EDEBE6", name: "象牙白", enName: "Ivory White" },
+          { hex: "#4A4A4A", name: "深灰", enName: "Charcoal Grey" },
+          { hex: "#B7A37A", name: "柔金光", enName: "Soft Gold" }
+        ],
+        materials: ["羊毛菱格针织背心", "高支棉白衬衫", "真丝黑色领带", "金属镜框眼镜"],
+        materialsEn: ["Wool argyle sweater vest", "High-thread cotton shirt", "Silk black tie", "Metal frame glasses"],
+        tailoring: [
+          "菱格纹理建立几何秩序感，象征理性结构",
+          "衬衫与领带收紧颈部线条，强化自持气质",
+          "针织背心柔化西装语境，平衡正式与舒适",
+          "整体比例克制端正，强调知识分子的仪式感"
+        ],
+        tailoringEn: [
+          "Argyle pattern builds geometric order",
+          "Shirt and tie tighten neckline for composure",
+          "Knit vest softens formal context",
+          "Balanced proportions emphasize intellectual ceremony"
+        ],
+        scriptSnippet: "车窗外风景快速后退，他低头阅读，面容平静。光线掠过镜框，仿佛在提醒他始终与世界保持一层理性的距离。",
+        scriptSnippetEn: "Scenery moves outside the window as he reads calmly. Light glides across his glasses, marking a rational distance from the world.",
+        directorNote: "这套造型强调内在秩序。坐姿笔直但不过分紧张，翻页动作缓慢而精确。黑白色调形成理性对比，暖色车内光线带来微妙温度。镜头应靠近面部与眼镜反光，让观众感受到沉默中的尊严与孤独。"
+      },
+      {
+        title: "深色西装里的无声对峙",
+        titleEn: "Silent Confrontation in Dark Suit",
+        subtitle: "深绿调西装 · 几何领带 · 克制权威",
+        subtitleEn: "Deep-Tone Suit · Geometric Tie · Restrained Authority",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Don%20Shirley/32.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvRG9uIFNoaXJsZXkvMzIucG5nIiwiaWF0IjoxNzcwNzc1OTAwLCJleHAiOjIwODYxMzU5MDB9.o8EP4SkQD0DqQQyIWHOaslRRJubwWhFqWK6V1Ftg5G4",
+        palette: [
+          { hex: "#0F2F2E", name: "深墨绿", enName: "Deep Teal" },
+          { hex: "#C4A25A", name: "琥珀棕", enName: "Amber Brown" },
+          { hex: "#F2F2F0", name: "冷白衬衫", enName: "Crisp White" },
+          { hex: "#2A2A2A", name: "影调黑", enName: "Shadow Black" }
+        ],
+        materials: ["精纺深色西装", "棉质白衬衫", "丝质几何纹领带", "细金属戒指"],
+        materialsEn: ["Worsted dark suit", "Cotton white shirt", "Silk patterned tie", "Slim metal ring"],
+        tailoring: [
+          "西装肩线稳固，强调挺拔姿态与精神力量",
+          "修身剪裁收束身体线条，呈现理性控制感",
+          "几何图案领带增加秩序感与视觉焦点",
+          "整体色调压低饱和度，营造克制氛围"
+        ],
+        tailoringEn: [
+          "Structured shoulders reinforce upright dignity",
+          "Slim cut emphasizes controlled composure",
+          "Geometric tie adds order and focal structure",
+          "Muted palette creates restrained atmosphere"
+        ],
+        scriptSnippet: "他在走廊中被引导前行，表情沉静。深色西装在冷光下显得更加锋利，仿佛一层看不见的盔甲。",
+        scriptSnippetEn: "Escorted down the corridor, his face remains calm. The dark suit sharpens under cold light, like an invisible armor.",
+        directorNote: "这套造型强调对抗中的尊严。动作必须克制，扣上西装纽扣的瞬间要缓慢而坚定。目光平视前方，不逃避也不挑衅。色彩压低情绪，让观众感受到理性与压力并存的张力。镜头应贴近面部与手部细节，强化沉默中的力量。"
+      }
+
+    ]
+  },
+  {
+    id: "great_beauty_yellow_blazer",
+    name: "杰普·甘巴德拉",
+    nameEn: "Jep Gambardella",
+    movie: "绝美之城",
+    movieEn: "La Grande Bellezza",
+    traits: ["审美至上主义者", "疲惫的享乐家", "冷静旁观者", "社交场中心", "优雅虚无", "时间见证者"],
+    traitsEn: ["Aesthetic Maximalist", "Weary Hedonist", "Detached Observer", "Social Epicenter", "Elegant Nihilist", "Witness of Time"],
+    stylings: [
+      {
+        title: "金色余晖中的艳丽冷感",
+        titleEn: "Radiant Coolness in Golden Light",
+        subtitle: "亮黄色西装 · 白色内搭 · 罗马式张扬",
+        subtitleEn: "Bright Yellow Blazer · White Base · Roman Theatricality",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Jep%20Gambardella/27.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvSmVwIEdhbWJhcmRlbGxhLzI3LnBuZyIsImlhdCI6MTc3MDc3NTA4OCwiZXhwIjoyMDg2MTM1MDg4fQ.Pm7NF1cmAtRXZrsriW3wgjkjnJQTeu2ziBopW6jsu5c",
+        palette: [
+          { hex: "#F4B400", name: "罗马金黄", enName: "Roman Yellow" },
+          { hex: "#F2EFE9", name: "石阶米白", enName: "Marble Ivory" },
+          { hex: "#C23B22", name: "暗红口袋巾", enName: "Deep Red Accent" },
+          { hex: "#2C2C2C", name: "深影黑", enName: "Shadow Black" }
+        ],
+        materials: ["精纺羊毛西装外套", "纯棉白衬衫", "棉质长裤", "双色牛津鞋", "丝质口袋巾"],
+        materialsEn: ["Wool blazer", "Cotton white shirt", "Cotton trousers", "Two-tone oxford shoes", "Silk pocket square"],
+        tailoring: [
+          "亮色单西强调肩线与姿态，让人物成为画面焦点",
+          "白色内搭与米色裤装形成干净层次，缓和高饱和色冲击",
+          "口袋巾点缀增强戏剧性与审美自觉",
+          "双色皮鞋体现复古绅士品味与轻微炫耀意味"
+        ],
+        tailoringEn: [
+          "Bright blazer highlights shoulders and posture as focal point",
+          "White and ivory layering softens saturated impact",
+          "Pocket square enhances theatrical awareness",
+          "Two-tone shoes express vintage gentleman flair"
+        ],
+        scriptSnippet: "他坐在大理石台阶上，黄色外套在阳光下近乎耀眼。人群喧闹，他却安静地看着远方，像一位疲惫却仍然优雅的见证者。",
+        scriptSnippetEn: "Seated on marble steps, his yellow blazer almost glows in sunlight. The crowd hums around him, yet he gazes afar, a weary but elegant witness.",
+        directorNote: "这套造型的核心是反差。颜色高调，情绪却冷静。坐姿必须松弛但保持仪式感，双腿交叠，身体略向后靠。黄色在视觉上象征生命力，在人物气质下却转化为对虚无的讽刺。镜头应捕捉光线在西装表面形成的强烈反射，让审美成为人物存在的理由。"
+      },
+      {
+        title: "古城遗迹中的纯白仪式",
+        titleEn: "White Ritual Among Ancient Ruins",
+        subtitle: "全白西装 · 巴拿马草帽 · 轻盈权威",
+        subtitleEn: "All-White Suit · Panama Hat · Light Authority",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Jep%20Gambardella/28.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvSmVwIEdhbWJhcmRlbGxhLzI4LnBuZyIsImlhdCI6MTc3MDc3NTE0NywiZXhwIjoyMDg2MTM1MTQ3fQ.6ryoYAiEpZZYW3vFOdDSxzCFOpGMsAp7GD6bh11hax4",
+        palette: [
+          { hex: "#F5F4EF", name: "石灰白", enName: "Limestone White" },
+          { hex: "#1A1A1A", name: "墨黑边框", enName: "Ink Black Accent" },
+          { hex: "#6E8AA6", name: "浅蓝条纹", enName: "Soft Blue Stripe" },
+          { hex: "#8B5E3C", name: "复古棕", enName: "Vintage Brown" }
+        ],
+        materials: ["轻质羊毛西装", "棉质条纹衬衫", "丝质口袋巾", "巴拿马草帽", "双色牛津鞋"],
+        materialsEn: ["Lightweight wool suit", "Striped cotton shirt", "Silk pocket square", "Panama hat", "Two-tone oxford shoes"],
+        tailoring: [
+          "单排扣西装强调干净肩线与自然垂坠比例",
+          "全白造型形成视觉仪式感，强化人物存在感",
+          "草帽投下柔和阴影，制造优雅距离",
+          "双色皮鞋延续复古审美语境，与古城背景呼应"
+        ],
+        tailoringEn: [
+          "Single-breasted suit highlights clean shoulders and natural drape",
+          "All-white palette creates ceremonial visual presence",
+          "Panama hat casts soft shadow for refined distance",
+          "Two-tone shoes extend vintage aesthetic"
+        ],
+        scriptSnippet: "他沿着古老城墙缓步前行，白色西装在夕阳下近乎透明。历史在身后延伸，而他像一个优雅的旁观者，既属于这里，又超脱其外。",
+        scriptSnippetEn: "He walks along ancient walls, white suit almost luminous at dusk. History stretches behind him, and he remains an elegant observer—both belonging and detached.",
+        directorNote: "这套造型的核心是轻盈与时间感。步伐从容，双手插袋，身体略向前倾。白色在阳光下象征纯粹与审美的极致，同时也暗示虚无与短暂。镜头应拉开空间比例，让古城背景与人物形成时间对话。人物气质必须平静，仿佛一切繁华都已看透。"
+      },
+      {
+        title: "夜色拱门下的白色宣言",
+        titleEn: "White Declaration Beneath the Arch",
+        subtitle: "奶油白西装 · 琥珀衬衫 · 仪式感张力",
+        subtitleEn: "Cream Suit · Amber Shirt · Ceremonial Tension",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Jep%20Gambardella/29.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvSmVwIEdhbWJhcmRlbGxhLzI5LnBuZyIsImlhdCI6MTc3MDc3NTIxNiwiZXhwIjoyMDg2MTM1MjE2fQ.eBvwevzgXJ77aPuyBiUvUtqy3aIAey8PcBx2fbx_tiA",
+        palette: [
+          { hex: "#F3EFE6", name: "奶油白", enName: "Cream White" },
+          { hex: "#8B4A2B", name: "琥珀棕", enName: "Amber Brown" },
+          { hex: "#E0A96D", name: "暖金光", enName: "Warm Gold" },
+          { hex: "#2A2A2A", name: "夜影黑", enName: "Night Shadow" }
+        ],
+        materials: ["轻质羊毛西装", "丝质开领衬衫", "丝绸口袋巾", "细腻棉质长裤"],
+        materialsEn: ["Light wool suit", "Silk open-collar shirt", "Silk pocket square", "Fine cotton trousers"],
+        tailoring: [
+          "单排扣西装呈现自然肩线与流畅垂坠比例",
+          "开领设计释放颈部空间，营造松弛而自信的姿态",
+          "整体色调柔和，却在灯光下形成强烈视觉对比",
+          "剪裁简洁克制，让肢体成为情绪表达核心"
+        ],
+        tailoringEn: [
+          "Single-breasted cut with natural shoulders and smooth drape",
+          "Open collar frees neckline for relaxed confidence",
+          "Soft palette contrasts dramatically under night lighting",
+          "Clean tailoring lets body language carry emotion"
+        ],
+        scriptSnippet: "他张开双臂站在拱门之下，仿佛在拥抱整座城市。夜色温暖而深沉，他的白色西装在灯光中像一场关于美与虚无的演讲。",
+        scriptSnippetEn: "Arms open beneath the arch, as if embracing the city. Warm night surrounds him, the white suit glowing like a speech about beauty and emptiness.",
+        directorNote: "这套造型是姿态的表达。双臂张开，身体微微前倾，形成欢迎与宣告的姿势。奶油白在夜色中象征纯粹与舞台中心感，同时也暗示人物对虚无的拥抱。镜头应拉开空间比例，让拱门形成时间与历史的框架。人物表情必须温和而复杂，带着一点讽刺的微笑。"
       }
     ]
   },
   {
-    id: "don_draper_madmen",
-    name: "唐·德雷柏",
-    nameEn: "Don Draper",
-    movie: "广告狂人",
-    movieEn: "Mad Men",
-    traits: ["神秘", "魅力", "双重身份", "创意天才", "控制欲", "逃避者", "完美表象"],
-    traitsEn: ["Mysterious", "Charismatic", "Dual Identity", "Creative Genius", "Control Freak", "Escapist", "Perfect Facade"],
+    id: "charlie_odays",
+    name: "查理",
+    nameEn: "Charlie",
+    movie: "孤狼的日子",
+    movieEn: "The Days of the Lone Wolf",
+    traits: ["情绪压抑", "孤独猎手", "高度专注", "精英式冷静", "危险吸引力", "理性外壳下的偏执", "理性优雅", "中产"],
+    traitsEn: ["Emotionally Repressed", "Lone Hunter", "Highly Focused", "Elite Calmness", "Dangerous Charisma", "Obsessive Beneath Rationality"],
     stylings: [
       {
-        title: "灰色西装的沉默权力",
-        titleEn: "Silent Power in Grey Suit",
-        subtitle: "麦迪逊大道 · 60年代剪裁 · 低调的掌控感",
-        subtitleEn: "Madison Avenue · 60s Tailoring · Understated Control",
-        image: "https://picsum.photos/seed/dondraper1/400/600",
+        title: "棕色麂皮的绅士伪装",
+        titleEn: "Gentleman Disguise in Brown Suede",
+        subtitle: "飞行员夹克 · 复古质感 · 低调锋利",
+        subtitleEn: "A-1 Jacket · Retro Texture · Subtle Sharpness",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/charlie/21.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvY2hhcmxpZS8yMS5wbmciLCJpYXQiOjE3NzA3NzI3MzUsImV4cCI6MjA4NjEzMjczNX0.Ldv-Tlva77HcccWIKIS129RrNzFlIREBnSwC37Wemi4",
         palette: [
-          { hex: "#5A5A5A", name: "中灰", enName: "Medium Grey" },
-          { hex: "#FFFFFF", name: "衬衫白", enName: "Shirt White" },
-          { hex: "#8B0000", name: "领带红", enName: "Tie Red" },
-          { hex: "#2A2A2A", name: "皮鞋黑", enName: "Shoe Black" }
+          { hex: "#7B4A2E", name: "焦糖棕", enName: "Caramel Brown" },
+          { hex: "#E6E1D6", name: "象牙白", enName: "Ivory White" },
+          { hex: "#BFAE97", name: "浅驼色", enName: "Light Camel" },
+          { hex: "#5A3B2A", name: "深咖啡", enName: "Deep Coffee" }
         ],
-        materials: ["精纺羊毛西装", "高支棉府绸衬衫", "真丝领带", "小牛皮皮鞋"],
-        materialsEn: ["Worsted wool suit", "High thread count poplin shirt", "Silk tie", "Calfskin shoes"],
+        materials: ["麂皮飞行员夹克", "羊毛针织衫", "高密度棉质长裤", "真皮手提包", "帆布枪袋", "丝质领巾"],
+        materialsEn: ["Suede A-1 jacket", "Wool knit sweater", "High-density cotton trousers", "Leather duffle bag", "Canvas rifle bag", "Silk neck scarf"],
         tailoring: [
-          "窄驳领单排扣西装，典型60年代美式剪裁",
-          "肩线自然但有力，不过分夸张",
-          "裤子高腰无褶，展现修长比例",
-          "整体线条干净利落，没有多余装饰"
+          "短款飞行员夹克强化上身比例，营造干净利落的机动感",
+          "麂皮材质在光线下呈现柔和颗粒感，削弱攻击性却保留力量",
+          "浅色裤装拉开整体色阶，使造型显得轻盈而不沉重",
+          "丝质领巾作为视觉焦点，增加精致层级与隐秘身份暗示"
         ],
         tailoringEn: [
-          "Narrow lapel single-breasted suit, typical 60s American cut",
-          "Natural but strong shoulder line, not exaggerated",
-          "High-waisted flat-front pants for long proportions",
-          "Overall clean lines with no excess decoration"
+          "Cropped A-1 jacket sharpens upper-body proportion, creating agile mobility",
+          "Suede texture softens aggression while maintaining strength",
+          "Light trousers balance color weight, preventing heaviness",
+          "Silk scarf adds refined layering and subtle identity signal"
         ],
-        scriptSnippet: "他走进会议室，灰色西装让他看起来像会议桌的延伸。他不需要说话，存在本身就是一种宣言。",
-        scriptSnippetEn: "He walks into the conference room, grey suit making him an extension of the table. No need to speak, his presence is a statement.",
-        directorNote: "Don Draper的穿着哲学是：永远不要成为房间里穿得最显眼的人，但要成为最被记住的人。灰色代表了他精心构建的正常人外壳，而红色领带是唯一允许自己流露的一点野心。",
-        directorNoteEn: "Don's philosophy: never be the most flashy in the room, but be the most remembered. Grey represents his carefully built normal facade, red tie the only allowed hint of ambition."
-      }
-    ]
-  },
-  {
-    id: "placeholder_male_1",
-    name: "待补充角色1",
-    nameEn: "Placeholder Character 1",
-    movie: "待补充电影",
-    movieEn: "Placeholder Movie",
-    traits: ["占位", "待填充"],
-    traitsEn: ["Placeholder", "To be filled"],
-    stylings: [
+        scriptSnippet: "他提着两只包穿过玻璃大厅，棕色夹克在冷光下显得温和。没人会第一眼看出危险，只会觉得他是个准备出差的绅士。",
+        scriptSnippetEn: "Carrying two bags through the glass hall, the brown jacket appears warm under cool lighting. No one sees danger at first glance, only a gentleman ready for travel.",
+        directorNote: "这套造型的重点在于反差。视觉语言是温暖的复古棕色，角色气质却是极度冷静。走路节奏要稳定且略快，双手提包的重量感强化行动即将开始的暗示。不要刻意表现杀意，让观众在细节中捕捉危险，例如目光的短暂停顿与微不可察的紧张。"
+      },
       {
-        title: "占位造型",
-        titleEn: "Placeholder Styling",
-        subtitle: "待补充",
-        subtitleEn: "To be filled",
-        image: "https://picsum.photos/seed/placeholder1/400/600",
+        title: "阳光之下的灰色伪装",
+        titleEn: "Grey Camouflage Under the Sun",
+        subtitle: "浅灰西装 · 极简线条 · 精英式冷峻",
+        subtitleEn: "Light Grey Suit · Minimal Lines · Elite Severity",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/charlie/20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvY2hhcmxpZS8yMC5wbmciLCJpYXQiOjE3NzA3NzI0MTksImV4cCI6MjA4NjEzMjQxOX0.ljuIrXFIh9k7_tyJqsWcPj2rRusMwUOnHDYUVjLh3NM",
         palette: [
-          { hex: "#808080", name: "灰色", enName: "Grey" }
+          { hex: "#C9C6BF", name: "浅岩灰", enName: "Stone Grey" },
+          { hex: "#1F2A33", name: "深海蓝", enName: "Deep Navy" },
+          { hex: "#FFFFFF", name: "冷白", enName: "Cold White" },
+          { hex: "#2E2E2E", name: "墨黑", enName: "Ink Black" }
         ],
-        materials: ["待补充"],
-        materialsEn: ["To be filled"],
-        tailoring: ["待补充"],
-        tailoringEn: ["To be filled"],
-        scriptSnippet: "待补充场景描述。",
-        scriptSnippetEn: "Scene description to be filled.",
-        directorNote: "待补充导演点评。",
-        directorNoteEn: "Director's note to be filled."
+        materials: ["精纺羊毛西装面料", "丝质领带", "棉质衬衫", "金属腕表", "醋酸板材墨镜"],
+        materialsEn: ["Worsted wool suit fabric", "Silk tie", "Cotton dress shirt", "Metal wristwatch", "Acetate sunglasses"],
+        tailoring: [
+          "修身但克制的单排扣剪裁，突出肩线与腰线的利落比例",
+          "裤线笔直下垂，与身体站姿形成干净垂直结构",
+          "口袋巾低调点缀，增强精英层级感而不过度张扬",
+          "墨镜遮挡情绪，保留人物的神秘与危险距离"
+        ],
+        tailoringEn: [
+          "Slim yet restrained single-breasted cut highlighting clean shoulder-to-waist ratio",
+          "Straight trousers fall cleanly, forming a vertical structure with posture",
+          "Pocket square adds subtle hierarchy without excess",
+          "Sunglasses conceal emotion, maintaining mystery and distance"
+        ],
+        scriptSnippet: "阳光直射，他站在车旁，浅灰色西装几乎与天空融为一体。风很轻，他却一动不动，像在等待某个早已计算好的结果。",
+        scriptSnippetEn: "Under direct sunlight, he stands by the car, light grey suit nearly merging with the sky. The wind is soft, yet he remains still, waiting for a pre-calculated outcome.",
+        directorNote: "这套造型强调对比。环境明亮温和，人物却冷静到近乎抽离。站姿保持挺拔但不僵硬，手部动作细微即可。浅灰色在阳光下呈现温和质感，却在角色气质下转化为锋利。镜头应捕捉他从容整理袖口的瞬间，那是一种危险的优雅。"
+      },
+      {
+        title: "荒野中的米色潜伏",
+        titleEn: "Beige Concealment in the Open Field",
+        subtitle: "素色衬衫 · 功能线条 · 呼吸般稳定",
+        subtitleEn: "Neutral Shirt · Functional Lines · Breath-Steady Control",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/charlie/22.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvY2hhcmxpZS8yMi5wbmciLCJpYXQiOjE3NzA3NzI5MzcsImV4cCI6MjA4NjEzMjkzN30.ZEJ0V_hYG52BraseZWmjr2yls52NkAVkys7ed6Cxxu0",
+        palette: [
+          { hex: "#D9CFBE", name: "沙米色", enName: "Sand Beige" },
+          { hex: "#4F5B3E", name: "原野深绿", enName: "Field Green" },
+          { hex: "#5C4634", name: "皮革棕", enName: "Leather Brown" },
+          { hex: "#B7A98F", name: "浅卡其", enName: "Light Khaki" }
+        ],
+        materials: ["轻质棉质衬衫", "高密度斜纹棉裤", "真皮腰带", "钢壳机械腕表"],
+        materialsEn: ["Lightweight cotton shirt", "High-density twill trousers", "Genuine leather belt", "Steel mechanical watch"],
+        tailoring: [
+          "衬衫合体剪裁贴合肩线与手臂，强化身体控制力",
+          "袖口卷起形成自然张力，展示力量与准备状态",
+          "裤装线条简洁利落，支撑稳定射击姿态",
+          "整体去装饰化设计，让人物气场集中于动作本身"
+        ],
+        tailoringEn: [
+          "Fitted shirt follows shoulder and arm lines, enhancing bodily control",
+          "Rolled cuffs create natural tension, signaling readiness",
+          "Clean trouser lines support stable shooting posture",
+          "Minimal design directs focus toward physical action"
+        ],
+        scriptSnippet: "他贴着树干，呼吸缓慢而均匀。风吹过草地，他的目光却只存在于瞄准镜的那一寸距离。",
+        scriptSnippetEn: "Pressed against the tree, his breathing stays slow and even. Wind moves across the field, yet his world exists only within the scope.",
+        directorNote: "这套造型强调压缩感。空间广阔，但人物能量向内收紧。站姿必须稳定，肩部下沉，呼吸极浅。米色在自然环境中形成隐形效果，让角色融入背景。危险来自安静，而不是动作。镜头应停留在眼神与腕表细节上，暗示时间与命运正在倒数。"
+      },
+      {
+        title: "驼色双排的静默威压",
+        titleEn: "Silent Authority in Camel Double-Breast",
+        subtitle: "双排大衣 · 高领内搭 · 旧世界锋利",
+        subtitleEn: "Double-Breasted Coat · Turtleneck Layering · Old-World Sharpness",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/charlie/23.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvY2hhcmxpZS8yMy5wbmciLCJpYXQiOjE3NzA3NzMwNjYsImV4cCI6MjA4NjEzMzA2Nn0.TfLR1-_aWAehDfD4utCnh5LU2hSkK1Tta3IuQlNvSbg",
+        palette: [
+          { hex: "#B89A78", name: "驼棕色", enName: "Camel Brown" },
+          { hex: "#1A1A1A", name: "深夜黑", enName: "Midnight Black" },
+          { hex: "#2E3A44", name: "烟灰蓝", enName: "Smoke Blue" },
+          { hex: "#C7B7A3", name: "砂岩米", enName: "Sandstone Beige" }
+        ],
+        materials: ["精纺羊毛大衣", "高领针织衫", "羊毛西裤", "费多拉礼帽", "丝质围巾"],
+        materialsEn: ["Wool overcoat", "Turtleneck knit", "Wool trousers", "Felt fedora", "Silk scarf"],
+        tailoring: [
+          "双排扣强化胸前结构，形成稳定的权力轮廓",
+          "高领内搭压缩颈部线条，削弱情绪表达",
+          "大衣长度延伸身形比例，制造垂直压迫感",
+          "礼帽投下阴影，使眼神成为最隐秘的武器"
+        ],
+        tailoringEn: [
+          "Double-breasted structure stabilizes the torso silhouette",
+          "Turtleneck compresses neckline, limiting emotional exposure",
+          "Long coat elongates vertical proportion for subtle dominance",
+          "Fedora casts shadow, turning the gaze into a concealed weapon"
+        ],
+        scriptSnippet: "他倚在门边，驼色大衣在街灯下泛着柔光。人群来去，他始终站在边缘，像一条不动声色的界线。",
+        scriptSnippetEn: "Leaning by the doorway, the camel coat glows softly under city lights. Crowds pass, yet he remains at the edge, like a silent boundary.",
+        directorNote: "这套造型强调旧世界的优雅与现代冷感的融合。动作必须极少，站姿自然但重心稳固。驼色在视觉上温和，却在气质中转化为威压。镜头应捕捉帽檐下微妙的目光变化，那是一种不需要提高音量的控制力。"
+      },
+      {
+        title: "深蓝夜色中的双排剪影",
+        titleEn: "Double-Breasted Silhouette in Midnight Blue",
+        subtitle: "海军蓝大衣 · 夜间灯影 · 都市孤影",
+        subtitleEn: "Navy Overcoat · Streetlight Glow · Urban Solitude",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/charlie/24.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvY2hhcmxpZS8yNC5wbmciLCJpYXQiOjE3NzA3NzM2MTUsImV4cCI6MjA4NjEzMzYxNX0.OZRwkuMlSNhvx8uCVhvSihHnicE-x54rCQb98mLTH5kg",
+        palette: [
+          { hex: "#0F1A2B", name: "午夜蓝", enName: "Midnight Navy" },
+          { hex: "#E1A84F", name: "钨丝暖黄", enName: "Tungsten Gold" },
+          { hex: "#2C2C2C", name: "深石灰", enName: "Dark Stone" },
+          { hex: "#6C7A89", name: "烟灰蓝", enName: "Smoke Blue" }
+        ],
+        materials: ["双排羊毛大衣", "高领针织内搭", "深色牛仔裤", "金属行李箱", "厚实毛呢结构"],
+        materialsEn: ["Double-breasted wool coat", "Turtleneck knit", "Dark denim", "Metal suitcase", "Heavy wool structure"],
+        tailoring: [
+          "大翻领与双排扣强化胸前结构，形成稳固权力线条",
+          "高领设计收紧颈部区域，降低情绪外露",
+          "大衣长度略短于传统长款，制造现代感与行动便利",
+          "整体线条干净利落，在夜色中呈现锐利剪影"
+        ],
+        tailoringEn: [
+          "Wide lapels and double-breasted structure create strong torso lines",
+          "Turtleneck tightens neckline, reducing emotional exposure",
+          "Coat slightly shorter than classic long styles for modern mobility",
+          "Clean lines produce a sharp silhouette against night lighting"
+        ],
+        scriptSnippet: "他在暖黄色街灯下停顿，深蓝大衣吸收了夜色。玻璃映出模糊倒影，他像在城市的边缘等待某个无声的信号。",
+        scriptSnippetEn: "He pauses beneath warm streetlights, navy coat absorbing the night. Reflections blur in the glass as he waits on the city's edge for a silent signal.",
+        directorNote: "这套造型强调光影对比。环境是暖黄灯光，人物必须保持冷蓝气质。站姿略微前倾，肩线保持稳定。动作克制到极限，让夜色成为背景，他成为焦点。镜头应捕捉街灯在大衣表面形成的微弱反光，那是一种孤独而自持的存在感。"
       }
     ]
   }
