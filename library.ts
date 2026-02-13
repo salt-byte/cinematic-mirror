@@ -1370,7 +1370,7 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         titleEn: "Defiant Charm in the Long Trench",
         subtitle: "黑色长风衣 · 双重图案领带 · 80年代极致风格",
         subtitleEn: "Black Trench · Dual Pattern Tie · Ultimate 80s Style",
-        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/mark/35.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbWFyay8zNS5wbmciLCJpYXQiOjE3NzA3NzYzMzUsImV4cCI6MjA4NjEzNjMzNX0.8wfpzArLmYtC-GTYAy-74ZWNRZPdLUYbhjWZU_rckTYhttps://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/Mark/trench.jpg",
+        image: "https://mzignrzkgmjblvauahqu.supabase.co/storage/v1/object/sign/cinematic/mark/35.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OWFlN2VmMy0xOTIzLTRkMzMtOGMyMi0wNzEwYmRhMTliMDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJjaW5lbWF0aWMvbWFyay8zNS5wbmciLCJpYXQiOjE3NzA4NzU5NzcsImV4cCI6MjA4NjIzNTk3N30.Y0fVwdlKL4wCZh37YTzWeoQc4xBK_mBRUOyxF0vaE60",
         palette: [
           { hex: "#121212", name: "极夜黑", enName: "Midnight Black" },
           { hex: "#4C4C4C", name: "旧西装灰", enName: "Vintage Grey" },
