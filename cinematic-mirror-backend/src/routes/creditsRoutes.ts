@@ -119,7 +119,7 @@ router.post('/verify', authMiddleware, async (req: Request, res: Response) => {
         if (isMembership) {
             // 会员订阅：添加赠送积分 + 记录会员状态
             const bonusCredits = MEMBERSHIP_CONFIG.benefits.monthlyBonusCredits;
-            await creditsService.addCredits(userId, bonusCredits, 'membership_bonus');
+            await creditsService.addCredits(userId, bonusCredits, 'pro_monthly', 'membership_bonus');
 
             const { balance } = await creditsService.getBalance(userId);
 

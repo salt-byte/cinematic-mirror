@@ -228,7 +228,7 @@ export class CreditsService {
     }
 
     // 充值积分
-    async addCredits(userId: string, amount: number, productId: string): Promise<void> {
+    async addCredits(userId: string, amount: number, productId: string, txType: 'purchase' | 'membership_bonus' = 'purchase'): Promise<void> {
         const { balance } = await this.getBalance(userId);
         const newBalance = balance + amount;
 
@@ -244,8 +244,8 @@ export class CreditsService {
         await supabase.from('credit_transactions').insert({
             user_id: userId,
             amount,
-            type: 'purchase',
-            description: `购买积分包: ${productId}`,
+            type: txType,
+            description: txType === 'membership_bonus' ? '月度会员赠送积分' : `购买积分包: ${productId}`,
         });
     }
 
