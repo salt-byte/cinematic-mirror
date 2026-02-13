@@ -60,28 +60,34 @@ export default function Credits({ onClose }: CreditsProps) {
         setSuccessMessage(null);
 
         try {
+            setSuccessMessage(txt('正在处理购买...', 'Processing purchase...'));
             const result: PurchaseResult = await purchaseProduct(packageId);
             if (!result.success) {
-                if (result.cancelled) return;
+                if (result.cancelled) {
+                    setSuccessMessage(null);
+                    return;
+                }
                 throw new Error(txt('购买失败', 'Purchase failed'));
             }
 
+            setSuccessMessage(txt('Apple付款成功，正在验证...', 'Payment confirmed, verifying...'));
             const verifyResult = await verifyPurchase(
                 packageId,
                 result.transactionId || '',
                 result.receipt || ''
             );
 
-            // 购买成功后，完整重新加载积分状态
+            setSuccessMessage(txt('验证成功，刷新积分...', 'Verified, refreshing credits...'));
             await loadCredits();
 
             setSuccessMessage(txt(
                 `购买成功！获得 ${verifyResult.creditsAdded} 积分`,
                 `Success! +${verifyResult.creditsAdded} credits`
             ));
-            setTimeout(() => setSuccessMessage(null), 3000);
+            setTimeout(() => setSuccessMessage(null), 5000);
         } catch (err: any) {
             setError(err.message || txt('购买失败', 'Purchase failed'));
+            setSuccessMessage(null);
         } finally {
             setPurchasing(null);
         }
@@ -100,27 +106,34 @@ export default function Credits({ onClose }: CreditsProps) {
         const membershipId = credits?.membership?.productId || 'pro_monthly';
         setPurchasing(membershipId);
         setError(null);
+        setSuccessMessage(null);
 
         try {
+            setSuccessMessage(txt('正在处理订阅...', 'Processing subscription...'));
             const result: PurchaseResult = await purchaseProduct(membershipId);
             if (!result.success) {
-                if (result.cancelled) return;
+                if (result.cancelled) {
+                    setSuccessMessage(null);
+                    return;
+                }
                 throw new Error(txt('订阅失败', 'Subscription failed'));
             }
 
+            setSuccessMessage(txt('Apple付款成功，正在验证...', 'Payment confirmed, verifying...'));
             await verifyPurchase(
                 membershipId,
                 result.transactionId || '',
                 result.receipt || ''
             );
 
-            // 订阅成功后，完整重新加载积分和会员状态
+            setSuccessMessage(txt('验证成功，刷新状态...', 'Verified, refreshing...'));
             await loadCredits();
 
             setSuccessMessage(txt('订阅成功！会员权益已生效', 'Subscribed! Benefits are now active'));
-            setTimeout(() => setSuccessMessage(null), 3000);
+            setTimeout(() => setSuccessMessage(null), 5000);
         } catch (err: any) {
             setError(err.message || txt('订阅失败', 'Subscription failed'));
+            setSuccessMessage(null);
         } finally {
             setPurchasing(null);
         }

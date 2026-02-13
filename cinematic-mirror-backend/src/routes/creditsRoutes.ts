@@ -94,9 +94,19 @@ router.post('/verify', authMiddleware, async (req: Request, res: Response) => {
         }
 
         // 2. 检查交易是否已处理（防止重复充值）
+        // 如果已处理，返回成功（积分已到账），避免前端重试时报错
         if (isTransactionProcessed(transactionId)) {
-            console.warn(`[积分验证] 交易已处理，拒绝重复请求: ${transactionId}`);
-            return res.status(409).json({ success: false, error: '该交易已处理' });
+            console.warn(`[积分验证] 交易已处理，返回当前余额: ${transactionId}`);
+            const { balance } = await creditsService.getBalance(userId);
+            return res.json({
+                success: true,
+                data: {
+                    type: 'already_processed',
+                    creditsAdded: 0,
+                    newBalance: balance,
+                    environment: 'cached',
+                },
+            });
         }
 
         // 3. 验证 Apple 收据
