@@ -186,6 +186,47 @@ ALTER TABLE post_likes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE post_comments DISABLE ROW LEVEL SECURITY;
 
 -- =====================================================
+-- 积分系统
+-- =====================================================
+
+-- 用户积分表
+CREATE TABLE IF NOT EXISTS user_credits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  balance INTEGER DEFAULT 100 NOT NULL,
+  total_interviews INTEGER DEFAULT 0 NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_credits_user_id ON user_credits(user_id);
+
+-- 积分交易记录表
+CREATE TABLE IF NOT EXISTS credit_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  amount INTEGER NOT NULL,
+  type VARCHAR(30) NOT NULL CHECK (type IN ('purchase', 'consume_interview', 'consume_consultation', 'bonus', 'initial', 'membership_bonus')),
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_user_id ON credit_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_type ON credit_transactions(type);
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_created_at ON credit_transactions(created_at DESC);
+
+-- 禁用 RLS
+ALTER TABLE user_credits DISABLE ROW LEVEL SECURITY;
+ALTER TABLE credit_transactions DISABLE ROW LEVEL SECURITY;
+
+-- 自动更新 updated_at
+DROP TRIGGER IF EXISTS update_user_credits_updated_at ON user_credits;
+CREATE TRIGGER update_user_credits_updated_at
+  BEFORE UPDATE ON user_credits
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================================================
 -- 插入示例数据
 -- =====================================================
 
