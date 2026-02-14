@@ -219,6 +219,22 @@ CREATE INDEX IF NOT EXISTS idx_credit_transactions_created_at ON credit_transact
 ALTER TABLE user_credits DISABLE ROW LEVEL SECURITY;
 ALTER TABLE credit_transactions DISABLE ROW LEVEL SECURITY;
 
+-- =====================================================
+-- 密码重置验证码
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS password_reset_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code VARCHAR(6) NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_password_reset_codes_user_id ON password_reset_codes(user_id);
+ALTER TABLE password_reset_codes DISABLE ROW LEVEL SECURITY;
+
 -- 自动更新 updated_at
 DROP TRIGGER IF EXISTS update_user_credits_updated_at ON user_credits;
 CREATE TRIGGER update_user_credits_updated_at

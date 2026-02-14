@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { login, forgotPassword } from '../apiService';
+import React, { useState, useEffect } from 'react';
+import { login, forgotPassword, resetPassword } from '../apiService';
 import { useLanguage } from '../i18n/LanguageContext';
 
 interface LoginProps {
@@ -16,7 +16,21 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotSuccess, setForgotSuccess] = useState(false);
+
+  // 重置密码相关状态
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // 倒计时
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,7 +39,6 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
     }
     setLoading(true);
     setError("");
-    setForgotSuccess(false);
     try {
       await login(email, password);
       onDirectorLogin();
@@ -43,10 +56,10 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
     }
     setForgotLoading(true);
     setError("");
-    setForgotSuccess(false);
     try {
       await forgotPassword(email);
-      setForgotSuccess(true);
+      setShowResetForm(true);
+      setResendCooldown(60);
     } catch (err: any) {
       setError(err.message || t('login.forgotPasswordError'));
     } finally {
@@ -54,6 +67,142 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!resetCode || !newPassword) {
+      setError(t('login.errorEmpty'));
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError(t('register.errorPassword'));
+      return;
+    }
+    setResetLoading(true);
+    setError("");
+    try {
+      await resetPassword(email, resetCode, newPassword);
+      setResetSuccess(true);
+    } catch (err: any) {
+      setError(err.message || t('login.resetError'));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShowResetForm(false);
+    setResetSuccess(false);
+    setResetCode("");
+    setNewPassword("");
+    setError("");
+  };
+
+  // 重置密码成功页
+  if (resetSuccess) {
+    return (
+      <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden items-center justify-center px-8" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex flex-col items-center gap-6 max-w-sm w-full">
+          <span className="material-symbols-outlined text-green-600 !text-6xl">check_circle</span>
+          <p className="text-walnut text-lg font-bold text-center">{t('login.resetSuccess')}</p>
+          <button
+            onClick={handleBackToLogin}
+            className="w-full bg-walnut text-parchment-light py-4 shadow-stack flex items-center justify-center gap-2 active:scale-95 transition-all"
+          >
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            <span className="text-lg font-black tracking-[0.2em]">{t('login.backToLogin')}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 重置密码表单（验证码 + 新密码）
+  if (showResetForm) {
+    return (
+      <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        {/* 顶部区域 */}
+        <div className="relative w-full shrink-0" style={{ height: 'calc(env(safe-area-inset-top, 0px) + 120px)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          <div className="absolute inset-0 bg-walnut/5"></div>
+          <button onClick={handleBackToLogin} className="absolute top-4 left-4 z-20 size-10 rounded-full bg-black/10 backdrop-blur flex items-center justify-center active:scale-95 transition-transform" style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}>
+            <span className="material-symbols-outlined text-walnut">arrow_back</span>
+          </button>
+          <div className="absolute bottom-6 left-8 right-8">
+            <span className="bg-vintageRed text-white text-[9px] font-black px-2 py-0.5 rounded-sm tracking-[0.3em] uppercase shadow-lg">PASSWORD RESET</span>
+            <h1 className="text-walnut text-2xl font-black tracking-tighter mt-2">{t('login.resetPassword')}</h1>
+          </div>
+        </div>
+
+        {/* 表单内容 */}
+        <div className="flex-1 px-8 pt-8 z-10 flex flex-col">
+          <div className="space-y-5">
+            <p className="text-walnut/60 text-sm font-serif">{t('login.forgotPasswordSent')}</p>
+            <p className="text-walnut/40 text-xs font-mono">{email}</p>
+
+            {/* 验证码输入 */}
+            <div className="space-y-2">
+              <label className="text-walnut/40 text-[9px] font-black tracking-[0.2em] flex items-center gap-2 uppercase">
+                <span className="material-symbols-outlined text-[14px]">pin</span>
+                {t('login.verificationCode')}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={resetCode}
+                onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="w-full h-14 bg-white/30 border-b-2 border-walnut/10 focus:border-vintageRed px-0 text-walnut font-mono text-2xl tracking-[0.5em] text-center transition-all outline-none"
+                placeholder="000000"
+              />
+            </div>
+
+            {/* 新密码输入 */}
+            <div className="space-y-2">
+              <label className="text-walnut/40 text-[9px] font-black tracking-[0.2em] flex items-center gap-2 uppercase">
+                <span className="material-symbols-outlined text-[14px]">key</span>
+                {t('login.newPassword')}
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full h-12 bg-white/30 border-b-2 border-walnut/10 focus:border-vintageRed px-0 text-walnut font-mono transition-all outline-none"
+                placeholder={t('login.newPasswordPlaceholder')}
+              />
+            </div>
+
+            {error && (
+              <p className="text-vintageRed text-sm font-serif text-center">{error}</p>
+            )}
+
+            {/* 确认重置按钮 */}
+            <button
+              onClick={handleResetPassword}
+              disabled={resetLoading || resetCode.length !== 6 || !newPassword}
+              className="w-full mt-4 bg-walnut text-parchment-light py-5 shadow-stack flex flex-col items-center justify-center gap-1 active:scale-95 transition-all group disabled:opacity-50"
+            >
+              <span className="text-[8px] font-bold tracking-[0.4em] uppercase opacity-40">CONFIRM RESET</span>
+              <span className="text-xl font-black tracking-[0.2em]">{resetLoading ? t('login.resetting') : t('login.resetSubmit')}</span>
+            </button>
+
+            {/* 重新发送验证码 */}
+            <div className="text-center pt-2">
+              <button
+                onClick={handleForgotPassword}
+                disabled={resendCooldown > 0 || forgotLoading}
+                className="text-vintageRed/70 text-[12px] font-medium hover:text-vintageRed transition-colors underline disabled:opacity-40 disabled:no-underline"
+              >
+                {resendCooldown > 0
+                  ? t('login.resendCooldown', { n: resendCooldown })
+                  : forgotLoading ? '...' : t('login.resendCode')
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 登录主页面
   return (
     <div className="flex-1 flex flex-col paper-texture bg-parchment-base relative overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       {/* 顶部海报区域 - 延伸到状态栏 */}
@@ -121,9 +270,6 @@ const Login: React.FC<LoginProps> = ({ onDirectorLogin, onGoToRegister, onBack }
               </button>
             </div>
 
-            {forgotSuccess && (
-              <p className="text-green-600 text-sm font-serif text-center">{t('login.forgotPasswordSent')}</p>
-            )}
             {error && (
               <p className="text-vintageRed text-sm font-serif text-center">{error}</p>
             )}

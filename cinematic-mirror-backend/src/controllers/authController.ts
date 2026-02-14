@@ -91,7 +91,7 @@ export class AuthController {
     }
   }
 
-  // 忘记密码
+  // 忘记密码 - 发送验证码
   async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
@@ -101,20 +101,40 @@ export class AuthController {
         return;
       }
 
-      // 这里实际应该发送重置密码邮件
-      // 目前简化处理，只验证邮箱格式并返回成功
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         sendError(res, '邮箱格式不正确', 400);
         return;
       }
 
-      // TODO: 集成邮件服务发送重置链接
-      // await userService.sendPasswordResetEmail(email);
+      await userService.sendResetCode(email);
 
-      sendSuccess(res, { message: '如果该邮箱已注册，您将收到密码重置链接' });
+      sendSuccess(res, { message: '如果该邮箱已注册，您将收到验证码' });
     } catch (error: any) {
-      sendError(res, error.message, 500);
+      sendError(res, error.message, 400);
+    }
+  }
+
+  // 重置密码 - 验证码 + 新密码
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, code, newPassword } = req.body;
+
+      if (!email || !code || !newPassword) {
+        sendError(res, '请填写完整信息', 400);
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        sendError(res, '密码长度至少6位', 400);
+        return;
+      }
+
+      await userService.resetPasswordWithCode(email, code, newPassword);
+
+      sendSuccess(res, { message: '密码重置成功' });
+    } catch (error: any) {
+      sendError(res, error.message, 400);
     }
   }
 }
