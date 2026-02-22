@@ -3,13 +3,37 @@ import { userService } from '../services/userService';
 import { sendSuccess, sendError } from '../utils/response';
 
 export class AuthController {
-  // 注册
+  // 发送注册验证码
+  async sendRegisterCode(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        sendError(res, '请填写邮箱', 400);
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        sendError(res, '邮箱格式不正确', 400);
+        return;
+      }
+
+      await userService.sendRegisterCode(email);
+
+      sendSuccess(res, { message: '验证码已发送' });
+    } catch (error: any) {
+      sendError(res, error.message, 400);
+    }
+  }
+
+  // 注册（需要验证码）
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password, nickname } = req.body;
+      const { email, password, nickname, code } = req.body;
 
-      if (!email || !password) {
-        sendError(res, '请填写邮箱和密码', 400);
+      if (!email || !password || !code) {
+        sendError(res, '请填写邮箱、密码和验证码', 400);
         return;
       }
 
@@ -21,7 +45,7 @@ export class AuthController {
       // 如果没有提供 nickname，使用邮箱前缀 + 随机数
       const finalNickname = nickname || `影迷${email.split('@')[0].slice(0, 4)}${Math.floor(Math.random() * 1000)}`;
 
-      const result = await userService.register(email, password, finalNickname);
+      const result = await userService.registerWithCode(email, password, finalNickname, code);
       sendSuccess(res, result, '注册成功', 201);
     } catch (error: any) {
       sendError(res, error.message, 400);

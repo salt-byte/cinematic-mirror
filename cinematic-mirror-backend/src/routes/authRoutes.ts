@@ -5,6 +5,7 @@ import { authMiddleware } from '../middleware/auth';
 const router = Router();
 
 // 公开路由
+router.post('/send-register-code', (req, res) => authController.sendRegisterCode(req, res));
 router.post('/register', (req, res) => authController.register(req, res));
 router.post('/login', (req, res) => authController.login(req, res));
 router.post('/forgot-password', (req, res) => authController.forgotPassword(req, res));

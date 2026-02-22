@@ -108,10 +108,29 @@ export class InterviewService {
     session.round++;
 
     // 调用 DeepSeek
-    const responseText = await chatCompletion(
+    let responseText = await chatCompletion(
       session.messages,
       { temperature: 0.85, max_tokens: 500 }
     );
+
+    // 检查是否包含结束关键词
+    const hasEndKeyword = this.containsEndKeyword(responseText);
+
+    // 如果还不到第8轮但AI说了结束语，从回复中去掉结束语，避免用户困惑
+    if (hasEndKeyword && session.round < 8) {
+      responseText = this.stripEndKeywords(responseText);
+      // 给AI追加提醒，让它继续聊
+      session.messages.push({ role: 'assistant', content: responseText });
+      session.messages.push({
+        role: 'system',
+        content: '【系统提醒】试镜还没结束，你还没覆盖完所有维度。请继续用新的问题探索对方，不要使用任何结束语。'
+      });
+    } else {
+      session.messages.push({ role: 'assistant', content: responseText });
+    }
+
+    // 判定是否结束：轮数>=8且有结束语，或轮数>=12强制结束
+    const isFinished = (hasEndKeyword && session.round >= 8) || session.round >= 12;
 
     // 记录模型回复
     const modelMsg: ChatMessage = {
@@ -120,10 +139,6 @@ export class InterviewService {
       timestamp: new Date().toISOString()
     };
     session.chatMessages.push(modelMsg);
-    session.messages.push({ role: 'assistant', content: responseText });
-
-    // 检查是否结束
-    const isFinished = this.checkIfFinished(responseText, session.round);
 
     // 更新数据库
     await supabase
@@ -143,16 +158,27 @@ export class InterviewService {
     };
   }
 
-  // 检查试镜是否结束
-  private checkIfFinished(response: string, round: number): boolean {
-    const endKeywords = [
-      'cut', 'Cut', 'CUT',
-      '辛苦了', '今天就到这儿', '今天就到这里', '试镜结束', '大概了解你了',
-      "That's a wrap", "got a read on you", "wrap for today"
-    ];
-    const hasEndKeyword = endKeywords.some(keyword => response.includes(keyword));
-    // 至少 8 轮才能结束，最多 12 轮自动结束
-    return (hasEndKeyword && round >= 8) || round >= 12;
+  // 结束关键词列表
+  private static END_KEYWORDS = [
+    'cut', 'Cut', 'CUT',
+    '辛苦了', '今天就到这儿', '今天就到这里', '试镜结束', '大概了解你了',
+    "That's a wrap", "got a read on you", "wrap for today"
+  ];
+
+  // 检查回复中是否包含结束关键词
+  private containsEndKeyword(response: string): boolean {
+    return InterviewService.END_KEYWORDS.some(keyword => response.includes(keyword));
+  }
+
+  // 从回复中移除结束关键词，避免提前说结束语造成用户困惑
+  private stripEndKeywords(response: string): string {
+    let cleaned = response;
+    for (const keyword of InterviewService.END_KEYWORDS) {
+      cleaned = cleaned.replace(new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+    }
+    // 清理可能剩余的空行和多余逗号/句号
+    cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
+    return cleaned;
   }
 
   // 生成人格档案

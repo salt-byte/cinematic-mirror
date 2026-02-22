@@ -56,7 +56,14 @@ async function request<T>(
 // 认证相关
 // =====================================================
 
-export async function register(email: string, password: string) {
+export async function sendRegisterCode(email: string): Promise<{ message: string }> {
+  return request<{ message: string }>('/auth/send-register-code', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function register(email: string, password: string, code?: string) {
   // 新用户注册，务必完全清空本地状态
   clearLocalArchives();
   authToken = null; // 清除内存中的 token
@@ -66,7 +73,7 @@ export async function register(email: string, password: string) {
 
   const result = await request<{ user: any; token: string }>('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, code }),
   });
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
