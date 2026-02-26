@@ -1,12 +1,16 @@
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import supabase from '../config/supabase';
 import { generateToken } from '../utils/jwt';
 import { creditsService } from './creditsService';
 import type { User, UserPublic } from '../types/index';
 
-// Gmail SMTP 邮件发送
+// Resend 邮件服务（推荐，云服务器发邮件稳定）
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// Gmail SMTP 作为备用
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -17,6 +21,28 @@ const transporter = nodemailer.createTransport({
 
 // 统一发送邮件的辅助函数
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  // 优先使用 Resend
+  if (resend) {
+    try {
+      const { error } = await resend.emails.send({
+        from: '影中镜 Cinematic Mirror <onboarding@resend.dev>',
+        to,
+        subject,
+        html,
+      });
+      if (error) {
+        console.error('Resend 发送失败:', error);
+        throw new Error('邮件发送失败');
+      }
+      console.log('邮件通过 Resend 发送成功');
+      return;
+    } catch (err: any) {
+      console.error('Resend 发送异常:', err);
+      throw new Error('邮件发送失败，请稍后重试');
+    }
+  }
+
+  // 备用：Gmail SMTP
   try {
     await transporter.sendMail({
       from: `"影中镜 Cinematic Mirror" <${process.env.SMTP_USER}>`,
@@ -25,7 +51,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
       html,
     });
   } catch (error: any) {
-    console.error('邮件发送失败:', error);
+    console.error('Gmail SMTP 邮件发送失败:', error);
     throw new Error('邮件发送失败，请稍后重试');
   }
 }
