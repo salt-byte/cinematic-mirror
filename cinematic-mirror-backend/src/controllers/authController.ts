@@ -27,13 +27,13 @@ export class AuthController {
     }
   }
 
-  // 注册（需要验证码）
+  // 注册（邮箱 + 密码）
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password, nickname, code } = req.body;
+      const { email, password, nickname } = req.body;
 
-      if (!email || !password || !code) {
-        sendError(res, '请填写邮箱、密码和验证码', 400);
+      if (!email || !password) {
+        sendError(res, '请填写邮箱和密码', 400);
         return;
       }
 
@@ -45,7 +45,7 @@ export class AuthController {
       // 如果没有提供 nickname，使用邮箱前缀 + 随机数
       const finalNickname = nickname || `影迷${email.split('@')[0].slice(0, 4)}${Math.floor(Math.random() * 1000)}`;
 
-      const result = await userService.registerWithCode(email, password, finalNickname, code);
+      const result = await userService.register(email, password, finalNickname);
       sendSuccess(res, result, '注册成功', 201);
     } catch (error: any) {
       sendError(res, error.message, 400);
