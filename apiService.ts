@@ -278,6 +278,7 @@ export async function generateProfile() {
   }
   const profile = await request<any>(`/interview/session/${currentSessionId}/generate`, {
     method: 'POST',
+    timeout: 120000, // 120秒超时，档案生成需要较长时间
   });
   currentSessionId = null;
   return profile;
