@@ -5,7 +5,7 @@
 
 import { GoogleGenAI, Modality } from '@google/genai';
 
-const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
+const LIVE_MODEL = 'gemini-2.0-flash-live-001';
 
 const getApiKey = (): string => {
     // @ts-ignore
@@ -69,8 +69,8 @@ class GeminiLiveService {
                         console.error('❌ Live API error:', error);
                         this.config.onError?.(error instanceof Error ? error : new Error(String(error)));
                     },
-                    onclose: () => {
-                        console.log('📴 Live API disconnected');
+                    onclose: (event: any) => {
+                        console.log('📴 Live API disconnected', event?.code, event?.reason);
                         this.isConnected = false;
                         this.config.onDisconnected?.();
                     }
@@ -85,9 +85,8 @@ class GeminiLiveService {
                             }
                         }
                     },
-                    // 关键：启用转录
-                    outputAudioTranscription: {},
-                    inputAudioTranscription: {},
+                    // 启用转录（需模型支持）
+                    outputAudioTranscription: { language: 'zh-CN' },
                 }
             });
 
