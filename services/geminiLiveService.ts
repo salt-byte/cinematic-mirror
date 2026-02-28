@@ -5,7 +5,7 @@
 
 import { GoogleGenAI, Modality } from '@google/genai';
 
-const LIVE_MODEL = 'gemini-2.0-flash-live-001';
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
 
 const getApiKey = (): string => {
     // @ts-ignore
@@ -210,7 +210,7 @@ class GeminiLiveService {
             const base64 = btoa(binary);
 
             this.session.sendRealtimeInput({
-                media: {
+                audio: {
                     data: base64,
                     mimeType: 'audio/pcm;rate=16000'
                 }
@@ -226,7 +226,7 @@ class GeminiLiveService {
         try {
             const base64Image = imageData.replace(/^data:image\/\w+;base64,/, '');
             this.session.sendRealtimeInput({
-                media: {
+                video: {
                     data: base64Image,
                     mimeType: 'image/jpeg'
                 }
