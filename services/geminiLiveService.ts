@@ -85,8 +85,7 @@ class GeminiLiveService {
                             }
                         }
                     },
-                    // 启用转录（需模型支持）
-                    outputAudioTranscription: { language: 'zh-CN' },
+                    outputAudioTranscription: {},
                 }
             });
 
