@@ -159,9 +159,6 @@ const Dashboard: React.FC<{ profile: PersonalityProfile | null }> = ({ profile: 
   const initLiveSession = async () => {
     if (!selectedProfile) return;
 
-    // iOS 需要在用户交互时初始化 AudioContext
-    geminiLive.initAudioContext();
-
     setLoading(true);
     setError('');
 
@@ -375,9 +372,12 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
   // 用户在 select_mode 页选好模式后，跳到选角色
   const handleModeSelect = (chosenMode: 'text' | 'video') => {
     if (archives.length === 0) {
-      // 没有存档，提示先去试镜
       setError(language === 'en' ? 'Please complete an audition first to create a character profile.' : '请先完成试镜以创建角色档案。');
       return;
+    }
+    // iOS 要求 AudioContext 必须在用户点击事件中直接创建，不能在 useEffect 里
+    if (chosenMode === 'video') {
+      geminiLive.initAudioContext();
     }
     setPendingMode(chosenMode);
     setMode('pick_role');
@@ -387,6 +387,10 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
   const handleModeChange = (newMode: 'text' | 'video') => {
     if (mode === 'video' && geminiLive.isSessionActive()) {
       cleanupLiveSession();
+    }
+    // iOS：切换到视频模式时在点击事件中初始化 AudioContext
+    if (newMode === 'video') {
+      geminiLive.initAudioContext();
     }
     setMessages([]);
     setError("");
