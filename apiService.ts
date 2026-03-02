@@ -268,14 +268,29 @@ export async function refreshArchivesFromServer(): Promise<any[]> {
 // 试镜相关
 // =====================================================
 
-let currentSessionId: string | null = null;
+// sessionId 持久化到 localStorage，防止 App 退出后丢失
+const SESSION_KEY = 'cinematic_pending_session';
+let currentSessionId: string | null = localStorage.getItem(SESSION_KEY);
+
+function setSessionId(id: string | null) {
+  currentSessionId = id;
+  if (id) {
+    localStorage.setItem(SESSION_KEY, id);
+  } else {
+    localStorage.removeItem(SESSION_KEY);
+  }
+}
+
+export function getPendingSessionId(): string | null {
+  return localStorage.getItem(SESSION_KEY);
+}
 
 export async function startInterview(userName?: string, userGender?: string, language?: 'zh' | 'en') {
   const result = await request<{ sessionId: string; initialMessage: any }>('/interview/start', {
     method: 'POST',
     body: JSON.stringify({ userName, userGender, language: language || 'zh' }),
   });
-  currentSessionId = result.sessionId;
+  setSessionId(result.sessionId);
   return result;
 }
 
@@ -298,9 +313,19 @@ export async function generateProfile() {
   }
   const profile = await request<any>(`/interview/session/${currentSessionId}/generate`, {
     method: 'POST',
-    timeout: 120000, // 120秒超时，档案生成需要较长时间
+    timeout: 120000,
   });
-  currentSessionId = null;
+  setSessionId(null); // 生成成功后清除
+  return profile;
+}
+
+// 用已有 sessionId 重新触发档案生成（App 重启后恢复用）
+export async function resumeGenerateProfile(sessionId: string) {
+  const profile = await request<any>(`/interview/session/${sessionId}/generate`, {
+    method: 'POST',
+    timeout: 120000,
+  });
+  setSessionId(null);
   return profile;
 }
 

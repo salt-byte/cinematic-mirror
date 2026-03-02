@@ -13,7 +13,7 @@ import Styling from './views/Styling';
 import ProfileView from './views/Profile';
 import Credits from './views/Credits';
 import { LanguageProvider, LanguageSwitcher, useLanguage } from './i18n/LanguageContext';
-import { isLoggedIn } from './apiService';
+import { isLoggedIn, getPendingSessionId, resumeGenerateProfile, loadUserArchives } from './apiService';
 
 const App: React.FC = () => {
   // 启动时检测：已登录用户直接进主页，跳过 Welcome 和 Login
@@ -43,9 +43,32 @@ const App: React.FC = () => {
     setProfile(null);
   };
 
-  // 初始化时加载
+  // 初始化时加载，并检测是否有中断的档案生成
   useEffect(() => {
     reloadProfile();
+
+    // 如果有未完成的试镜 session（退出 App 前还没生成完档案）
+    const pendingSession = getPendingSessionId();
+    if (isLoggedIn() && pendingSession) {
+      // 跳到生成中页面，后台恢复生成
+      setCurrentView(View.DEVELOPING);
+      resumeGenerateProfile(pendingSession)
+        .then((newProfile) => {
+          // 生成成功，保存并跳转结果
+          setProfile(newProfile);
+          localStorage.setItem('cinematic_mirror_profile', JSON.stringify(newProfile));
+          const saved = localStorage.getItem('cinematic_archives');
+          const existing = saved ? JSON.parse(saved) : [];
+          const updated = [newProfile, ...existing.filter((p: any) => p.id !== newProfile.id)];
+          localStorage.setItem('cinematic_archives', JSON.stringify(updated));
+          loadUserArchives();
+          setTimeout(() => setCurrentView(View.RESULT), 500);
+        })
+        .catch(() => {
+          // 生成失败，返回主页
+          setCurrentView(View.STYLING);
+        });
+    }
   }, []);
 
   const navigate = (view: View) => {
