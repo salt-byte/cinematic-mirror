@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { startInterview, sendInterviewMessage, generateProfile, checkCanStartInterview } from '../apiService';
+import { startInterview, sendInterviewMessage, generateProfile, checkCanStartInterview, uploadAvatar, updateProfile } from '../apiService';
 import { PersonalityProfile, ChatMessage } from '../types';
 import { useLanguage } from '../i18n/LanguageContext';
 import { translations } from '../i18n/translations';
@@ -163,6 +163,19 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; o
   const initChat = async () => {
     // 保存用户信息到 localStorage
     localStorage.setItem('cinematic_user_info', JSON.stringify(userInfo));
+
+    // 异步将 display_name/gender 同步到后端（不阻塞面试启动）
+    updateProfile({ display_name: userInfo.name, gender: userInfo.gender }).catch(e => {
+      console.warn('[用户信息] 同步失败:', e);
+    });
+
+    // 将头像上传到 Supabase Storage（异步，不阻塞面试启动）
+    if (userInfo.avatar && userInfo.avatar.startsWith('data:')) {
+      uploadAvatar(userInfo.avatar).catch(e => {
+        console.warn('[头像] 上传失败，仅本地保存:', e);
+      });
+    }
+
     // 启动试镜
     await startInterviewWithInfo(userInfo);
   };

@@ -6,7 +6,9 @@
 export interface User {
   id: string;
   email: string;
-  nickname: string; // 片场代号
+  nickname: string; // 片场代号（唯一）
+  display_name?: string; // 用户真实填写的名字（试镜时填写）
+  gender?: string; // 'male' | 'female'
   password_hash: string;
   avatar_url?: string;
   created_at: string;
@@ -17,6 +19,8 @@ export interface UserPublic {
   id: string;
   email: string;
   nickname: string;
+  display_name?: string;
+  gender?: string;
   avatar_url?: string;
   created_at: string;
 }

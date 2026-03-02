@@ -257,4 +257,11 @@ INSERT INTO plaza_posts (user_id, content, image_urls, inspiration_tags, locatio
   ('00000000-0000-0000-0000-000000000001', '试着用 Technicolor 的调色方式处理了这组照片，复古的感觉出来了。', ARRAY['https://picsum.photos/seed/post2/800/600', 'https://picsum.photos/seed/post3/800/600'], ARRAY['Technicolor', 'Vintage Hollywood'], '北京·798艺术区')
 ON CONFLICT DO NOTHING;
 
+-- =====================================================
+-- 迁移：为 users 表添加 display_name 和 gender 字段
+-- 如果是全新初始化可忽略此段；如果已有表，在 Supabase SQL Editor 单独执行这两行
+-- =====================================================
+ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gender VARCHAR(10) CHECK (gender IN ('male', 'female', ''));
+
 SELECT '数据库初始化完成！' as message;

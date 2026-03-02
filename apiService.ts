@@ -92,6 +92,16 @@ export async function login(email: string, password: string) {
   authToken = result.token;
   localStorage.setItem('cinematic_token', result.token);
 
+  // 登录后从后端完整还原用户信息（名字、性别、头像）到 localStorage
+  if (result.user) {
+    const restoredInfo = {
+      name: result.user.display_name || result.user.nickname || '',
+      gender: result.user.gender || '',
+      avatar: result.user.avatar_url || '',
+    };
+    localStorage.setItem('cinematic_user_info', JSON.stringify(restoredInfo));
+  }
+
   // 登录后在后台加载档案，不阻塞页面跳转
   loadUserArchives();
 
@@ -132,6 +142,16 @@ export async function loadUserArchives(): Promise<void> {
   }
 }
 
+// 上传头像到 Supabase Storage，返回公开 URL
+export async function uploadAvatar(base64: string): Promise<string> {
+  const result = await request<{ avatar_url: string }>('/auth/me/avatar', {
+    method: 'POST',
+    body: JSON.stringify({ avatar: base64 }),
+    timeout: 60000,
+  });
+  return result.avatar_url;
+}
+
 export async function forgotPassword(email: string): Promise<{ message: string }> {
   return request<{ message: string }>('/auth/forgot-password', {
     method: 'POST',
@@ -152,8 +172,8 @@ export async function getCurrentUser() {
   return request<any>('/auth/me');
 }
 
-export async function updateProfile(data: { nickname?: string; avatar_url?: string }) {
-  return request<any>('/auth/profile', {
+export async function updateProfile(data: { nickname?: string; display_name?: string; gender?: string; avatar_url?: string }) {
+  return request<any>('/auth/me', {
     method: 'PUT',
     body: JSON.stringify(data)
   });

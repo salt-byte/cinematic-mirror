@@ -102,16 +102,42 @@ export class AuthController {
         return;
       }
 
-      const { nickname, avatar_url } = req.body;
+      const { nickname, display_name, gender, avatar_url } = req.body;
 
       const updatedUser = await userService.updateUser(userId, {
         nickname,
+        display_name,
+        gender,
         avatar_url
       });
 
       sendSuccess(res, updatedUser, '更新成功');
     } catch (error: any) {
       sendError(res, error.message, 400);
+    }
+  }
+
+  // 上传头像
+  async uploadAvatar(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        sendError(res, '未登录', 401);
+        return;
+      }
+
+      const { avatar } = req.body;
+
+      if (!avatar) {
+        sendError(res, '请提供头像图片', 400);
+        return;
+      }
+
+      const avatarUrl = await userService.uploadAvatar(userId, avatar);
+      sendSuccess(res, { avatar_url: avatarUrl }, '头像上传成功');
+    } catch (error: any) {
+      sendError(res, error.message, 500);
     }
   }
 

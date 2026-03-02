@@ -16,10 +16,13 @@ interface UserInfo {
 interface UserAccount {
   email?: string;
   nickname?: string;
+  display_name?: string;
+  gender?: string;
+  avatar_url?: string;
   created_at?: string;
 }
 
-// 获取用户上传的头像
+// 获取用户头像：优先用 localStorage（可能是 base64 或后端 URL），不存在则返回 null
 const getUserAvatar = (): string | null => {
   const userInfoStr = localStorage.getItem('cinematic_user_info');
   if (userInfoStr) {
@@ -62,7 +65,7 @@ const ProfileView: React.FC<{
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
   const [credits, setCredits] = useState<CreditsBalance | null>(null);
-  const userAvatar = getUserAvatar();
+  const [userAvatar, setUserAvatar] = useState<string | null>(getUserAvatar());
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
 
@@ -70,13 +73,13 @@ const ProfileView: React.FC<{
     if (!editName.trim()) return;
 
     try {
-      // 1. 调用后端更新
-      await updateProfile({ nickname: editName });
+      // 1. 调用后端更新 display_name（不修改 nickname，nickname 是唯一片场代号）
+      await updateProfile({ display_name: editName });
 
       // 2. 更新本地显示 (userAccount)
-      setUserAccount(prev => prev ? { ...prev, nickname: editName } : null);
+      setUserAccount(prev => prev ? { ...prev, display_name: editName } : null);
 
-      // 3. 更新本地存储 (userInfo - 兼容旧逻辑)
+      // 3. 更新本地存储
       const newUserInfo = { ...userInfo, name: editName };
       setUserInfo(newUserInfo as UserInfo);
       localStorage.setItem('cinematic_user_info', JSON.stringify(newUserInfo));
@@ -89,7 +92,7 @@ const ProfileView: React.FC<{
   };
 
   const startEditing = () => {
-    setEditName(userInfo?.name || userAccount?.nickname || "");
+    setEditName(userInfo?.name || userAccount?.display_name || userAccount?.nickname || "");
     setIsEditing(true);
   };
 
@@ -120,8 +123,23 @@ const ProfileView: React.FC<{
       setUserAccount({
         email: user.email,
         nickname: user.nickname,
+        display_name: user.display_name,
+        gender: user.gender,
+        avatar_url: user.avatar_url,
         created_at: user.created_at,
       });
+
+      // 用后端数据同步更新 localStorage，保证重新打开 App 时数据一致
+      const stored = localStorage.getItem('cinematic_user_info');
+      const currentInfo = stored ? JSON.parse(stored) : {};
+      const merged = {
+        name: user.display_name || user.nickname || currentInfo.name || '',
+        gender: user.gender || currentInfo.gender || '',
+        avatar: user.avatar_url || currentInfo.avatar || '',
+      };
+      localStorage.setItem('cinematic_user_info', JSON.stringify(merged));
+      setUserInfo(merged as UserInfo);
+      if (merged.avatar) setUserAvatar(merged.avatar);
     } catch (e) {
       // 未登录或获取失败
     }
@@ -163,7 +181,7 @@ const ProfileView: React.FC<{
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
               <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
-                <img src={userAvatar || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
+                <img src={userAvatar || userAccount?.avatar_url || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
                 <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
               </div>
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />

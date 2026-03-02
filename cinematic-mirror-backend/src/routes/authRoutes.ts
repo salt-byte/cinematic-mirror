@@ -14,5 +14,6 @@ router.post('/reset-password', (req, res) => authController.resetPassword(req, r
 // 需要认证的路由
 router.get('/me', authMiddleware, (req, res) => authController.getCurrentUser(req, res));
 router.put('/me', authMiddleware, (req, res) => authController.updateProfile(req, res));
+router.post('/me/avatar', authMiddleware, (req, res) => authController.uploadAvatar(req, res));
 
 export default router;

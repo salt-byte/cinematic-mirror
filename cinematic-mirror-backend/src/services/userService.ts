@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
-import supabase from '../config/supabase';
+import supabase, { supabaseAdmin } from '../config/supabase';
 import { generateToken } from '../utils/jwt';
 import { creditsService } from './creditsService';
 import type { User, UserPublic } from '../types/index';
@@ -95,7 +95,7 @@ export class UserService {
         nickname,
         avatar_url: `https://picsum.photos/seed/${userId}/200/200`
       })
-      .select('id, email, nickname, avatar_url, created_at')
+      .select('id, email, nickname, display_name, gender, avatar_url, created_at')
       .single();
 
     if (error) {
@@ -150,7 +150,7 @@ export class UserService {
   async getUserById(userId: string): Promise<UserPublic | null> {
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, email, nickname, avatar_url, created_at')
+      .select('id, email, nickname, display_name, gender, avatar_url, created_at')
       .eq('id', userId)
       .single();
 
@@ -162,7 +162,7 @@ export class UserService {
   }
 
   // 更新用户信息
-  async updateUser(userId: string, updates: { nickname?: string; avatar_url?: string }): Promise<UserPublic> {
+  async updateUser(userId: string, updates: { nickname?: string; display_name?: string; gender?: string; avatar_url?: string }): Promise<UserPublic> {
     // 如果更新昵称，检查是否已被使用
     if (updates.nickname) {
       const { data: existingNickname } = await supabase
@@ -184,7 +184,7 @@ export class UserService {
         updated_at: new Date().toISOString()
       })
       .eq('id', userId)
-      .select('id, email, nickname, avatar_url, created_at')
+      .select('id, email, nickname, display_name, gender, avatar_url, created_at')
       .single();
 
     if (error) {
@@ -192,6 +192,48 @@ export class UserService {
     }
 
     return updatedUser;
+  }
+
+  // 上传头像到 Supabase Storage，返回公开 URL 并更新数据库
+  async uploadAvatar(userId: string, base64: string): Promise<string> {
+    // 解析 base64 data URL：data:image/jpeg;base64,xxxxx
+    const matches = base64.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) {
+      throw new Error('无效的图片格式');
+    }
+
+    const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+    const imageBuffer = Buffer.from(matches[2], 'base64');
+    const fileName = `${userId}/avatar.${ext}`;
+
+    // 确保 avatars bucket 存在
+    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+    const bucketExists = buckets?.some(b => b.name === 'avatars');
+    if (!bucketExists) {
+      await supabaseAdmin.storage.createBucket('avatars', { public: true });
+    }
+
+    // 上传到 Supabase Storage（upsert 覆盖已有头像）
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from('avatars')
+      .upload(fileName, imageBuffer, {
+        contentType: `image/${matches[1]}`,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      throw new Error('头像上传失败: ' + uploadError.message);
+    }
+
+    // 获取公开访问 URL
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('avatars')
+      .getPublicUrl(fileName);
+
+    // 更新数据库中的 avatar_url
+    await this.updateUser(userId, { avatar_url: publicUrl });
+
+    return publicUrl;
   }
 
   // 发送注册验证码
