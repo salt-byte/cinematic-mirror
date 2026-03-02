@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PersonalityProfile } from '../types';
 import { ParchmentCard, Tape, Stamp } from '../components/ParchmentCard';
 import { useLanguage } from '../i18n/LanguageContext';
-import { logout, getCurrentUser, getCreditsBalance, updateProfile, CreditsBalance } from '../apiService';
+import { logout, getCurrentUser, getCreditsBalance, updateProfile, uploadAvatar, CreditsBalance } from '../apiService';
 import { MOVIE_DATABASE } from '../library';
 
 // 用户信息接口
@@ -68,6 +68,8 @@ const ProfileView: React.FC<{
   const [userAvatar, setUserAvatar] = useState<string | null>(getUserAvatar());
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpdateProfile = async () => {
     if (!editName.trim()) return;
@@ -94,6 +96,53 @@ const ProfileView: React.FC<{
   const startEditing = () => {
     setEditName(userInfo?.name || userAccount?.display_name || userAccount?.nickname || "");
     setIsEditing(true);
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        // 压缩到 300x300
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const scale = Math.max(300 / img.width, 300 / img.height);
+        const x = (300 - img.width * scale) / 2;
+        const y = (300 - img.height * scale) / 2;
+        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        const compressed = canvas.toDataURL('image/jpeg', 0.8);
+
+        // 本地立即预览
+        setUserAvatar(compressed);
+        const newInfo = { ...userInfo, avatar: compressed };
+        setUserInfo(newInfo as UserInfo);
+        localStorage.setItem('cinematic_user_info', JSON.stringify(newInfo));
+
+        // 上传到后端
+        setIsUploadingAvatar(true);
+        try {
+          const url = await uploadAvatar(compressed);
+          // 更新为后端返回的持久化 URL
+          const finalInfo = { ...newInfo, avatar: url };
+          setUserInfo(finalInfo as UserInfo);
+          setUserAvatar(url);
+          localStorage.setItem('cinematic_user_info', JSON.stringify(finalInfo));
+        } catch (err) {
+          console.warn('[头像] 上传失败，保留本地预览', err);
+        } finally {
+          setIsUploadingAvatar(false);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -180,10 +229,32 @@ const ProfileView: React.FC<{
         <ParchmentCard rotation="rotate-[-1deg]" className="p-8 shadow-stack">
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
-              <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
-                <img src={userAvatar || userAccount?.avatar_url || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
-                <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
-              </div>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                className="group relative block"
+                disabled={isUploadingAvatar}
+              >
+                <div className="bg-white p-2 pb-10 shadow-vintage border border-black/5 transform rotate-3">
+                  <img src={userAvatar || userAccount?.avatar_url || getProfileImage(profile)} alt="" className="w-32 h-32 object-cover" />
+                  <div className="absolute bottom-3 left-0 right-0 text-center text-[7px] font-mono text-walnut/30 uppercase tracking-widest italic">{t('profile.sceneScan')}{profile?.id?.slice(0, 4)}</div>
+                </div>
+                {/* 悬停/上传中遮罩 */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center bg-black/40 transition-opacity ${isUploadingAvatar ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                  <span className="material-symbols-outlined text-white text-2xl">
+                    {isUploadingAvatar ? 'hourglass_empty' : 'photo_camera'}
+                  </span>
+                  <span className="text-white text-[9px] mt-1 font-mono tracking-wider">
+                    {isUploadingAvatar ? 'UPLOADING...' : 'CHANGE'}
+                  </span>
+                </div>
+              </button>
               <Tape className="-top-4 -left-6 w-20 rotate-[-15deg]" />
             </div>
 
