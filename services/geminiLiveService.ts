@@ -213,7 +213,7 @@ class GeminiLiveService {
 
     private stopAllAudio(): void {
         this.activeSources.forEach(source => {
-            try { source.stop(); } catch (e) {}
+            try { source.stop(); } catch (e) { }
         });
         this.activeSources.clear();
         this.nextStartTime = 0;
@@ -272,12 +272,12 @@ class GeminiLiveService {
         this.stopAllAudio();
 
         if (this.keepAliveSource) {
-            try { this.keepAliveSource.stop(); } catch (e) {}
+            try { this.keepAliveSource.stop(); } catch (e) { }
             this.keepAliveSource = null;
         }
 
         if (this.session) {
-            try { this.session.close(); } catch (e) {}
+            try { this.session.close(); } catch (e) { }
             this.session = null;
         }
         this.isConnected = false;
