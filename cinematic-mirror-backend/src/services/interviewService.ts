@@ -10,6 +10,7 @@ const activeSessions = new Map<string, {
   userId: string;
   userName?: string;
   userGender?: string;
+  language: 'zh' | 'en';
   messages: { role: string; content: string }[];
   chatMessages: ChatMessage[];
   round: number;
@@ -64,6 +65,7 @@ export class InterviewService {
       userId,
       userName,
       userGender,
+      language,
       messages: [
         systemMessage,
         userStartMessage,
@@ -197,10 +199,10 @@ export class InterviewService {
         throw new Error('会话不存在');
       }
 
-      return this.generateProfileFromMessages(dbSession.user_id, dbSession.messages, sessionId, undefined);
+      return this.generateProfileFromMessages(dbSession.user_id, dbSession.messages, sessionId, undefined, 'zh');
     }
 
-    return this.generateProfileFromMessages(session.userId, session.chatMessages, sessionId, session.userGender);
+    return this.generateProfileFromMessages(session.userId, session.chatMessages, sessionId, session.userGender, session.language);
   }
 
   // 检查是否可以开始试镜（积分检查）
@@ -213,33 +215,44 @@ export class InterviewService {
     userId: string,
     messages: ChatMessage[],
     sessionId: string,
-    userGender?: string
+    userGender?: string,
+    language: 'zh' | 'en' = 'zh'
   ): Promise<PersonalityProfile> {
+    const isEn = language === 'en';
+
     // 构建对话历史文本
     const conversationText = messages
-      .map(m => `${m.role === 'user' ? '受试者' : '陆野导演'}: ${m.text}`)
+      .map(m => `${m.role === 'user' ? (isEn ? 'Subject' : '受试者') : (isEn ? 'Director Lu Ye' : '陆野导演')}: ${m.text}`)
       .join('\n\n');
 
     // 根据性别选择角色数据库
     const characterDatabase = userGender ? getDatabase(userGender) : MOVIE_DATABASE;
 
-    // 精简版数据库，只包含匹配所需的信息（不含造型详情）
+    // 精简版数据库，只包含匹配所需的信息（英文版用英文名）
     const simplifiedDatabase = characterDatabase.map(c => ({
       id: c.id,
-      name: c.name,
-      movie: c.movie,
+      name: isEn ? ((c as any).nameEn || c.name) : c.name,
+      movie: isEn ? ((c as any).movieEn || c.movie) : c.movie,
       traits: c.traits
     }));
 
+    // 根据语言选择提示词
+    const prompts = getPromptsByLanguage(language);
+    const profilePrompt = prompts.profilePrompt;
+
     // 构建提示词
-    const prompt = PROFILE_GENERATION_PROMPT
+    const sectionLabel = isEn ? '## Audition Conversation Record\n' : '## 试镜对话记录\n';
+    const prompt = profilePrompt
       .replace('{MOVIE_DATABASE}', JSON.stringify(simplifiedDatabase, null, 2))
-      + '\n\n## 试镜对话记录\n' + conversationText;
+      + '\n\n' + sectionLabel + conversationText;
 
     // 调用 DeepSeek 生成档案
+    const systemMsg = isEn
+      ? 'You are a professional personality analyst. Output strictly in JSON format with no additional content.'
+      : '你是一个专业的人格分析师。请严格按照JSON格式输出，不要添加任何其他内容。';
     const responseText = await chatCompletion(
       [
-        { role: 'system', content: '你是一个专业的人格分析师。请严格按照JSON格式输出，不要添加任何其他内容。' },
+        { role: 'system', content: systemMsg },
         { role: 'user', content: prompt }
       ],
       { temperature: 0.7, max_tokens: 2000 }
@@ -266,20 +279,20 @@ export class InterviewService {
     // 处理角色匹配
     const matches: CharacterMatch[] = (profileData.matches || []).map((match: any) => {
       const character = characterDatabase.find(c =>
-        c.id === match.characterId || c.name === match.name
+        c.id === match.characterId || c.name === match.name || (c as any).nameEn === match.name
       );
       if (character) {
         return {
-          name: character.name,
-          movie: character.movie,
+          name: isEn ? ((character as any).nameEn || character.name) : character.name,
+          movie: isEn ? ((character as any).movieEn || character.movie) : character.movie,
           matchRate: match.matchRate || 85,
           description: match.description || '',
           image: character.stylings[0]?.image || ''
         };
       }
       return {
-        name: match.name || '未知角色',
-        movie: match.movie || '未知电影',
+        name: match.name || (isEn ? 'Unknown Character' : '未知角色'),
+        movie: match.movie || (isEn ? 'Unknown Film' : '未知电影'),
         matchRate: match.matchRate || 80,
         description: match.description || '',
         image: `https://picsum.photos/seed/${match.name}/800/1000`
@@ -291,7 +304,7 @@ export class InterviewService {
 
     // 添加匹配角色的造型（取第一套造型）
     for (const match of matches) {
-      const character = characterDatabase.find((c: any) => c.name === match.name);
+      const character = characterDatabase.find((c: any) => c.name === match.name || (c as any).nameEn === match.name);
       if (character && character.stylings && character.stylings.length > 0) {
         const firstStyling = character.stylings[0];
         stylingVariants.push({
@@ -329,8 +342,8 @@ export class InterviewService {
     const profile: PersonalityProfile = {
       id: profileId,
       user_id: userId,
-      title: profileData.title || '神秘访客',
-      subtitle: profileData.subtitle || '等待解读',
+      title: profileData.title || (isEn ? 'Mysterious Guest' : '神秘访客'),
+      subtitle: profileData.subtitle || (isEn ? 'Awaiting Analysis' : '等待解读'),
       analysis: profileData.analysis || '',
       narrative: profileData.narrative || '',
       angles: profileData.angles || [],

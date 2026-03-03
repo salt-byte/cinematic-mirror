@@ -273,6 +273,16 @@ class GeminiLiveService {
     isSessionActive(): boolean {
         return this.isConnected;
     }
+
+    getAudioContext(): AudioContext {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+        }
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+        return this.audioContext;
+    }
 }
 
 export const geminiLive = new GeminiLiveService();
