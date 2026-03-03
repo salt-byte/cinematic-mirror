@@ -1637,7 +1637,8 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "他提着两只包穿过玻璃大厅，棕色夹克在冷光下显得温和。没人会第一眼看出危险，只会觉得他是个准备出差的绅士。",
         scriptSnippetEn: "Carrying two bags through the glass hall, the brown jacket appears warm under cool lighting. No one sees danger at first glance, only a gentleman ready for travel.",
-        directorNote: "这套造型的重点在于反差。视觉语言是温暖的复古棕色，角色气质却是极度冷静。走路节奏要稳定且略快，双手提包的重量感强化行动即将开始的暗示。不要刻意表现杀意，让观众在细节中捕捉危险，例如目光的短暂停顿与微不可察的紧张。"
+        directorNote: "这套造型的重点在于反差。视觉语言是温暖的复古棕色，角色气质却是极度冷静。走路节奏要稳定且略快，双手提包的重量感强化行动即将开始的暗示。不要刻意表现杀意，让观众在细节中捕捉危险，例如目光的短暂停顿与微不可察的紧张。",
+        directorNoteEn: "The look hinges on contrast. The visual language is warm vintage brown, yet the character's energy is ice-cold. Walk at a steady, slightly brisk pace — the weight of both bags implies action is about to begin. Don't perform menace; let the audience find the danger in small details: a momentary pause in the gaze, barely visible tension."
       },
       {
         title: "阳光之下的灰色伪装",
@@ -1667,7 +1668,8 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "阳光直射，他站在车旁，浅灰色西装几乎与天空融为一体。风很轻，他却一动不动，像在等待某个早已计算好的结果。",
         scriptSnippetEn: "Under direct sunlight, he stands by the car, light grey suit nearly merging with the sky. The wind is soft, yet he remains still, waiting for a pre-calculated outcome.",
-        directorNote: "这套造型强调对比。环境明亮温和，人物却冷静到近乎抽离。站姿保持挺拔但不僵硬，手部动作细微即可。浅灰色在阳光下呈现温和质感，却在角色气质下转化为锋利。镜头应捕捉他从容整理袖口的瞬间，那是一种危险的优雅。"
+        directorNote: "这套造型强调对比。环境明亮温和，人物却冷静到近乎抽离。站姿保持挺拔但不僵硬，手部动作细微即可。浅灰色在阳光下呈现温和质感，却在角色气质下转化为锋利。镜头应捕捉他从容整理袖口的瞬间，那是一种危险的优雅。",
+        directorNoteEn: "This look is built on contrast: the setting is bright and mild, yet the character is cool to the point of detachment. Stand tall but not rigid; hand gestures stay minimal. Light grey feels gentle under sunlight, but the character's energy transforms it into something sharp. Catch the moment he adjusts his cuff — that is dangerous elegance."
       },
       {
         title: "荒野中的米色潜伏",
@@ -1697,7 +1699,8 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "他贴着树干，呼吸缓慢而均匀。风吹过草地，他的目光却只存在于瞄准镜的那一寸距离。",
         scriptSnippetEn: "Pressed against the tree, his breathing stays slow and even. Wind moves across the field, yet his world exists only within the scope.",
-        directorNote: "这套造型强调压缩感。空间广阔，但人物能量向内收紧。站姿必须稳定，肩部下沉，呼吸极浅。米色在自然环境中形成隐形效果，让角色融入背景。危险来自安静，而不是动作。镜头应停留在眼神与腕表细节上，暗示时间与命运正在倒数。"
+        directorNote: "这套造型强调压缩感。空间广阔，但人物能量向内收紧。站姿必须稳定，肩部下沉，呼吸极浅。米色在自然环境中形成隐形效果，让角色融入背景。危险来自安静，而不是动作。镜头应停留在眼神与腕表细节上，暗示时间与命运正在倒数。",
+        directorNoteEn: "This look emphasizes compression. The space is vast, yet the character's energy folds inward. Stance must be steady — shoulders lowered, breathing nearly imperceptible. Beige creates an invisibility effect in the natural environment, letting the figure dissolve into background. Danger lives in stillness, not in motion. The lens should linger on the eyes and watch detail: time and fate are counting down."
       },
       {
         title: "驼色双排的静默威压",
@@ -1727,7 +1730,8 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "他倚在门边，驼色大衣在街灯下泛着柔光。人群来去，他始终站在边缘，像一条不动声色的界线。",
         scriptSnippetEn: "Leaning by the doorway, the camel coat glows softly under city lights. Crowds pass, yet he remains at the edge, like a silent boundary.",
-        directorNote: "这套造型强调旧世界的优雅与现代冷感的融合。动作必须极少，站姿自然但重心稳固。驼色在视觉上温和，却在气质中转化为威压。镜头应捕捉帽檐下微妙的目光变化，那是一种不需要提高音量的控制力。"
+        directorNote: "这套造型强调旧世界的优雅与现代冷感的融合。动作必须极少，站姿自然但重心稳固。驼色在视觉上温和，却在气质中转化为威压。镜头应捕捉帽檐下微妙的目光变化，那是一种不需要提高音量的控制力。",
+        directorNoteEn: "This look merges old-world elegance with modern coldness. Movement must be minimal — posture natural but grounded. Camel is visually soft, yet in this character's hands it becomes a form of dominance. The camera should catch the subtle shift of eyes beneath the hat brim: authority that requires no raised voice."
       },
       {
         title: "深蓝夜色中的双排剪影",
@@ -1757,7 +1761,8 @@ export const MALE_MOVIE_DATABASE: MovieCharacter[] = [
         ],
         scriptSnippet: "他在暖黄色街灯下停顿，深蓝大衣吸收了夜色。玻璃映出模糊倒影，他像在城市的边缘等待某个无声的信号。",
         scriptSnippetEn: "He pauses beneath warm streetlights, navy coat absorbing the night. Reflections blur in the glass as he waits on the city's edge for a silent signal.",
-        directorNote: "这套造型强调光影对比。环境是暖黄灯光，人物必须保持冷蓝气质。站姿略微前倾，肩线保持稳定。动作克制到极限，让夜色成为背景，他成为焦点。镜头应捕捉街灯在大衣表面形成的微弱反光，那是一种孤独而自持的存在感。"
+        directorNote: "这套造型强调光影对比。环境是暖黄灯光，人物必须保持冷蓝气质。站姿略微前倾，肩线保持稳定。动作克制到极限，让夜色成为背景，他成为焦点。镜头应捕捉街灯在大衣表面形成的微弱反光，那是一种孤独而自持的存在感。",
+        directorNoteEn: "This look is about the tension between warm light and cold presence. The environment glows amber, but the character must stay blue and still. Lean very slightly forward, keep the shoulders level. Restraint taken to the limit — let the night be the background, the figure be the subject. The camera should catch streetlight catching the faintest reflection on the coat: solitary, self-contained."
       }
     ]
   }

@@ -14,6 +14,7 @@ const activeSessions = new Map<string, {
   messages: { role: string; content: string }[];
   chatMessages: ChatMessage[];
   round: number;
+  finalDeepAsked?: boolean; // AI 已经提问了 "Final deep" 终极问题，下一条用户消息直接触发生成
 }>();
 
 export class InterviewService {
@@ -109,6 +110,30 @@ export class InterviewService {
     session.messages.push({ role: 'user', content: userMessage });
     session.round++;
 
+    // 如果 AI 已经提问了 "Final deep" 终极问题，用户回答后直接触发生成，不再调用 AI
+    if (session.finalDeepAsked) {
+      const closingText = session.language === 'en' ? "That's a wrap." : '镜头停。';
+      const modelMsg: ChatMessage = {
+        role: 'model',
+        text: closingText,
+        timestamp: new Date().toISOString()
+      };
+      session.chatMessages.push(modelMsg);
+      session.messages.push({ role: 'assistant', content: closingText });
+
+      await supabase
+        .from('interview_sessions')
+        .update({
+          messages: session.chatMessages,
+          round: session.round,
+          status: 'completed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+
+      return { response: modelMsg, isFinished: true, round: session.round };
+    }
+
     // 调用 DeepSeek
     let responseText = await chatCompletion(
       session.messages,
@@ -117,6 +142,11 @@ export class InterviewService {
 
     // 检查是否包含结束关键词
     const hasEndKeyword = this.containsEndKeyword(responseText);
+
+    // AI 回复中检测到 "Final deep"，标记下一轮直接结束
+    if (responseText.includes('Final deep') || responseText.includes('final deep')) {
+      session.finalDeepAsked = true;
+    }
 
     // 如果还不到第8轮但AI说了结束语，从回复中去掉结束语，避免用户困惑
     if (hasEndKeyword && session.round < 8) {

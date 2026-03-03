@@ -115,12 +115,12 @@ const Result: React.FC<ResultProps> = ({ profile, onContinue, onBack }) => {
 
                   <div className="grid grid-cols-1 gap-20">
                      {matches.map((match, idx) => {
-                        const character = MOVIE_DATABASE.find(c => c.name === match.name || c.id === match.characterId);
+                        const character = MOVIE_DATABASE.find(c => c.name === match.name || (c as any).nameEn === match.name || c.id === (match as any).characterId);
                         return (
                            <div key={idx} className="flex flex-col items-center">
                               <div className="w-full max-w-[220px] aspect-[3/4] bg-white/5 p-1 relative shadow-2xl mb-8 group overflow-hidden">
                                  <img
-                                    src={character?.stylings?.[0]?.image || `https://picsum.photos/seed/${match.name}/400/600`}
+                                    src={match.image || character?.stylings?.[0]?.image || `https://picsum.photos/seed/${match.name}/400/600`}
                                     className="w-full h-full object-cover object-top grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000"
                                  />
                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
