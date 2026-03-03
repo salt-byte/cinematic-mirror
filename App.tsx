@@ -111,11 +111,10 @@ const App: React.FC = () => {
     const newCollection = [newProfile, ...existing.filter((p: any) => p.id !== newProfile.id)];
     localStorage.setItem('cinematic_archives', JSON.stringify(newCollection));
 
-    navigate(View.DEVELOPING);
+    // 已经在显影界面了，停留 2 秒后跳结果页
     setTimeout(() => {
-      // 直接切换到结果页，不更新 previousView（避免"返回"到 Developing）
       setCurrentView(View.RESULT);
-    }, 3000);
+    }, 2000);
   };
 
   const handleViewArchive = (archivedProfile: PersonalityProfile) => {
@@ -143,7 +142,7 @@ const App: React.FC = () => {
       case View.REGISTER:
         return <Register onBack={() => navigate(View.LOGIN)} onComplete={() => navigate(View.INTERVIEW)} />;
       case View.INTERVIEW:
-        return <Interview onComplete={handleInterviewComplete} onBack={goBack} />;
+        return <Interview onComplete={handleInterviewComplete} onGenerating={() => setCurrentView(View.DEVELOPING)} onBack={goBack} />;
       case View.DEVELOPING:
         return <Developing />;
       case View.RESULT:

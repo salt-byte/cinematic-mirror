@@ -17,7 +17,7 @@ interface UserInfo {
   avatar: string; // base64 头像
 }
 
-const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; onBack?: () => void }> = ({ onComplete, onBack }) => {
+const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; onGenerating?: () => void; onBack?: () => void }> = ({ onComplete, onGenerating, onBack }) => {
   const { t, language } = useLanguage();
 
   // 同步初始化：检查 localStorage 中是否已有用户信息，避免表单闪烁
@@ -218,15 +218,9 @@ const Interview: React.FC<{ onComplete: (profile: PersonalityProfile) => void; o
 
       if (isFinished) {
         setIsFinishing(true);
-        setTimeout(async () => {
-          try {
-            const profile = await generateProfile();
-            onComplete(profile);
-          } catch (err: any) {
-            setError(err.message || t('common.error'));
-            setIsFinishing(false);
-          }
-        }, 2000);
+        // 立刻跳转显影界面，后台继续生成
+        onGenerating?.();
+        generateProfile().then(onComplete).catch(() => {});
       } else {
         setRound(newRound);
       }
