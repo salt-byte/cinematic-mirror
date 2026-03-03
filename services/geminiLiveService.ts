@@ -31,6 +31,7 @@ class GeminiLiveService {
     private isConnected = false;
     private nextStartTime = 0;
     private activeSources: Set<AudioBufferSourceNode> = new Set();
+    private keepAliveSource: AudioBufferSourceNode | null = null;
 
     initAudioContext(): void {
         if (!this.audioContext) {
@@ -40,14 +41,26 @@ class GeminiLiveService {
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
-        // iOS 必须在用户手势中真实播放一次（哪怕静音）才能解锁 AudioContext
-        // 否则后续通过 WebSocket 收到音频数据时无法播放
+
+        // iOS 解锁：用户手势中播放一次静音
         const silentBuffer = this.audioContext.createBuffer(1, 1, this.audioContext.sampleRate);
-        const source = this.audioContext.createBufferSource();
-        source.buffer = silentBuffer;
-        source.connect(this.audioContext.destination);
-        source.start(0);
-        console.log('🔊 AudioContext unlocked via silent buffer');
+        const unlock = this.audioContext.createBufferSource();
+        unlock.buffer = silentBuffer;
+        unlock.connect(this.audioContext.destination);
+        unlock.start(0);
+
+        // iOS keep-alive：循环播放 1 秒静音 buffer，防止 AudioContext 被系统挂起
+        // 若 AudioContext 被挂起，WebSocket 回调中无法 resume（需要用户手势），导致无声
+        if (!this.keepAliveSource) {
+            const loopBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate, this.audioContext.sampleRate);
+            this.keepAliveSource = this.audioContext.createBufferSource();
+            this.keepAliveSource.buffer = loopBuffer;
+            this.keepAliveSource.loop = true;
+            this.keepAliveSource.connect(this.audioContext.destination);
+            this.keepAliveSource.start(0);
+            console.log('🔊 AudioContext keep-alive loop started');
+        }
+        console.log('🔊 AudioContext unlocked');
     }
 
     async connect(config: LiveSessionConfig): Promise<void> {
@@ -257,6 +270,11 @@ class GeminiLiveService {
 
     disconnect(): void {
         this.stopAllAudio();
+
+        if (this.keepAliveSource) {
+            try { this.keepAliveSource.stop(); } catch (e) {}
+            this.keepAliveSource = null;
+        }
 
         if (this.session) {
             try { this.session.close(); } catch (e) {}
