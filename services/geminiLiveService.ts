@@ -17,6 +17,7 @@ export interface LiveSessionConfig {
     voiceName?: string;
     onAudioData?: (audioData: ArrayBuffer) => void;
     onTextResponse?: (text: string) => void;
+    onTurnComplete?: () => void;
     onError?: (error: Error) => void;
     onConnected?: () => void;
     onDisconnected?: () => void;
@@ -135,6 +136,7 @@ class GeminiLiveService {
             // 处理回合完成
             if (message.serverContent?.turnComplete) {
                 console.log('✔️ Turn complete');
+                this.config.onTurnComplete?.();
             }
 
         } catch (error) {
