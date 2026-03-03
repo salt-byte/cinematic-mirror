@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import StoreKit
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -9,6 +10,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var transactionUpdateTask: Task<Void, Never>?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // 配置音频会话：允许麦克风录音 + 从扬声器外放（视频咨询功能需要）
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playAndRecord,
+                options: [.defaultToSpeaker, .allowBluetooth]
+            )
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("[Audio] 音频会话配置失败: \(error)")
+        }
+
         // 启动时监听 StoreKit 2 交易更新，防止丢失购买
         if #available(iOS 15.0, *) {
             transactionUpdateTask = Task {

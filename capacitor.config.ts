@@ -9,7 +9,8 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     scrollEnabled: true,
     preferredContentMode: 'mobile',
-    backgroundColor: '#e8d5b5'
+    backgroundColor: '#e8d5b5',
+    allowsInlineMediaPlayback: true,
   },
   server: {
     iosScheme: 'capacitor'

@@ -38,8 +38,15 @@ class GeminiLiveService {
         }
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
-            console.log('🔊 AudioContext resumed');
         }
+        // iOS 必须在用户手势中真实播放一次（哪怕静音）才能解锁 AudioContext
+        // 否则后续通过 WebSocket 收到音频数据时无法播放
+        const silentBuffer = this.audioContext.createBuffer(1, 1, this.audioContext.sampleRate);
+        const source = this.audioContext.createBufferSource();
+        source.buffer = silentBuffer;
+        source.connect(this.audioContext.destination);
+        source.start(0);
+        console.log('🔊 AudioContext unlocked via silent buffer');
     }
 
     async connect(config: LiveSessionConfig): Promise<void> {
