@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { PersonalityProfile, ChatMessage } from '../types';
 import { startConsultation, sendConsultationMessage, checkCanStartConsultation } from '../apiService';
 import { geminiLive } from '../services/geminiLiveService';
@@ -541,10 +542,10 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
     );
   }
 
-  // 视频咨询模式 - 全屏视频通话样式
+  // 视频咨询模式 - 全屏视频通话样式（用 Portal 挂到 body，避免父级 overflow-hidden 限制 fixed 定位）
   if (mode === 'video') {
-    return (
-      <div className="fixed inset-0 bg-black z-[200]">
+    return ReactDOM.createPortal(
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: '#000', zIndex: 9999 }}>
         {/* 全屏视频背景 */}
         <video
           ref={videoRef}
@@ -699,7 +700,8 @@ ${userName ? `用户的名字是"${userName}"。请用名字称呼用户，营�
             </div>
           </div>
         )}
-      </div>
+      </div>,
+      document.body
     );
   }
 
